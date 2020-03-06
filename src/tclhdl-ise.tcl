@@ -1,0 +1,433 @@
+#------------------------------------------------------------------------------
+#-- Copyright (c) 2019 OpenHh
+#-- 
+#-- Permission is hereby granted, free of charge, to any person obtaining a copy
+#-- of this software and associated documentation files (the "Software"), to deal
+#-- in the Software without restriction, including without limitation the rights
+#-- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#-- copies of the Software, and to permit persons to whom the Software is
+#-- furnished to do so, subject to the following conditions:
+#-- 
+#-- The above copyright notice and this permission notice shall be included in all
+#-- copies or substantial portions of the Software.
+#-- 
+#-- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#-- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#-- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#-- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#-- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#-- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+#-- SOFTWARE.
+#------------------------------------------------------------------------------
+#-- Project  :  
+#-- Filename :  
+#-- Author   :  
+#------------------------------------------------------------------------------
+#-- File Description:
+#--
+#--
+#--
+#--
+#------------------------------------------------------------------------------
+#-- ChangeLog:
+#--
+#--
+#--
+#--
+#------------------------------------------------------------------------------
+
+
+package require ::tclhdl::definitions
+
+#------------------------------------------------------------------------------
+## Namespace Declaration
+#------------------------------------------------------------------------------
+namespace eval ::tclhdl::ise {
+ 
+    #---------------------------------------------------------------------------
+    #-- Export Procedures
+    #---------------------------------------------------------------------------
+    namespace export get_version
+
+    namespace export open_project
+    namespace export close_project
+
+    namespace export set_project_name
+    namespace export set_project_revision
+    namespace export set_project_settings
+    namespace export set_project_part
+    namespace export set_project_build_dir
+    namespace export set_project_settings
+    namespace export set_project_synth
+    namespace export set_project_impl
+    namespace export set_project_constr
+    namespace export set_project_sim
+    namespace export set_project_flow_synth
+    namespace export set_project_flow_impl
+
+    namespace export build_synthesis
+    namespace export build_fitting
+    namespace export build_timing
+    namespace export build_bitstream
+    namespace export build_report
+
+    namespace export ip_set_name
+    namespace export ip_set_type
+    namespace export ip_set_output_root
+    namespace export ip_set_output_dir
+    namespace export ip_set_output_type
+    namespace export ip_set_component_name
+    namespace export ip_set_component_param
+    namespace export ip_set_system_info
+    namespace export ip_set_report_file
+    namespace export ip_set_synthesis
+    namespace export ip_set_language
+    namespace export ip_get_info 
+    namespace export ip_generate 
+    namespace export ip_add
+
+    #---------------------------------------------------------------------------
+    #-- Member Variables 
+    #---------------------------------------------------------------------------
+    variable is_project_closed 0
+    variable project_name
+    variable project_revision
+    variable project_part
+    variable project_build_dir
+    variable project_settings
+    variable project_synth                  "synth_1"
+    variable project_synth_flow             "Vivado Synthesis Defaults"
+    variable project_impl                   "impl_1"
+    variable project_impl_flow              "Vivado Implementation Defaults"
+    variable project_constr
+    variable project_sim
+    variable project_flow_synth
+    variable project_flow_impl              
+    variable project_fileset_source         "sources_1"
+    variable project_fileset_constraint     "constrs_1"
+    variable project_fileset_simulation     "sim_1"
+    variable project_jobs                   "4"
+
+    variable ip_name          ""
+    variable ip_type          INTEL_IP
+    variable ip_coregen_project ""
+    variable output_root       ""
+    variable output_dir       ""
+    variable output_type      ""
+    variable component_name   ""
+    variable component_value  ""
+    variable component_param  ""
+    variable report_file      ""
+    variable system_info      ""
+    variable language         "VERILOG"
+    variable synthesis        "--synthesis=VERILOG"
+
+    #---------------------------------------------------------------------------
+    #-- Namespace internal variables
+    #---------------------------------------------------------------------------
+    variable home [file join [pwd] [file dirname [info script]]]
+    set version 1.0
+}
+ 
+
+#------------------------------------------------------------------------------
+## Get Version
+#------------------------------------------------------------------------------
+proc ::tclhdl::ise::get_version {} {
+   puts $tclhdl::ise::version
+}
+
+#------------------------------------------------------------------------------
+## Open Project
+#------------------------------------------------------------------------------
+proc ::tclhdl::ise::open_project {args} {
+    global ::tclhdl::ise::is_project_closed
+    global ::tclhdl::ise::is_project_assignments
+    global ::tclhdl::ise::project_part
+    global ::tclhdl::ise::project_synth
+    global ::tclhdl::ise::project_synth_flow
+    global ::tclhdl::ise::project_impl
+    global ::tclhdl::ise::project_impl_flow
+    global ::tclhdl::ise::project_fileset_source
+    global ::tclhdl::ise::project_fileset_constraint
+    global ::tclhdl::ise::project_fileset_simulation
+    set current_dir [pwd]
+
+    log::log debug "ise::open_project: Trying to open project $::tclhdl::ise::project_name"
+
+    if { [file exists "$::tclhdl::ise::project_name.xise"] } {
+        log::log debug "ise::open_project: We are at $current_dir"
+        log::log debug "ise::open_project: Open project $::tclhdl::ise::project_name.xise"
+        project open "$::tclhdl::ise::project_name.xise"
+        set ::tclhdl::ise::is_project_closed 1
+    } else {
+        log::log debug "ise::open_project: New project $::tclhdl::ise::project_name"
+        project new $::tclhdl::ise::project_name
+        project set "Cores Search Directories" "$::tclhdl::project_build_ip_dir" -process "Synthesize - XST"
+        project set "Work Directory" "$current_dir/xst" -process "Synthesize - XST"
+
+        #-- Set Project to Close
+        set ::tclhdl::ise::is_project_closed 1
+    }
+}
+
+#------------------------------------------------------------------------------
+## Close Project
+#------------------------------------------------------------------------------
+proc ::tclhdl::ise::close_project {} {
+    global ::tclhdl::ise::is_project_closed
+    global ::tclhdl::ise::is_project_assignments
+
+    log::log debug "ise::project_close:: Closing project $::tclhdl::ise::project_name"
+
+    if {$::tclhdl::ise::is_project_closed} {
+        log::log debug "ise::project_close:: Project Closed"
+        project save
+        project close
+    }
+}
+
+#------------------------------------------------------------------------------
+## 
+#------------------------------------------------------------------------------
+proc ::tclhdl::ise::set_project_name {name} {
+    global ::tclhdl::ise::project_name
+    set ::tclhdl::ise::project_name $name
+}
+
+proc ::tclhdl::ise::set_project_revision {rev} {
+    global ::tclhdl::ise::project_revision
+    set ::tclhdl::ise::project_revision $rev
+}
+
+proc ::tclhdl::ise::set_project_part {part} {
+    global ::tclhdl::ise::project_part
+    set ::tclhdl::ise::project_part $part
+}
+
+proc ::tclhdl::ise::set_project_build_dir {dir} {
+    global ::tclhdl::ise::project_build_dir
+    set ::tclhdl::ise::project_build_dir $dir
+}
+
+proc ::tclhdl::ise::set_project_settings {settings} {
+    global ::tclhdl::ise::project_settings
+    set ::tclhdl::ise::project_settings $settings
+}
+
+proc ::tclhdl::ise::set_project_synth {synth} {
+    global ::tclhdl::ise::project_synth
+    set ::tclhdl::ise::project_synth $synth
+}
+
+proc ::tclhdl::ise::set_project_impl {impl} {
+    global ::tclhdl::ise::project_impl
+    set ::tclhdl::ise::project_impl $impl
+}
+
+proc ::tclhdl::ise::set_project_constr {constr} {
+    global ::tclhdl::ise::project_constr
+    set ::tclhdl::ise::project_constr $constr
+}
+
+proc ::tclhdl::ise::set_project_sim {sim} {
+    global ::tclhdl::ise::project_sim
+    set ::tclhdl::ise::project_sim $sim
+}
+
+proc ::tclhdl::ise::set_project_flow_synth {flow} {
+    global ::tclhdl::ise::project_flow_synth
+    set ::tclhdl::ise::project_flow_synth $flow
+}
+
+proc ::tclhdl::ise::set_project_flow_impl {flow} {
+    global ::tclhdl::ise::project_flow_impl
+    set ::tclhdl::ise::project_flow_impl $flow
+}
+
+#------------------------------------------------------------------------------
+#--
+#------------------------------------------------------------------------------
+proc ::tclhdl::ise::build_ip {} {
+    log::log debug "ise::build_ip : launch coregen"
+    process run "Regenerate All Cores"
+}
+
+#------------------------------------------------------------------------------
+## build synthesis
+#------------------------------------------------------------------------------
+proc ::tclhdl::ise::build_synthesis {} {
+    log::log debug "ise::build_synthesis : launch synthesis"
+    process run "Synthesize - XST"
+}
+
+#------------------------------------------------------------------------------
+#--
+#------------------------------------------------------------------------------
+proc ::tclhdl::ise::build_fitting {} {
+    log::log debug "ise::build_fitting : launch implementation"
+    process run "Implement Design"
+}
+
+#------------------------------------------------------------------------------
+#--
+#------------------------------------------------------------------------------
+proc ::tclhdl::ise::build_timing {} {
+}
+
+#------------------------------------------------------------------------------
+#--
+#------------------------------------------------------------------------------
+proc ::tclhdl::ise::build_bitstream {} {
+    log::log debug "ise::build_bitstream : launch bitstream"
+    process run "Generate Programming File"
+}
+
+#------------------------------------------------------------------------------
+#--
+#------------------------------------------------------------------------------
+proc ::tclhdl::ise::build_report {} {
+}
+
+#------------------------------------------------------------------------------
+#--
+#------------------------------------------------------------------------------
+proc ::tclhdl::ise::ip_reset {} {
+    global ::tclhdl::ise::ip_name         
+    global ::tclhdl::ise::ip_type         
+    global ::tclhdl::ise::output_dir      
+    global ::tclhdl::ise::output_type     
+    global ::tclhdl::ise::component_name  
+    global ::tclhdl::ise::component_value 
+    global ::tclhdl::ise::component_param 
+    global ::tclhdl::ise::report_file     
+    global ::tclhdl::ise::system_info     
+    global ::tclhdl::ise::language        
+    global ::tclhdl::ise::synthesis       
+
+    set ::tclhdl::ise::ip_name          ""
+    set ::tclhdl::ise::ip_type          ""
+    set ::tclhdl::ise::output_dir       ""
+    set ::tclhdl::ise::output_type      ""
+    set ::tclhdl::ise::component_name   ""
+    set ::tclhdl::ise::component_value  ""
+    set ::tclhdl::ise::component_param  ""
+    set ::tclhdl::ise::report_file      ""
+    set ::tclhdl::ise::system_info      ""
+    set ::tclhdl::ise::language         "VERILOG"
+    set ::tclhdl::ise::synthesis        "--synthesis=VERILOG"
+}
+
+#------------------------------------------------------------------------------
+#--
+#------------------------------------------------------------------------------
+proc ::tclhdl::ise::ip_set_name {name} {
+    global ::tclhdl::ise::ip_name
+    set ::tclhdl::ise::ip_name $name
+}
+
+proc ::tclhdl::ise::ip_set_type {type} {
+    global ::tclhdl::ise::ip_type
+    set ::tclhdl::ise::ip_type $type
+}
+
+proc ::tclhdl::ise::ip_set_output_root {dir} {
+    global ::tclhdl::ise::output_root
+    set ::tclhdl::ise::output_root $dir
+}
+proc ::tclhdl::ise::ip_set_output_dir {dir} {
+    global ::tclhdl::ise::output_dir
+    set ::tclhdl::ise::output_dir "--output-directory=$dir"
+}
+
+proc ::tclhdl::ise::ip_set_output_type {type} {
+    global ::tclhdl::ise::output_type
+    set ::tclhdl::ise::output_type "--file-set=$type"
+}
+
+proc ::tclhdl::ise::ip_set_component_name {name} {
+    global ::tclhdl::ise::component_name
+    set ::tclhdl::ise::component_name "--component-name=$name"
+}
+
+proc ::tclhdl::ise::ip_set_component_param {param} {
+    global ::tclhdl::ise::component_param
+    lappend component_param "--component-param=$param"
+}
+
+proc ::tclhdl::ise::ip_set_system_info {sys_info} {
+    global ::tclhdl::ise::system_info
+    lappend system_info "--system-info=$sys_info"
+}
+
+proc ::tclhdl::ise::ip_set_report_file {rpt} {
+    global ::tclhdl::ise::report_file
+    set ::tclhdl::ise::report_file "--report-file=$rpt"
+}
+
+proc ::tclhdl::ise::ip_set_synthesis {synth} {
+    global ::tclhdl::ise::synthesis
+    set ::tclhdl::ise::synthesis "--synthesis-file=$synth"
+}
+
+proc ::tclhdl::ise::ip_set_language {lang} {
+    global ::tclhdl::ise::language
+    set ::tclhdl::ise::language "--language=$lang"
+}
+
+proc ::tclhdl::ise::ip_get_info {} {
+    puts "The info are $system_info"
+}
+
+proc ::tclhdl::ise::ip_generate {} {
+    log::log debug "ip_generate: Generate $::tclhdl::ise::ip_type for $::tclhdl::ise::ip_name"
+}
+
+proc ::tclhdl::ise::set_project_top {value} {
+    set obj [get_filesets sources_1]
+    set_property "top" $value $obj
+}
+
+proc ::tclhdl::ise::source_add {type src} {
+    log::log debug "ise::source_add: Add $type - $src"
+    if { $type != "TCL" } {
+        xfile add $src
+    } else {
+        log::log debug "ise::source_add: source tcl"
+        source $src
+    }
+
+}
+
+proc ::tclhdl::ise::ip_add {type src} {
+    global ::tclhdl::ise::ip_coregen_project
+
+    set ip_dir $::tclhdl::project_build_ip_dir
+    set filename [file tail $src]
+    set src_new $ip_dir/$filename
+    file copy -force $src $src_new
+
+    log::log debug "ise::ip_add: Add $type $src"
+    if { $type != "COREGEN" } {
+        log::log debug "ise::ip_add: run coregen - $::tclhdl::ise::ip_coregen_project"
+        xfile add $src_new
+        #exec coregen -p $::tclhdl::ise::ip_coregen_project -b $src -intstyle ise
+        #if { [catch { eval exec coregen -p $::tclhdl::ise::ip_coregen_project -b $src -intstyle ise }] } {
+        #    log::log debug "ise::ip_add: done"
+        #}
+    } else {
+        log::log debug "ise::ip_add: add coregen"
+        set ::tclhdl::ise::ip_coregen_project "$src_new"
+    }
+
+}
+
+proc ::tclhdl::ise::constraint_add {type src} {
+    log::log debug "ise::constraint_add: Add $type $src"
+    xfile add $src
+}
+#------------------------------------------------------------------------------
+## Package Declaration
+#------------------------------------------------------------------------------
+package provide ::tclhdl::ise $tclhdl::ise::version
+
