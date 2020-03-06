@@ -145,7 +145,7 @@ if { $params(report) } {
 }
 
 set has_b [expr {[string length $params(bitstream)] > 0}]
-if { $params(bistream) } {
+if { $params(bitstream) } {
     ::tclhdl::project_bitstream $params(bitstream)
 }
 

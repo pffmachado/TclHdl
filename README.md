@@ -26,6 +26,11 @@ Quartus II supports that library that isn't true for the other tools.
 We could think in the case to ship with this library TclOO but that isn't foreseen
 for the time being, perhaps in the future!
 
+## CMake Module
+The first draft of a CMake module is also provided.
+CMake is an excellent tool for setting up build infrastructure. On that regard
+the UseHdl.cmake module intend to generate the TclHdl project structure.
+
 ## Status
 The project is under development and there is no release available.
 It is already possible to use for Quartus II, Vivado and ISE.
@@ -40,6 +45,7 @@ The development environment is being done on Linux (Arch Linux).
     * That includes support Modelsim, XSim, GHDL, Icarus
 * Add support to pyunit
 * Refactoring and Clean Up
+* Provide a CMake Module
 * First Release
 * ...
 
