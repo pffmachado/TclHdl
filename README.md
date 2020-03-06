@@ -43,7 +43,7 @@ The development environment is being done on Linux (Arch Linux).
 * Add support to Lattice
 * Add support to simulation
     * That includes support Modelsim, XSim, GHDL, Icarus
-* Add support to pyunit
+* Add support to vunit
 * Refactoring and Clean Up
 * Provide a CMake Module
 * First Release
