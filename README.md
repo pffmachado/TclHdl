@@ -53,5 +53,5 @@ The development environment is being done on Linux (Arch Linux).
 
 ## Related Projects
 
-[VLSI-EDA/PoC](https://github.com/VLSI-EDA/PoC)
-[FuseSoc](https://github.com/olofk/fusesoc)
+* [VLSI-EDA/PoC](https://github.com/VLSI-EDA/PoC)
+* [FuseSoc](https://github.com/olofk/fusesoc)
