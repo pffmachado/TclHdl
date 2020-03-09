@@ -22,7 +22,7 @@ function(add_hdl _TARGET_NAME)
     cmake_parse_arguments(_add_hdl
         ""
         "VENDOR;TOOL;SETTINGS;REVISION;OUTPUT_DIR;OUTPUT_NAME"
-        "VHDL;VERILOG;COEFF;TCL;TCLHDL;SOURCES;POST;SOURCEDIR;IPDIR;SETTINGDIR;SCRIPTDIR"
+        "VHDL;VERILOG;COEFF;TCL;TCLHDL;SOURCES;POST;SOURCEDIR;IPDIR;CONSTRAINTDIR;SETTINGDIR;SCRIPTDIR"
         ${ARGN}
         )
 
@@ -54,6 +54,7 @@ function(add_hdl _TARGET_NAME)
     set (_HDL_POST_FILES 	    ${_add_hdl_POST})
     set (_HDL_SOURCEDIR 	    ${_add_hdl_SOURCEDIR})
     set (_HDL_IPDIR 	        ${_add_hdl_IPDIR})
+    set (_HDL_CONSTRAINT 	    ${_add_hdl_CONSTRAINTDIR})
     set (_HDL_SETTINGDIR 	    ${_add_hdl_SETTINGDIR})
     set (_HDL_SCRIPTDIR 	    ${_add_hdl_SCRIPTDIR})
     set (_HDL_SOURCE_FILES 	    ${_add_hdl_SOURCES} ${_add_hdl_UNPARSED_ARGUMENTS})
@@ -92,6 +93,8 @@ function(add_hdl _TARGET_NAME)
     set (_name "::tclhdl::set_source_dir \"${_HDL_SOURCEDIR}\"\n\n")
     file (APPEND ${CMAKE_HDL_TCLHDL_FILE_PROJECT} ${_name})
     set (_name "::tclhdl::set_ip_dir \"${_HDL_IPDIR}\"\n\n")
+    file (APPEND ${CMAKE_HDL_TCLHDL_FILE_PROJECT} ${_name})
+    set (_name "::tclhdl::set_constraint_dir \"${_HDL_CONSTRAINT}\"\n\n")
     file (APPEND ${CMAKE_HDL_TCLHDL_FILE_PROJECT} ${_name})
     set (_name "::tclhdl::set_settings_dir \"${_HDL_SETTINGSDIR}\"\n\n")
     file (APPEND ${CMAKE_HDL_TCLHDL_FILE_PROJECT} ${_name})

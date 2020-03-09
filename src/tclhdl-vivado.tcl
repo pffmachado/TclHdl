@@ -281,37 +281,44 @@ proc ::tclhdl::vivado::build_ip {} {
 }
 
 #------------------------------------------------------------------------------
-## build synthesis
+## Run Synthesis
+#
 #------------------------------------------------------------------------------
 proc ::tclhdl::vivado::build_synthesis {} {
     if { [get_property needs_refresh [get_runs $::tclhdl::vivado::project_synth]] } {
         synth_design
-        wait_on_run $::tclhdl::vivado::project_synth
     } else {
-        reset_run synth_1
+        reset_run $::tclhdl::vivado::project_synth
         launch_runs $::tclhdl::vivado::project_synth -jobs $::tclhdl::vivado::project_jobs
-        wait_on_run $::tclhdl::vivado::project_synth
     }
-
+    wait_on_run $::tclhdl::vivado::project_synth
 }
 
 #------------------------------------------------------------------------------
-#--
+## Run Fitting/Implementation
+#
 #------------------------------------------------------------------------------
 proc ::tclhdl::vivado::build_fitting {} {
     log::log debug "xilinx::build_fitting : launch implementation"
-    launch_runs $::tclhdl::vivado::project_impl -to_step write_bitstream -jobs $::tclhdl::vivado::project_jobs
+    if { [get_property needs_refresh [get_runs $::tclhdl::vivado::project_impl]] } {
+        launch_runs $::tclhdl::vivado::project_impl -to_step write_bitstream -jobs $::tclhdl::vivado::project_jobs
+    } else {
+        reset_runs $::tclhdl::vivado::project_impl
+        launch_runs $::tclhdl::vivado::project_impl -to_step write_bitstream -jobs $::tclhdl::vivado::project_jobs
+    }
     wait_on_run $::tclhdl::vivado::project_impl
 }
 
 #------------------------------------------------------------------------------
-#--
+## Run Timing Analysis
+#
 #------------------------------------------------------------------------------
 proc ::tclhdl::vivado::build_timing {} {
 }
 
 #------------------------------------------------------------------------------
-#--
+## Run Generate Bitstream
+#
 #------------------------------------------------------------------------------
 proc ::tclhdl::vivado::build_bitstream {} {
     log::log debug "xilinx::build_bitstream : launch bitstream"
@@ -322,7 +329,8 @@ proc ::tclhdl::vivado::build_bitstream {} {
 }
 
 #------------------------------------------------------------------------------
-#--
+## Run Report Generation
+#
 #------------------------------------------------------------------------------
 proc ::tclhdl::vivado::build_report {} {
     #report_drc
