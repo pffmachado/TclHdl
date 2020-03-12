@@ -74,7 +74,6 @@ if { [regexp {(quartus)} [info library]] } {
 } elseif { [regexp {(Vivado)} [info library]] } {
     set runtime_prog "vivado"
     log::log debug "Known runtime program: $runtime_prog"
-    package require try
 } elseif { [regexp {(ISE)} [info library]] } {
     set runtime_prog "ise"
     log::log debug "Known runtime program: $runtime_prog"
@@ -94,6 +93,7 @@ set options {
     {generate               "Project Generator"}
     {generateip             "Project IP Generator"}
     {build                  "Project Build"}
+    {incremental            "Project Incremental Build"}
     {report                 "Project Report"}
     {bitstream              "Project Bitstream"}
     {program                "Project Program"}
@@ -137,6 +137,11 @@ if { $params(generateip) } {
 set has_b [expr {[string length $params(build)] > 0}]
 if { $params(build) } {
     ::tclhdl::project_build $params(build)
+}
+
+set has_bi [expr {[string length $params(incremental)] > 0}]
+if { $params(build) } {
+    ::tclhdl::project_incremental $params(incremental)
 }
 
 set has_r [expr {[string length $params(report)] > 0}]

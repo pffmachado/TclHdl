@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------
-#-- Copyright (c) 2019 OpenHh
+#-- Copyright (c) 2020 TCLHDL
 #-- 
 #-- Permission is hereby granted, free of charge, to any person obtaining a copy
 #-- of this software and associated documentation files (the "Software"), to deal
@@ -129,16 +129,9 @@ namespace eval ::tclhdl::ise {
     set version 1.0
 }
  
-
-#------------------------------------------------------------------------------
-## Get Version
-#------------------------------------------------------------------------------
-proc ::tclhdl::ise::get_version {} {
-   puts $tclhdl::ise::version
-}
-
 #------------------------------------------------------------------------------
 ## Open Project
+#
 #------------------------------------------------------------------------------
 proc ::tclhdl::ise::open_project {args} {
     global ::tclhdl::ise::is_project_closed
@@ -173,6 +166,7 @@ proc ::tclhdl::ise::open_project {args} {
 
 #------------------------------------------------------------------------------
 ## Close Project
+#
 #------------------------------------------------------------------------------
 proc ::tclhdl::ise::close_project {} {
     global ::tclhdl::ise::is_project_closed
@@ -246,15 +240,17 @@ proc ::tclhdl::ise::set_project_flow_impl {flow} {
 }
 
 #------------------------------------------------------------------------------
-#--
+## Run Ip Build
+#
 #------------------------------------------------------------------------------
 proc ::tclhdl::ise::build_ip {} {
     log::log debug "ise::build_ip : launch coregen"
-    process run "Regenerate All Cores"
+    #process run "Regenerate All Cores"
 }
 
 #------------------------------------------------------------------------------
-## build synthesis
+## Run Synthesis
+#
 #------------------------------------------------------------------------------
 proc ::tclhdl::ise::build_synthesis {} {
     log::log debug "ise::build_synthesis : launch synthesis"
@@ -262,7 +258,8 @@ proc ::tclhdl::ise::build_synthesis {} {
 }
 
 #------------------------------------------------------------------------------
-#--
+## Run Fitting/Implementation
+#
 #------------------------------------------------------------------------------
 proc ::tclhdl::ise::build_fitting {} {
     log::log debug "ise::build_fitting : launch implementation"
@@ -270,13 +267,15 @@ proc ::tclhdl::ise::build_fitting {} {
 }
 
 #------------------------------------------------------------------------------
-#--
+## Run Timing Analysis
+#
 #------------------------------------------------------------------------------
 proc ::tclhdl::ise::build_timing {} {
 }
 
 #------------------------------------------------------------------------------
-#--
+## Run Generate Bitstream
+#
 #------------------------------------------------------------------------------
 proc ::tclhdl::ise::build_bitstream {} {
     log::log debug "ise::build_bitstream : launch bitstream"
@@ -284,101 +283,16 @@ proc ::tclhdl::ise::build_bitstream {} {
 }
 
 #------------------------------------------------------------------------------
-#--
+## Run Report Generation
+#
 #------------------------------------------------------------------------------
 proc ::tclhdl::ise::build_report {} {
 }
 
 #------------------------------------------------------------------------------
-#--
+## IP Generate
+#
 #------------------------------------------------------------------------------
-proc ::tclhdl::ise::ip_reset {} {
-    global ::tclhdl::ise::ip_name         
-    global ::tclhdl::ise::ip_type         
-    global ::tclhdl::ise::output_dir      
-    global ::tclhdl::ise::output_type     
-    global ::tclhdl::ise::component_name  
-    global ::tclhdl::ise::component_value 
-    global ::tclhdl::ise::component_param 
-    global ::tclhdl::ise::report_file     
-    global ::tclhdl::ise::system_info     
-    global ::tclhdl::ise::language        
-    global ::tclhdl::ise::synthesis       
-
-    set ::tclhdl::ise::ip_name          ""
-    set ::tclhdl::ise::ip_type          ""
-    set ::tclhdl::ise::output_dir       ""
-    set ::tclhdl::ise::output_type      ""
-    set ::tclhdl::ise::component_name   ""
-    set ::tclhdl::ise::component_value  ""
-    set ::tclhdl::ise::component_param  ""
-    set ::tclhdl::ise::report_file      ""
-    set ::tclhdl::ise::system_info      ""
-    set ::tclhdl::ise::language         "VERILOG"
-    set ::tclhdl::ise::synthesis        "--synthesis=VERILOG"
-}
-
-#------------------------------------------------------------------------------
-#--
-#------------------------------------------------------------------------------
-proc ::tclhdl::ise::ip_set_name {name} {
-    global ::tclhdl::ise::ip_name
-    set ::tclhdl::ise::ip_name $name
-}
-
-proc ::tclhdl::ise::ip_set_type {type} {
-    global ::tclhdl::ise::ip_type
-    set ::tclhdl::ise::ip_type $type
-}
-
-proc ::tclhdl::ise::ip_set_output_root {dir} {
-    global ::tclhdl::ise::output_root
-    set ::tclhdl::ise::output_root $dir
-}
-proc ::tclhdl::ise::ip_set_output_dir {dir} {
-    global ::tclhdl::ise::output_dir
-    set ::tclhdl::ise::output_dir "--output-directory=$dir"
-}
-
-proc ::tclhdl::ise::ip_set_output_type {type} {
-    global ::tclhdl::ise::output_type
-    set ::tclhdl::ise::output_type "--file-set=$type"
-}
-
-proc ::tclhdl::ise::ip_set_component_name {name} {
-    global ::tclhdl::ise::component_name
-    set ::tclhdl::ise::component_name "--component-name=$name"
-}
-
-proc ::tclhdl::ise::ip_set_component_param {param} {
-    global ::tclhdl::ise::component_param
-    lappend component_param "--component-param=$param"
-}
-
-proc ::tclhdl::ise::ip_set_system_info {sys_info} {
-    global ::tclhdl::ise::system_info
-    lappend system_info "--system-info=$sys_info"
-}
-
-proc ::tclhdl::ise::ip_set_report_file {rpt} {
-    global ::tclhdl::ise::report_file
-    set ::tclhdl::ise::report_file "--report-file=$rpt"
-}
-
-proc ::tclhdl::ise::ip_set_synthesis {synth} {
-    global ::tclhdl::ise::synthesis
-    set ::tclhdl::ise::synthesis "--synthesis-file=$synth"
-}
-
-proc ::tclhdl::ise::ip_set_language {lang} {
-    global ::tclhdl::ise::language
-    set ::tclhdl::ise::language "--language=$lang"
-}
-
-proc ::tclhdl::ise::ip_get_info {} {
-    puts "The info are $system_info"
-}
-
 proc ::tclhdl::ise::ip_generate {} {
     log::log debug "ip_generate: Generate $::tclhdl::ise::ip_type for $::tclhdl::ise::ip_name"
 }
@@ -388,6 +302,10 @@ proc ::tclhdl::ise::set_project_top {value} {
     set_property "top" $value $obj
 }
 
+#-------------------------------------------------------------------------------
+## Adding Source Files
+#
+#-------------------------------------------------------------------------------
 proc ::tclhdl::ise::source_add {type src} {
     log::log debug "ise::source_add: Add $type - $src"
     if { $type != "TCL" } {
@@ -399,6 +317,10 @@ proc ::tclhdl::ise::source_add {type src} {
 
 }
 
+#-------------------------------------------------------------------------------
+## Adding IP Files
+#
+#-------------------------------------------------------------------------------
 proc ::tclhdl::ise::ip_add {type src} {
     global ::tclhdl::ise::ip_coregen_project
 
@@ -422,12 +344,26 @@ proc ::tclhdl::ise::ip_add {type src} {
 
 }
 
+#-------------------------------------------------------------------------------
+## Adding Constraint Files
+#
+#-------------------------------------------------------------------------------
 proc ::tclhdl::ise::constraint_add {type src} {
     log::log debug "ise::constraint_add: Add $type $src"
     xfile add $src
 }
+
+#------------------------------------------------------------------------------
+## Get Version
+#
+#------------------------------------------------------------------------------
+proc ::tclhdl::vivado::get_version {} {
+   puts $tclhdl::vivado::version
+}
+
 #------------------------------------------------------------------------------
 ## Package Declaration
+#
 #------------------------------------------------------------------------------
 package provide ::tclhdl::ise $tclhdl::ise::version
 

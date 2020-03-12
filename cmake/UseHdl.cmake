@@ -22,7 +22,7 @@ function(add_hdl _TARGET_NAME)
     cmake_parse_arguments(_add_hdl
         ""
         "VENDOR;TOOL;SETTINGS;REVISION;OUTPUT_DIR;OUTPUT_NAME"
-        "VHDL;VERILOG;COEFF;TCL;TCLHDL;SOURCES;POST;SOURCEDIR;IPDIR;CONSTRAINTDIR;SETTINGDIR;SCRIPTDIR"
+        "VHDL;VHDL_2008;VERILOG;COEFF;TCL;TCLHDL;SOURCES;POST;SOURCEDIR;IPDIR;CONSTRAINTDIR;SETTINGDIR;SCRIPTDIR"
         ${ARGN}
         )
 
@@ -47,6 +47,7 @@ function(add_hdl _TARGET_NAME)
     set (_HDL_SETTINGS 	        ${_add_hdl_SETTINGS})
     set (_HDL_REVISION 	        ${_add_hdl_REVISION})
     set (_HDL_VHDL_FILES 	    ${_add_hdl_VHDL})
+    set (_HDL_VHDL2008_FILES 	${_add_hdl_VHDL_2008})
     set (_HDL_VERILOG_FILES	    ${_add_hdl_VERILOG})
     set (_HDL_COEFF_FILES	    ${_add_hdl_COEFF})
     set (_HDL_TCL_FILES 	    ${_add_hdl_TCL})
@@ -141,6 +142,16 @@ function(add_hdl _TARGET_NAME)
     foreach(_HDL_SOURCE_FILE IN LISTS _HDL_VHDL_FILES)
         set(_name "::tclhdl::add_source ")
         string (CONCAT _name ${_name} "\"VHDL\" ")
+        string (CONCAT _name ${_name} "\"${_HDL_SOURCE_FILE}\"")
+        string (CONCAT _name ${_name} "\n")
+        file (APPEND ${CMAKE_HDL_TCLHDL_FILE_SOURCE} ${_name})
+        message (STATUS "------------ Parse files: ${_name}")
+    endforeach()
+
+    message (STATUS "------- Parse files: VHDL2008 ${_HDL_VHDL2008_FILES}")
+    foreach(_HDL_SOURCE_FILE IN LISTS _HDL_VHDL2008_FILES)
+        set(_name "::tclhdl::add_source ")
+        string (CONCAT _name ${_name} "\"VHDL 2008\" ")
         string (CONCAT _name ${_name} "\"${_HDL_SOURCE_FILE}\"")
         string (CONCAT _name ${_name} "\n")
         file (APPEND ${CMAKE_HDL_TCLHDL_FILE_SOURCE} ${_name})

@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------
-#-- Copyright (c) 2019 OpenHh
+#-- Copyright (c) 2020 TCLHDL
 #-- 
 #-- Permission is hereby granted, free of charge, to any person obtaining a copy
 #-- of this software and associated documentation files (the "Software"), to deal
@@ -35,8 +35,14 @@
 #--
 #--
 #------------------------------------------------------------------------------
+## \file tclhdl-vivado.tcl
+#
+#------------------------------------------------------------------------------
 
-
+#------------------------------------------------------------------------------
+## Local System Packages
+#
+#------------------------------------------------------------------------------
 package require ::tclhdl::definitions
 
 #------------------------------------------------------------------------------
@@ -130,14 +136,8 @@ namespace eval ::tclhdl::vivado {
  
 
 #------------------------------------------------------------------------------
-## Get Version
-#------------------------------------------------------------------------------
-proc ::tclhdl::vivado::get_version {} {
-   puts $tclhdl::vivado::version
-}
-
-#------------------------------------------------------------------------------
 ## Open Project
+#
 #------------------------------------------------------------------------------
 proc ::tclhdl::vivado::open_project {args} {
     global ::tclhdl::vivado::is_project_closed
@@ -199,6 +199,7 @@ proc ::tclhdl::vivado::open_project {args} {
 
 #------------------------------------------------------------------------------
 ## Close Project
+#
 #------------------------------------------------------------------------------
 proc ::tclhdl::vivado::close_project {} {
     global ::tclhdl::vivado::is_project_closed
@@ -271,11 +272,8 @@ proc ::tclhdl::vivado::set_project_flow_impl {flow} {
 }
 
 #------------------------------------------------------------------------------
-## 
-#------------------------------------------------------------------------------
-
-#------------------------------------------------------------------------------
-#--
+## Run Ip Build
+#
 #------------------------------------------------------------------------------
 proc ::tclhdl::vivado::build_ip {} {
 }
@@ -303,7 +301,7 @@ proc ::tclhdl::vivado::build_fitting {} {
     if { [get_property needs_refresh [get_runs $::tclhdl::vivado::project_impl]] } {
         launch_runs $::tclhdl::vivado::project_impl -to_step write_bitstream -jobs $::tclhdl::vivado::project_jobs
     } else {
-        reset_runs $::tclhdl::vivado::project_impl
+        reset_run $::tclhdl::vivado::project_impl
         launch_runs $::tclhdl::vivado::project_impl -to_step write_bitstream -jobs $::tclhdl::vivado::project_jobs
     }
     wait_on_run $::tclhdl::vivado::project_impl
@@ -339,111 +337,24 @@ proc ::tclhdl::vivado::build_report {} {
 }
 
 #------------------------------------------------------------------------------
-#--
+## IP Generate
+#
 #------------------------------------------------------------------------------
-proc ::tclhdl::vivado::ip_reset {} {
-    global ::tclhdl::vivado::ip_name         
-    global ::tclhdl::vivado::ip_type         
-    global ::tclhdl::vivado::output_dir      
-    global ::tclhdl::vivado::output_type     
-    global ::tclhdl::vivado::component_name  
-    global ::tclhdl::vivado::component_value 
-    global ::tclhdl::vivado::component_param 
-    global ::tclhdl::vivado::report_file     
-    global ::tclhdl::vivado::system_info     
-    global ::tclhdl::vivado::language        
-    global ::tclhdl::vivado::synthesis       
-
-    set ::tclhdl::vivado::ip_name          ""
-    set ::tclhdl::vivado::ip_type          INTEL_IP
-    set ::tclhdl::vivado::output_dir       ""
-    set ::tclhdl::vivado::output_type      ""
-    set ::tclhdl::vivado::component_name   ""
-    set ::tclhdl::vivado::component_value  ""
-    set ::tclhdl::vivado::component_param  ""
-    set ::tclhdl::vivado::report_file      ""
-    set ::tclhdl::vivado::system_info      ""
-    set ::tclhdl::vivado::language         "VERILOG"
-    set ::tclhdl::vivado::synthesis        "--synthesis=VERILOG"
-}
-
-#------------------------------------------------------------------------------
-#--
-#------------------------------------------------------------------------------
-proc ::tclhdl::vivado::ip_set_name {name} {
-    global ::tclhdl::vivado::ip_name
-    set ::tclhdl::vivado::ip_name $name
-}
-
-proc ::tclhdl::vivado::ip_set_type {type} {
-    global ::tclhdl::vivado::ip_type
-    set ::tclhdl::vivado::ip_type $type
-}
-
-proc ::tclhdl::vivado::ip_set_output_root {dir} {
-    global ::tclhdl::vivado::output_root
-    set ::tclhdl::vivado::output_root $dir
-}
-proc ::tclhdl::vivado::ip_set_output_dir {dir} {
-    global ::tclhdl::vivado::output_dir
-    set ::tclhdl::vivado::output_dir "--output-directory=$dir"
-}
-
-proc ::tclhdl::vivado::ip_set_output_type {type} {
-    global ::tclhdl::vivado::output_type
-    set ::tclhdl::vivado::output_type "--file-set=$type"
-}
-
-proc ::tclhdl::vivado::ip_set_component_name {name} {
-    global ::tclhdl::vivado::component_name
-    set ::tclhdl::vivado::component_name "--component-name=$name"
-}
-
-proc ::tclhdl::vivado::ip_set_component_param {param} {
-    global ::tclhdl::vivado::component_param
-    lappend component_param "--component-param=$param"
-}
-
-proc ::tclhdl::vivado::ip_set_system_info {sys_info} {
-    global ::tclhdl::vivado::system_info
-    lappend system_info "--system-info=$sys_info"
-}
-
-proc ::tclhdl::vivado::ip_set_report_file {rpt} {
-    global ::tclhdl::vivado::report_file
-    set ::tclhdl::vivado::report_file "--report-file=$rpt"
-}
-
-proc ::tclhdl::vivado::ip_set_synthesis {synth} {
-    global ::tclhdl::vivado::synthesis
-    set ::tclhdl::vivado::synthesis "--synthesis-file=$synth"
-}
-
-proc ::tclhdl::vivado::ip_set_language {lang} {
-    global ::tclhdl::vivado::language
-    set ::tclhdl::vivado::language "--language=$lang"
-}
-
-proc ::tclhdl::vivado::ip_get_info {} {
-    puts "The info are $system_info"
-}
-
 proc ::tclhdl::vivado::ip_generate {} {
     log::log debug "ip_generate: Generate $::tclhdl::vivado::ip_type for $::tclhdl::vivado::ip_name"
 }
 
-proc ::tclhdl::vivado::set_project_top {value} {
-    set obj [get_filesets sources_1]
-    set_property "top" $value $obj
-}
-
+#-------------------------------------------------------------------------------
+## Adding Source Files
+#
+#-------------------------------------------------------------------------------
 proc ::tclhdl::vivado::source_add {type src} {
     log::log debug "source_add: Add $type - $src"
 
     set obj [get_filesets sources_1]
-    add_files -norecurse -scan_for_includes -fileset $obj $src
 
     if { $type != "COEFF" } {
+        add_files -norecurse -scan_for_includes -fileset $obj $src
         set file [file normalize $src]
         set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
         set_property "file_type" $type $file_obj
@@ -451,12 +362,22 @@ proc ::tclhdl::vivado::source_add {type src} {
         set_property "is_global_include" "0" $file_obj
         set_property "library" "xil_defaultlib" $file_obj
         set_property "path_mode" "RelativeFirst" $file_obj
-        #set_property "used_in_implementation" "1" $file_obj
         set_property "used_in_synthesis" "1" $file_obj
         set_property "used_in_simulation" "1" $file_obj
+    } else {
+        #set coefname [file tail $src]
+        #set coefname_dir [lindex [split $coefname .] 0]
+        #set fileset_dir "$::tclhdl::vivado::project_name.srcs/sources_1/source"
+        #set coef  [file normalize "$fileset_dir/$coefname"]
+        #file mkdir $fileset_dir
+        #file copy $src $coef
     }
 }
 
+#-------------------------------------------------------------------------------
+## Adding IP Files
+#
+#-------------------------------------------------------------------------------
 proc ::tclhdl::vivado::ip_add {type src} {
     log::log debug "xilinx::ip_add: Add $type $src"
     set ipname [file tail $src]
@@ -491,6 +412,10 @@ proc ::tclhdl::vivado::ip_add {type src} {
     log::log debug "xilinx::ip_add: Done"
 }
 
+#-------------------------------------------------------------------------------
+## Adding Constraint Files
+#
+#-------------------------------------------------------------------------------
 proc ::tclhdl::vivado::constraint_add {type src} {
     set obj [get_filesets $::tclhdl::vivado::project_fileset_constraint]
     set fd "[file normalize "$src"]"
@@ -501,8 +426,18 @@ proc ::tclhdl::vivado::constraint_add {type src} {
     set_property "used_in_synthesis" "0" $file_obj
     set_property "used_in_implementation" "1" $file_obj
 }
+
+#------------------------------------------------------------------------------
+## Get Version
+#
+#------------------------------------------------------------------------------
+proc ::tclhdl::vivado::get_version {} {
+   puts $tclhdl::vivado::version
+}
+
 #------------------------------------------------------------------------------
 ## Package Declaration
+#
 #------------------------------------------------------------------------------
 package provide ::tclhdl::vivado $tclhdl::vivado::version
 
