@@ -210,9 +210,15 @@ function(add_hdl _TARGET_NAME)
 
     #-- Prepare Vendor Tools
 
+    set (CMAKE_HDL_SYSTEM_SOURCE "")
+    if (UNIX)
+        set (CMAKE_HDL_SYSTEM_SOURCE "source")
+    endif ()
+
     if ( ${_vendor} STREQUAL "XILINX" )
         message (STATUS "------------ Set tools: ${_vendor}")
-        set (XILINX_SOURCE_SETTINGS ${CMAKE_HDL_TOOL_SETTINGS})
+        #set (XILINX_SOURCE_SETTINGS ${CMAKE_HDL_TOOL_SETTINGS})
+        file (TO_NATIVE_PATH ${CMAKE_HDL_TOOL_SETTINGS} XILINX_SOURCE_SETTINGS)
         if ( ${_tool} STREQUAL "VIVADO" )
             set (_VENDOR_TOOL "vivado" "-mode" "tcl" "-notrace" "-source")
             set (_VENDOR_ARGS "-tclargs")
@@ -230,7 +236,8 @@ function(add_hdl _TARGET_NAME)
         set (_VENDOR_SOURCE "${INTEL_SOURCE_SETTINGS}")
     endif ()
 
-    set (TCLHDL_TOOL ${CMAKE_HDL_TCLHDL})
+    #set (TCLHDL_TOOL ${CMAKE_HDL_TCLHDL})
+    file (TO_NATIVE_PATH ${CMAKE_HDL_TCLHDL} TCLHDL_TOOL)
     #if ( ${HAS_TCLHDL} )
         set (_TCLHDL_TOOL       "${TCLHDL_TOOL}")
         set (_TCLHDL_IP         "-generateip")
@@ -245,43 +252,43 @@ function(add_hdl _TARGET_NAME)
     #endif ()
 
     add_custom_target (${_TARGET_NAME}-shell
-        COMMAND source ${_VENDOR_SOURCE} &&
+        COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
         ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_SHELL} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
         WORKING_DIRECTORY ${_HDL_PROJECT_DIR}
         )
 
     add_custom_target (${_TARGET_NAME}-ip
-        COMMAND source ${_VENDOR_SOURCE} &&
+        COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
             ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_IP} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
         WORKING_DIRECTORY ${_HDL_PROJECT_DIR}
         )
 
     add_custom_target (${_TARGET_NAME}-generate
-        COMMAND source ${_VENDOR_SOURCE} &&
+        COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
             ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_GENERATE} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         )
 
     add_custom_target (${_TARGET_NAME}-report
-        COMMAND source ${_VENDOR_SOURCE} &&
+        COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
             ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_BUILD} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
         WORKING_DIRECTORY ${_HDL_PROJECT_DIR}
         )
 
     add_custom_target (${_TARGET_NAME}-bitstream
-        COMMAND source ${_VENDOR_SOURCE} &&
+        COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
             ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_BITSTREAM} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
         WORKING_DIRECTORY ${_HDL_PROJECT_DIR}
         )
 
     add_custom_target (${_TARGET_NAME}-program
-        COMMAND source ${_VENDOR_SOURCE} &&
+        COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
             ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_PROGRAM} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
         WORKING_DIRECTORY ${_HDL_PROJECT_DIR}
         )
 
     add_custom_target (${_TARGET_NAME}
-        COMMAND source ${_VENDOR_SOURCE} &&
+        COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
             ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_BUILD} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         )
