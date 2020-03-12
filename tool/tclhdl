@@ -140,7 +140,7 @@ if { $params(build) } {
 }
 
 set has_bi [expr {[string length $params(incremental)] > 0}]
-if { $params(build) } {
+if { $params(incremental) } {
     ::tclhdl::project_incremental $params(incremental)
 }
 
