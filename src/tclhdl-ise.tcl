@@ -357,8 +357,8 @@ proc ::tclhdl::ise::constraint_add {type src} {
 ## Get Version
 #
 #------------------------------------------------------------------------------
-proc ::tclhdl::vivado::get_version {} {
-   puts $tclhdl::vivado::version
+proc ::tclhdl::ise::get_version {} {
+   puts $tclhdl::ise::version
 }
 
 #------------------------------------------------------------------------------
