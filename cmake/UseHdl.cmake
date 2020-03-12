@@ -241,12 +241,18 @@ function(add_hdl _TARGET_NAME)
         set (_TCLHDL_REPORT     "-report")
         set (_TCLHDL_BITSTREAM  "-bitstream")
         set (_TCLHDL_PROGRAM    "-program")
+        set (_TCLHDL_SHELL      "-shell")
     #endif ()
 
+    add_custom_target (${_TARGET_NAME}-shell
+        COMMAND source ${_VENDOR_SOURCE} &&
+        ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_SHELL} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
+        WORKING_DIRECTORY ${_HDL_PROJECT_DIR}
+        )
 
     add_custom_target (${_TARGET_NAME}-ip
-        COMMAND ${_VENDOR_SOURCE}
-        COMMAND ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_TCLHDL_IP} ${_TARGET_NAME}
+        COMMAND source ${_VENDOR_SOURCE} &&
+            ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_IP} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
         WORKING_DIRECTORY ${_HDL_PROJECT_DIR}
         )
 
@@ -257,20 +263,20 @@ function(add_hdl _TARGET_NAME)
         )
 
     add_custom_target (${_TARGET_NAME}-report
-        COMMAND ${_VENDOR_SOURCE}
-        COMMAND ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_TCLHDL_REPORT} ${_TARGET_NAME}
+        COMMAND source ${_VENDOR_SOURCE} &&
+            ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_BUILD} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
         WORKING_DIRECTORY ${_HDL_PROJECT_DIR}
         )
 
     add_custom_target (${_TARGET_NAME}-bitstream
-        COMMAND ${_VENDOR_SOURCE}
-        COMMAND ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_TCLHDL_GENERATE} ${_TARGET_NAME}
+        COMMAND source ${_VENDOR_SOURCE} &&
+            ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_BITSTREAM} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
         WORKING_DIRECTORY ${_HDL_PROJECT_DIR}
         )
 
     add_custom_target (${_TARGET_NAME}-program
-        COMMAND ${_VENDOR_SOURCE}
-        COMMAND ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_TCLHDL_PROGRAM} ${_TARGET_NAME}
+        COMMAND source ${_VENDOR_SOURCE} &&
+            ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_PROGRAM} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
         WORKING_DIRECTORY ${_HDL_PROJECT_DIR}
         )
 

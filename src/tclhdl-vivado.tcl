@@ -70,6 +70,7 @@ namespace eval ::tclhdl::vivado {
     namespace export set_project_sim
     namespace export set_project_flow_synth
     namespace export set_project_flow_impl
+    namespace export get_project_tool_version
 
     namespace export build_synthesis
     namespace export build_fitting
@@ -113,6 +114,7 @@ namespace eval ::tclhdl::vivado {
     variable project_fileset_constraint     "constrs_1"
     variable project_fileset_simulation     "sim_1"
     variable project_jobs                   "4"
+    variable project_tool_version
 
     variable ip_name          ""
     variable ip_type          INTEL_IP
@@ -152,6 +154,7 @@ proc ::tclhdl::vivado::open_project {args} {
     global ::tclhdl::vivado::project_fileset_simulation
 
     log::log debug "xilinx::open_project: Trying to open project $::tclhdl::vivado::project_name"
+    get_project_tool_version
 
     if { [file exists "$::tclhdl::vivado::project_name.xpr"] } {
         set current_dir [pwd]
@@ -189,8 +192,11 @@ proc ::tclhdl::vivado::open_project {args} {
         current_run -implementation [get_runs $::tclhdl::vivado::project_synth]
 
         set obj [get_projects $::tclhdl::vivado::project_name]
-        set_property "ip_cache_permissions" "read write" $obj
-        set_property "ip_output_repo" "$::tclhdl::vivado::project_name.cache/ip" $obj
+        if { [expr $::tclhdl::vivado::project_tool_version > 2018.0] } {
+            log::log debug "xilinx::open_project: Setting ip output - version $::tclhdl::vivado::project_tool_version"
+            set_property "ip_cache_permissions" "read write" $obj
+            set_property "ip_output_repo" "$::tclhdl::vivado::project_name.cache/ip" $obj
+        }
 
         #-- Set Project to Close
         set ::tclhdl::vivado::is_project_closed 1
@@ -215,7 +221,13 @@ proc ::tclhdl::vivado::close_project {} {
 
 #------------------------------------------------------------------------------
 ## 
+#
 #------------------------------------------------------------------------------
+proc ::tclhdl::vivado::get_project_tool_version {} {
+    global ::tclhdl::vivado::project_tool_version
+    set ::tclhdl::vivado::project_tool_version [::version -short]
+}
+
 proc ::tclhdl::vivado::set_project_name {name} {
     global ::tclhdl::vivado::project_name
     set ::tclhdl::vivado::project_name $name

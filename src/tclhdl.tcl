@@ -689,6 +689,36 @@ proc ::tclhdl::is_project_created {} {
 }
 
 #-------------------------------------------------------------------------------
+## Shell Project
+#
+#-------------------------------------------------------------------------------
+proc ::tclhdl::project_shell {} {
+    #-- Verify Project
+    ::tclhdl::project_verify $prj
+
+    #-- Get Environment Variables
+    log::log debug "project_build: Setting enviornment"
+    set ::tclhdl::flag_project_create 0
+    source $::tclhdl::project_target_dir/project
+
+    #-- Build Project
+    log::log debug "project_build: Build Project"
+    foreach lst $::tclhdl::list_projects {
+        set project [lindex $lst 0]
+        set settings [lindex $lst 1]
+
+        #-- Move to build directory
+        log::log debug "project_build: Change Dir to $::tclhdl::project_target_dir/$project-$settings"
+        cd "$::tclhdl::project_target_dir/$project-$settings"
+
+        #-- Opennning the existent Project
+        log::log debug "project_build: Build Execute"
+        ::tclhdl::project_open [lindex $lst 0] [lindex $lst 1] [lindex $lst 2]
+        exit 1
+    }
+}
+
+#-------------------------------------------------------------------------------
 ## Fetch IP sources
 #
 #-------------------------------------------------------------------------------
