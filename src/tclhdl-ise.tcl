@@ -245,7 +245,7 @@ proc ::tclhdl::ise::set_project_flow_impl {flow} {
 #------------------------------------------------------------------------------
 proc ::tclhdl::ise::build_ip {} {
     log::log debug "ise::build_ip : launch coregen"
-    #process run "Regenerate All Cores"
+    process run "Regenerate All Cores"
 }
 
 #------------------------------------------------------------------------------
