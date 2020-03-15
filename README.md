@@ -49,6 +49,10 @@ The development environment is being done on Linux (Arch Linux).
 * First Release
 * ...
 
+## Project Documentation
+
+* [TCLDHL](https://pffmachado.github.io/TclHdl)
+
 ## Related Projects
 
 * [VLSI-EDA/PoC](https://github.com/VLSI-EDA/PoC)
