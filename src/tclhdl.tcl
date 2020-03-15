@@ -684,9 +684,11 @@ proc ::tclhdl::project_close {prj} {
 ## Clean Project
 #
 #-------------------------------------------------------------------------------
-proc ::tclhdl::project_clean {} {
-    #-- Verify Project
-    ::tclhdl::project_verify $prj
+proc ::tclhdl::project_clean {prj} {
+    set path [pwd]
+
+    log::log debug "project_clean: Cleaning project $path/$prj"
+    file delete -force [glob -type d $path/$prj/$prj-*]
 }
 
 #-------------------------------------------------------------------------------

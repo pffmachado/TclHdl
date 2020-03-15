@@ -157,7 +157,7 @@ if { $params(shell) } {
 
 set has_c [expr {[string length $params(clean)] > 0}]
 if { $params(clean) } {
-    ::tclhdl::project_clean $params(clean)
+    ::tclhdl::project_clean $params(project)
 }
 
 exit 0

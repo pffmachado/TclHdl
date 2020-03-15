@@ -249,6 +249,7 @@ function(add_hdl _TARGET_NAME)
         set (_TCLHDL_BITSTREAM  "-bitstream")
         set (_TCLHDL_PROGRAM    "-program")
         set (_TCLHDL_SHELL      "-shell")
+        set (_TCLHDL_CLEAN      "-clean")
     #endif ()
 
     add_custom_target (${_TARGET_NAME}-shell
@@ -284,6 +285,12 @@ function(add_hdl _TARGET_NAME)
     add_custom_target (${_TARGET_NAME}-program
         COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
             ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_PROGRAM} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        )
+
+    add_custom_target (${_TARGET_NAME}-clean
+        COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
+            ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_CLEAN} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         )
 
