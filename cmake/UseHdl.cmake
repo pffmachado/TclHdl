@@ -321,7 +321,7 @@ function(add_hdl_ip _TARGET_NAME)
     set(_HDL_COREGEN_FILES 	    ${_add_hdl_ip_COREGEN})
     set(_HDL_XCI_FILES 	        ${_add_hdl_ip_XCI})
     set(_HDL_XCO_FILES 	        ${_add_hdl_ip_XCO})
-    set(_HDL_XCO_UPGRADE_FILES 	${_add_hdl_ip_XCO})
+    set(_HDL_XCO_UPGRADE_FILES 	${_add_hdl_ip_XCO_UPGRADE})
 
     set (_HDL_PROJECT_DIR "${CMAKE_CURRENT_BINARY_DIR}/${_TARGET_NAME}")
     set (CMAKE_HDL_TCLHDL_FILE_IP           "${_HDL_PROJECT_DIR}/ip")
