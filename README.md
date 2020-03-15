@@ -49,9 +49,8 @@ The development environment is being done on Linux (Arch Linux).
 * First Release
 * ...
 
-
-
 ## Related Projects
 
 * [VLSI-EDA/PoC](https://github.com/VLSI-EDA/PoC)
 * [FuseSoc](https://github.com/olofk/fusesoc)
+* [pyIPCMI](https://github.com/Paebbels/pyIPCMI)

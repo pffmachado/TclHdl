@@ -36,7 +36,6 @@
 #--
 #------------------------------------------------------------------------------
 
-
 package require ::tclhdl::definitions
 
 #------------------------------------------------------------------------------
@@ -44,9 +43,9 @@ package require ::tclhdl::definitions
 #------------------------------------------------------------------------------
 namespace eval ::tclhdl::ise {
  
-    #---------------------------------------------------------------------------
+    #--------------------------------------------------------------------------
     #-- Export Procedures
-    #---------------------------------------------------------------------------
+    #--------------------------------------------------------------------------
     namespace export get_version
 
     namespace export open_project
@@ -122,9 +121,9 @@ namespace eval ::tclhdl::ise {
     variable language         "VERILOG"
     variable synthesis        "--synthesis=VERILOG"
 
-    #---------------------------------------------------------------------------
+    #--------------------------------------------------------------------------
     #-- Namespace internal variables
-    #---------------------------------------------------------------------------
+    #--------------------------------------------------------------------------
     variable home [file join [pwd] [file dirname [info script]]]
     set version 1.0
 }
@@ -326,22 +325,26 @@ proc ::tclhdl::ise::ip_add {type src} {
 
     set ip_dir $::tclhdl::project_build_ip_dir
     set filename [file tail $src]
+    set filext [file extension $src]
     set src_new $ip_dir/$filename
     file copy -force $src $src_new
 
-    log::log debug "ise::ip_add: Add $type $src"
-    if { $type != "COREGEN" } {
+    log::log debug "ise::ip_add: Add $type $src $filext"
+    if { $type == "XCO" && $filext == ".xco" } {
         log::log debug "ise::ip_add: run coregen - $::tclhdl::ise::ip_coregen_project"
         xfile add $src_new
-        #exec coregen -p $::tclhdl::ise::ip_coregen_project -b $src -intstyle ise
-        #if { [catch { eval exec coregen -p $::tclhdl::ise::ip_coregen_project -b $src -intstyle ise }] } {
-        #    log::log debug "ise::ip_add: done"
+        #if { $upgrade == "UPGRADE" } {
+        #    if { [catch { eval exec coregen -p $::tclhdl::ise::ip_coregen_project -b $src -intstyle ise -u }] } {
+        #        log::log debug "ise::ip_add: done"
+        #    }
         #}
-    } else {
+    } elseif { $type == "COREGEN" } {
         log::log debug "ise::ip_add: add coregen"
         set ::tclhdl::ise::ip_coregen_project "$src_new"
-    }
 
+    } else {
+        log::log debug "ise::ip_add: add $filext"
+    }
 }
 
 #-------------------------------------------------------------------------------

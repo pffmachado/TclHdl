@@ -112,6 +112,7 @@ namespace eval ::tclhdl {
 
     namespace export is_project_created
 
+    namespace export build_pre
     namespace export build_ip
     namespace export build_synthesis
     namespace export build_fitting
@@ -137,6 +138,8 @@ namespace eval ::tclhdl {
     variable project_scripts_dir
     variable project_build_dir
     variable project_build_ip_dir
+    variable project_build_full     1
+    variable project_build_step     "full"
 
     variable list_projects
     variable list_source
@@ -545,7 +548,18 @@ proc ::tclhdl::project_create {prj} {
 ##  Build Project
 #
 #-------------------------------------------------------------------------------
-proc ::tclhdl::project_build {prj} {
+proc ::tclhdl::project_build {prj step} {
+    global ::tclhdl::project_build_full
+    global ::tclhdl::project_build_step
+    
+    log::log debug "project_build: Building $prj with Flow $step"
+    #-- Get build step
+    set ::tclhdl::project_build_full 0
+    set ::tclhdl::project_build_step $step
+    if { $step == "full" } {
+        set ::tclhdl::project_build_full 1
+    }
+
     #-- Verify Project
     ::tclhdl::project_verify $prj
 
@@ -692,7 +706,7 @@ proc ::tclhdl::is_project_created {} {
 ## Shell Project
 #
 #-------------------------------------------------------------------------------
-proc ::tclhdl::project_shell {} {
+proc ::tclhdl::project_shell {prj} {
     #-- Verify Project
     ::tclhdl::project_verify $prj
 
@@ -714,7 +728,6 @@ proc ::tclhdl::project_shell {} {
         #-- Opennning the existent Project
         log::log debug "project_build: Build Execute"
         ::tclhdl::project_open [lindex $lst 0] [lindex $lst 1] [lindex $lst 2]
-        exit 1
     }
 }
 
@@ -939,10 +952,22 @@ proc ::tclhdl::set_scripts_dir {dir} {
 }
 
 #-------------------------------------------------------------------------------
+## Build Pre
+#
+#-------------------------------------------------------------------------------
+proc ::tclhdl::build_pre {} {
+    log::log debug "build_pre: Pre Script build"
+}
+
+#-------------------------------------------------------------------------------
 ## Build IP
 #
 #-------------------------------------------------------------------------------
 proc ::tclhdl::build_ip {} {
+    if { $::tclhdl::project_build_full == 0 && $::tclhdl::project_build_step != "ip" } {
+        return 0
+    }
+
     log::log debug "build_ip: Build Ip Cores"
     switch $::tclhdl::project_tool {
         INTEL_QUARTUS {
@@ -966,6 +991,10 @@ proc ::tclhdl::build_ip {} {
 #
 #-------------------------------------------------------------------------------
 proc ::tclhdl::build_synthesis {} {
+    if { $::tclhdl::project_build_full == 0 && $::tclhdl::project_build_step != "synthesis" } {
+        return 0
+    }
+
     log::log debug "build_synthesis: Synthesis"
     switch $::tclhdl::project_tool {
         INTEL_QUARTUS {
@@ -990,6 +1019,10 @@ proc ::tclhdl::build_synthesis {} {
 #
 #-------------------------------------------------------------------------------
 proc ::tclhdl::build_fitting {} {
+    if { $::tclhdl::project_build_full == 0 && $::tclhdl::project_build_step != "fitting" } {
+        return 0
+    }
+
     log::log debug "build_fitting: Place and Route"
     switch $::tclhdl::project_tool {
         INTEL_QUARTUS {
@@ -1014,6 +1047,10 @@ proc ::tclhdl::build_fitting {} {
 #
 #-------------------------------------------------------------------------------
 proc ::tclhdl::build_timing {} {
+    if { $::tclhdl::project_build_full == 0 && $::tclhdl::project_build_step != "timing" } {
+        return 0
+    }
+
     log::log debug "build_timing: Timming Analysis"
     switch $::tclhdl::project_tool {
         INTEL_QUARTUS {
@@ -1041,7 +1078,6 @@ proc ::tclhdl::build_post {} {
     foreach lst $::tclhdl::list_post_scripts {
         source $lst
     }
-
 }
 
 #-------------------------------------------------------------------------------
@@ -1049,6 +1085,10 @@ proc ::tclhdl::build_post {} {
 #
 #-------------------------------------------------------------------------------
 proc ::tclhdl::build_bitstream {} {
+    if { $::tclhdl::project_build_full == 0 && $::tclhdl::project_build_step != "bitstream" } {
+        return 0
+    }
+
     log::log debug "build_bitstream: Generate Bitstream"
     switch $::tclhdl::project_tool {
         INTEL_QUARTUS {
@@ -1073,6 +1113,10 @@ proc ::tclhdl::build_bitstream {} {
 #
 #-------------------------------------------------------------------------------
 proc ::tclhdl::build_report {} {
+    if { $::tclhdl::project_build_full == 0 && $::tclhdl::project_build_step != "report" } {
+        return 0
+    }
+
     log::log debug "build_report: Generate Report"
     switch $::tclhdl::project_tool {
         INTEL_QUARTUS {

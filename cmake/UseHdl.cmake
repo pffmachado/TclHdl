@@ -254,13 +254,13 @@ function(add_hdl _TARGET_NAME)
     add_custom_target (${_TARGET_NAME}-shell
         COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
         ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_SHELL} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
-        WORKING_DIRECTORY ${_HDL_PROJECT_DIR}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         )
 
     add_custom_target (${_TARGET_NAME}-ip
         COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
             ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_IP} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
-        WORKING_DIRECTORY ${_HDL_PROJECT_DIR}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         )
 
     add_custom_target (${_TARGET_NAME}-generate
@@ -272,19 +272,19 @@ function(add_hdl _TARGET_NAME)
     add_custom_target (${_TARGET_NAME}-report
         COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
             ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_BUILD} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
-        WORKING_DIRECTORY ${_HDL_PROJECT_DIR}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         )
 
     add_custom_target (${_TARGET_NAME}-bitstream
         COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
             ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_BITSTREAM} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
-        WORKING_DIRECTORY ${_HDL_PROJECT_DIR}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         )
 
     add_custom_target (${_TARGET_NAME}-program
         COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
             ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_PROGRAM} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
-        WORKING_DIRECTORY ${_HDL_PROJECT_DIR}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         )
 
     add_custom_target (${_TARGET_NAME}
@@ -300,7 +300,7 @@ function(add_hdl_ip _TARGET_NAME)
     cmake_parse_arguments(_add_hdl_ip
         ""
         "OUTPUT_DIR;OUTPUT_NAME"
-        "COREGEN;XCI;XCO;QSYS;TCL;TCLHDL"
+        "COREGEN;XCI;XCO;XCO_UPGRADE;QSYS;TCL;TCLHDL"
         ${ARGN}
         )
 
@@ -318,9 +318,10 @@ function(add_hdl_ip _TARGET_NAME)
         get_filename_component(_add_hdl_ip_OUTPUT_DIR ${_add_hdl_ip_OUTPUT_DIR} ABSOLUTE)
     endif()
 
-    set(_HDL_COREGEN_FILES 	${_add_hdl_ip_COREGEN})
-    set(_HDL_XCI_FILES 	${_add_hdl_ip_XCI})
-    set(_HDL_XCO_FILES 	${_add_hdl_ip_XCO})
+    set(_HDL_COREGEN_FILES 	    ${_add_hdl_ip_COREGEN})
+    set(_HDL_XCI_FILES 	        ${_add_hdl_ip_XCI})
+    set(_HDL_XCO_FILES 	        ${_add_hdl_ip_XCO})
+    set(_HDL_XCO_UPGRADE_FILES 	${_add_hdl_ip_XCO})
 
     set (_HDL_PROJECT_DIR "${CMAKE_CURRENT_BINARY_DIR}/${_TARGET_NAME}")
     set (CMAKE_HDL_TCLHDL_FILE_IP           "${_HDL_PROJECT_DIR}/ip")
@@ -353,6 +354,17 @@ function(add_hdl_ip _TARGET_NAME)
         set(_name "::tclhdl::add_ip ")
         string (CONCAT _name ${_name} "\"XCO\" ")
         string (CONCAT _name ${_name} "\"${_HDL_SOURCE_FILE}\"")
+        string (CONCAT _name ${_name} "\n")
+        file (APPEND ${CMAKE_HDL_TCLHDL_FILE_IP} ${_name})
+        message (STATUS "------------ Parse files: ${_name}")
+    endforeach()
+
+    message (STATUS "------- Parse files: XCO_UPGRADE")
+    foreach(_HDL_SOURCE_FILE IN LISTS _HDL_XCO_UPGRADE_FILES)
+        set(_name "::tclhdl::add_ip ")
+        string (CONCAT _name ${_name} "\"XCO\" ")
+        string (CONCAT _name ${_name} "\"${_HDL_SOURCE_FILE}\"")
+        string (CONCAT _name ${_name} "\"UPGRADE\"")
         string (CONCAT _name ${_name} "\n")
         file (APPEND ${CMAKE_HDL_TCLHDL_FILE_IP} ${_name})
         message (STATUS "------------ Parse files: ${_name}")

@@ -1,6 +1,6 @@
 #!/usr/bin/env tclsh
 #------------------------------------------------------------------------------
-#-- Copyright (c) 2019 TclHdl
+#-- Copyright (c) 2020 TclHdl
 #-- 
 #-- Permission is hereby granted, free of charge, to any person obtaining a copy
 #-- of this software and associated documentation files (the "Software"), to deal
@@ -36,11 +36,10 @@
 #--
 #--
 #------------------------------------------------------------------------------
+
 #------------------------------------------------------------------------------
 #--  Banner
 #------------------------------------------------------------------------------
-
-
 puts "  _____ ____ _     _   _ ____           "
 puts " |_   _/ ___| |   | | | |  _ \\| |      "
 puts "   | || |   | |   | |_| | | | | |       "
@@ -54,7 +53,7 @@ set path_tclhdl [file normalize "$path_script/../.."]
 lappend auto_path "$path_tclhdl/src"
 
 #------------------------------------------------------------------------------
-#--
+#-- Added Required Packages
 #------------------------------------------------------------------------------
 package require Tcl
 package require cmdline
@@ -63,9 +62,8 @@ package require log
 log::lvSuppress info 0
 
 #------------------------------------------------------------------------------
-#--
+#-- Get Runtime Program
 #------------------------------------------------------------------------------
-
 set runtime_prog ""
 
 if { [regexp {(quartus)} [info library]] } {
@@ -86,7 +84,6 @@ package require ::tclhdl
 #------------------------------------------------------------------------------
 #-- TclHdl Menu
 #------------------------------------------------------------------------------
-
 set options {
     {debug                  "Enable Debug"}
     {project.arg    ""      "Project Name"}
@@ -103,16 +100,10 @@ set options {
 }
 set usage ": tclhdl \[options] ...\noptions:"
 array set params [::cmdline::getoptions argv $options $usage]
-#try {
-#} trap {CMDLINE USAGE} {msg o} {
-#    puts $msg
-#    exit 1
-#}
 
 #------------------------------------------------------------------------------
 #-- TclHdl Menu - Execute Options
 #------------------------------------------------------------------------------
-
 if {  $params(debug) } {
     log::lvSuppress debug 0
 }
@@ -126,32 +117,27 @@ if { $has_p } {
 
 set has_g [expr {[string length $params(generate)] > 0}]
 if { $params(generate) } {
-    ::tclhdl::project_create $params(generate)
+    ::tclhdl::project_create $params(project)
 }
 
 set has_gi [expr {[string length $params(generateip)] > 0}]
 if { $params(generateip) } {
-    ::tclhdl::project_ip $params(generateip)
+    ::tclhdl::project_build $params(project) "ip"
 }
 
 set has_b [expr {[string length $params(build)] > 0}]
 if { $params(build) } {
-    ::tclhdl::project_build $params(build)
-}
-
-set has_bi [expr {[string length $params(incremental)] > 0}]
-if { $params(incremental) } {
-    ::tclhdl::project_incremental $params(incremental)
+    ::tclhdl::project_build $params(project) "full"
 }
 
 set has_r [expr {[string length $params(report)] > 0}]
 if { $params(report) } {
-    ::tclhdl::project_report $params(report)
+    ::tclhdl::project_build $params(project) "report"
 }
 
-set has_b [expr {[string length $params(bitstream)] > 0}]
+set has_bit [expr {[string length $params(bitstream)] > 0}]
 if { $params(bitstream) } {
-    ::tclhdl::project_bitstream $params(bitstream)
+    ::tclhdl::project_build $params(project) "bitstream"
 }
 
 set has_p [expr {[string length $params(program)] > 0}]
@@ -161,12 +147,12 @@ if { $params(program) } {
 
 set has_v [expr {[string length $params(verify)] > 0}]
 if { $params(verify) } {
-    ::tclhdl::project_verify $params(verify)
+    ::tclhdl::project_verify $params(project)
 }
 
 set has_s [expr {[string length $params(shell)] > 0}]
 if { $params(shell) } {
-    ::tclhdl::project_shell $params(shell)
+    ::tclhdl::project_shell $params(project)
 }
 
 set has_c [expr {[string length $params(clean)] > 0}]
@@ -175,12 +161,4 @@ if { $params(clean) } {
 }
 
 exit 0
-#set has_t [expr {$params(t) != -1}]
-#set has_r [expr {[string length $params(r)] > 0}]
-#if {$has_t && $has_r} {
-#    return -code error "Cannot specify both -r and -t"
-#} elseif {$has_t} {
-#    puts "mfsdfsf"
-#}
-
 
