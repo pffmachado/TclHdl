@@ -334,9 +334,9 @@ proc ::tclhdl::ise::ip_add {type src} {
         log::log debug "ise::ip_add: run coregen - $::tclhdl::ise::ip_coregen_project"
         xfile add $src_new
         #if { $upgrade == "UPGRADE" } {
-        #    if { [catch { eval exec coregen -p $::tclhdl::ise::ip_coregen_project -b $src -intstyle ise -u }] } {
-        #        log::log debug "ise::ip_add: done"
-        #    }
+            if { [catch { eval exec coregen -p $::tclhdl::ise::ip_coregen_project -b $src -intstyle ise -u }] } {
+                log::log debug "ise::ip_add: done"
+            }
         #}
     } elseif { $type == "COREGEN" } {
         log::log debug "ise::ip_add: add coregen"
