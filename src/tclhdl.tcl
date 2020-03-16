@@ -80,6 +80,7 @@ namespace eval ::tclhdl {
     namespace export add_constraint
     namespace export add_settings
     namespace export add_tcl
+    namespace export add_pre
     namespace export add_post
 
     namespace export project_create
@@ -90,6 +91,7 @@ namespace eval ::tclhdl {
     namespace export project_open
     namespace export project_close
 
+    namespace export fetch_pre
     namespace export fetch_ips
     namespace export fetch_sources
     namespace export fetch_constraints
@@ -147,6 +149,7 @@ namespace eval ::tclhdl {
     variable list_constraint
     variable list_settings
     variable list_target_dir ""
+    variable list_pre_scripts
     variable list_post_scripts
 
     variable flag_project_create
@@ -454,6 +457,16 @@ proc ::tclhdl::add_project {prj settings rev} {
         }
     }
 }
+#-------------------------------------------------------------------------------
+## Add Pre Script
+#
+#-------------------------------------------------------------------------------
+proc ::tclhdl::add_pre {src} {
+    global ::tclhdl::list_pre_scripts
+    log::log debug "add_pre: Add Pre File to Project $src"
+
+    lappend ::tclhdl::list_pre_scripts $src
+}
 
 #-------------------------------------------------------------------------------
 ## Add Post Script
@@ -732,6 +745,14 @@ proc ::tclhdl::project_shell {prj} {
         ::tclhdl::project_open [lindex $lst 0] [lindex $lst 1] [lindex $lst 2]
     }
 }
+#-------------------------------------------------------------------------------
+## Fetch Post Scripts
+#
+#-------------------------------------------------------------------------------
+proc ::tclhdl::fetch_pre {} {
+    log::log debug "fetch_pre: Fetching Pre build"
+    source $::tclhdl::project_target_dir/pre
+}
 
 #-------------------------------------------------------------------------------
 ## Fetch IP sources
@@ -803,9 +824,10 @@ proc ::tclhdl::fetch_settings {} {
 #
 #-------------------------------------------------------------------------------
 proc ::tclhdl::fetch_post {} {
-    log::log debug "fetch_settings: Fetching for Settings file"
+    log::log debug "fetch_post: Fetching Post Buiding"
     source $::tclhdl::project_target_dir/post
 }
+
 #-------------------------------------------------------------------------------
 ## Set Project Name
 #
@@ -959,6 +981,9 @@ proc ::tclhdl::set_scripts_dir {dir} {
 #-------------------------------------------------------------------------------
 proc ::tclhdl::build_pre {} {
     log::log debug "build_pre: Pre Script build"
+    foreach lst $::tclhdl::list_pre_scripts {
+        source $lst
+    }
 }
 
 #-------------------------------------------------------------------------------

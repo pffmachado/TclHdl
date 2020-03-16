@@ -22,7 +22,7 @@ function(add_hdl _TARGET_NAME)
     cmake_parse_arguments(_add_hdl
         ""
         "VENDOR;TOOL;SETTINGS;REVISION;OUTPUT_DIR;OUTPUT_NAME"
-        "VHDL;VHDL_2008;VERILOG;COEFF;TCL;TCLHDL;SOURCES;POST;SOURCEDIR;IPDIR;CONSTRAINTDIR;SETTINGDIR;SCRIPTDIR"
+        "VHDL;VHDL_2008;VERILOG;COEFF;TCL;TCLHDL;SOURCES;PRE;POST;SOURCEDIR;IPDIR;CONSTRAINTDIR;SETTINGDIR;SCRIPTDIR"
         ${ARGN}
         )
 
@@ -52,6 +52,7 @@ function(add_hdl _TARGET_NAME)
     set (_HDL_COEFF_FILES	    ${_add_hdl_COEFF})
     set (_HDL_TCL_FILES 	    ${_add_hdl_TCL})
     set (_HDL_TCLHDL_FILES 	    ${_add_hdl_TCLHDL})
+    set (_HDL_PRE_FILES 	    ${_add_hdl_PRE})
     set (_HDL_POST_FILES 	    ${_add_hdl_POST})
     set (_HDL_SOURCEDIR 	    ${_add_hdl_SOURCEDIR})
     set (_HDL_IPDIR 	        ${_add_hdl_IPDIR})
@@ -68,6 +69,7 @@ function(add_hdl _TARGET_NAME)
     set (CMAKE_HDL_TCLHDL_FILE_IP           "${_HDL_PROJECT_DIR}/ip")
     set (CMAKE_HDL_TCLHDL_FILE_CONSTRAINTS  "${_HDL_PROJECT_DIR}/constraints")
     set (CMAKE_HDL_TCLHDL_FILE_SIMULATION   "${_HDL_PROJECT_DIR}/simulation")
+    set (CMAKE_HDL_TCLHDL_FILE_PRE          "${_HDL_PROJECT_DIR}/pre")
     set (CMAKE_HDL_TCLHDL_FILE_POST         "${_HDL_PROJECT_DIR}/post")
 
     #-- Create Project Directory
@@ -81,6 +83,7 @@ function(add_hdl _TARGET_NAME)
     file (TOUCH ${CMAKE_HDL_TCLHDL_FILE_IP})
     file (TOUCH ${CMAKE_HDL_TCLHDL_FILE_CONSTRAINTS})
     file (TOUCH ${CMAKE_HDL_TCLHDL_FILE_SIMULATION})
+    file (TOUCH ${CMAKE_HDL_TCLHDL_FILE_PRE})
     file (TOUCH ${CMAKE_HDL_TCLHDL_FILE_POST})
 
     #-- Project file
@@ -105,6 +108,8 @@ function(add_hdl _TARGET_NAME)
     set (_name "::tclhdl::add_project \"${_TARGET_NAME}\" \"${_HDL_SETTINGS}\" \"${_HDL_REVISION}\"\n\n")
     file (APPEND ${CMAKE_HDL_TCLHDL_FILE_PROJECT} ${_name})
 
+    set (_name "::tclhdl::fetch_pre\n\n")
+    file (APPEND ${CMAKE_HDL_TCLHDL_FILE_PROJECT} ${_name})
     set (_name "::tclhdl::fetch_ips\n\n")
     file (APPEND ${CMAKE_HDL_TCLHDL_FILE_PROJECT} ${_name})
     set (_name "::tclhdl::fetch_sources\n\n")
@@ -195,6 +200,16 @@ function(add_hdl _TARGET_NAME)
         string (CONCAT _name ${_name} "\"${_HDL_SOURCE_FILE}\"")
         string (CONCAT _name ${_name} "\n")
         file (APPEND ${CMAKE_HDL_TCLHDL_FILE_SOURCE} ${_name})
+        message (STATUS "------------ Parse files: ${_name}")
+    endforeach()
+
+    message (STATUS "------- Parse files: PRE")
+    file (WRITE ${CMAKE_HDL_TCLHDL_FILE_PRE} "")
+    foreach(_HDL_SOURCE_FILE IN LISTS _HDL_PRE_FILES)
+        set(_name "::tclhdl::add_pre ")
+        string (CONCAT _name ${_name} "\"${_HDL_SOURCE_FILE}\"")
+        string (CONCAT _name ${_name} "\n")
+        file (APPEND ${CMAKE_HDL_TCLHDL_FILE_PRE} ${_name})
         message (STATUS "------------ Parse files: ${_name}")
     endforeach()
 
