@@ -124,6 +124,38 @@ proc ::tclhdl::utils::grep {REset fp} {
         }
     }
 }
+
+#------------------------------------------------------------------------------
+## CPU Number
+#
+#------------------------------------------------------------------------------
+proc ncpu {} {
+    global tcl_platform env
+    switch ${tcl_platform(platform)} {
+        "windows" { 
+            return $env(NUMBER_OF_PROCESSORS)       
+        }
+        "unix" {
+            if {![catch {open "/proc/cpuinfo"} f]} {
+                set cores [regexp -all -line {^processor\s} [read $f]]
+                close $f
+                if {$cores > 0} {
+                    return $cores
+                }
+            }
+        }
+        "Darwin" {
+            if {![catch {exec {*}$sysctl -n "hw.ncpu"} cores]} {
+                return $cores
+            }
+        }
+        default {
+            puts "Unknown System"
+            return 1
+        }
+    }
+}
+
 #------------------------------------------------------------------------------
 ## Get Version
 #
