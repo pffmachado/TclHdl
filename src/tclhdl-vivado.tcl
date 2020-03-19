@@ -311,6 +311,8 @@ proc ::tclhdl::vivado::build_synthesis {} {
 proc ::tclhdl::vivado::build_fitting {} {
     log::log debug "xilinx::build_fitting : launch implementation"
     if { [get_property needs_refresh [get_runs $::tclhdl::vivado::project_impl]] } {
+        #TODO:Verify this reset! On windows isn't work
+        reset_run $::tclhdl::vivado::project_impl
         launch_runs $::tclhdl::vivado::project_impl -to_step write_bitstream -jobs $::tclhdl::vivado::project_jobs
     } else {
         reset_run $::tclhdl::vivado::project_impl
