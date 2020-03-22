@@ -810,13 +810,13 @@ proc ::tclhdl::fetch_simulations {} {
 ## Fetch Settings
 #
 #-------------------------------------------------------------------------------
-proc ::tclhdl::fetch_settings {} {
+proc ::tclhdl::fetch_settings {src} {
     if { [::tclhdl::is_project_created] } {
         return 0
     }
 
     log::log debug "fetch_settings: Fetching for Settings file"
-    source $::tclhdl::project_target_dir/settings
+    source $src
 }
 
 #-------------------------------------------------------------------------------
