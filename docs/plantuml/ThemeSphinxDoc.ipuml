@@ -1,0 +1,51 @@
+
+skinparam backgroundColor transparent
+
+skinparam UseCaseArrowColor #EE9816
+skinparam UseCaseBorderColor #EE9816
+skinparam UseCaseBackgroundColor #BFD1D4
+
+skinparam ActorArrowColor #EE9816
+skinparam ActorBorderColor #EE9816
+skinparam ActorBackgroundColor #BFD1D4
+
+skinparam ParticipantArrowColor #EE9816
+skinparam ParticipantBorderColor #EE9816
+skinparam ParticipantBackgroundColor #BFD1D4
+
+skinparam LifeLineArrowColor #EE9816
+skinparam LifeLineBorderColor #EE9816
+skinparam LifeLineBackgroundColor #BFD1D4
+
+skinparam InterfaceArrowColor #EE9816
+skinparam InterfaceBorderColor #EE9816
+skinparam InterfaceBackgroundColor #BFD1D4
+
+skinparam ClassArrowColor #EE9816
+skinparam ClassBorderColor #EE9816
+skinparam ClassBackgroundColor #BFD1D4
+
+skinparam ComponentArrowColor #EE9816
+skinparam ComponentBorderColor #EE9816
+skinparam ComponentBackgroundColor #BFD1D4
+
+skinparam NodeArrowColor #EE9816
+skinparam NodeBorderColor #EE9816
+skinparam NodeBackgroundColor #BFD1D4
+
+skinparam NoteArrowColor #EE9816
+skinparam NoteBorderColor #EE9816
+skinparam NoteBackgroundColor #BFD1D4
+
+skinparam StateArrowColor #EE9816
+skinparam StateBorderColor #EE9816
+skinparam StateBackgroundColor #BFD1D4
+skinparam StateStartColor #BFD1D4
+skinparam StateEndColor #BFD1D4
+
+skinparam linetype polyline
+skinparam linetype ortho
+
+skinparam Shadowing false
+'skinparam dpi 150
+'scale 180*90

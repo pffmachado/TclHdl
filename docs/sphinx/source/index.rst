@@ -6,11 +6,31 @@
 Welcome to TCLHDL's documentation!
 ==================================
 
+Outline
+=======
+
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+  :maxdepth: 1
 
+  _doc/Introduction
 
+  _doc/TclHdl
+
+Source Code Documentation
+=========================
+
+.. toctree::
+  :maxdepth: 1
+
+  _doxygen/Doxygen
+
+CMake
+=====
+
+.. toctree::
+  :maxdepth: 1
+
+  _cmake/UseHdl
 
 Indices and tables
 ==================
@@ -18,3 +38,5 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+

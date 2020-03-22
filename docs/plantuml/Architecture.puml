@@ -1,0 +1,33 @@
+@startuml
+!include ThemeSphinxDoc.ipuml
+
+'-- Main State Machine
+[*] --> Setup
+Setup --> ProjectConfiguration
+ProjectConfiguration --> BuildTarget
+BuildTarget --> Install
+Install --> [*]
+
+'-- 
+state Setup {
+CheckEnvironment --> CheckDependencies
+CheckDependencies --> CheckProjects
+CheckProjects --> CheckTools
+CheckTools --> CheckToolchains
+
+CheckDependencies --> InstallRequired
+CheckProjects --> InstallRequired
+CheckTools --> InstallRequired
+CheckToolchains --> InstallRequired
+
+
+}
+
+state BuildTarget {
+
+}
+
+state Install {
+}
+
+@enduml
