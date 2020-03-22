@@ -86,7 +86,7 @@ sphinx: cmakedoc doxygen plantuml doc
 	cd $(PATH_SPHINX); \
 		make html; \
 		cp -r $(PATH_SPHINX_BUILD_HTML)/* $(PATH_DOCS); \
-		cp -r $(PATH_SPHINX_SOURCE)/_doxygen/hml $(PATH_DOCS)/_doxygen; \
+		cp -r $(PATH_SPHINX_SOURCE)/_doxygen/html $(PATH_DOCS)/_doxygen; \
 		rm -rf $(PATH_SPHINX_BUILD); \
 		rm -rf $(PATH_SPHINX_SOURCE)/_markdown; \
 		rm -rf $(PATH_SPHINX_SOURCE)/_images; \
