@@ -1,0 +1,98 @@
+UseHdl
+-------
+
+Use Module for HDL
+
+This file provides functions for TclHdl.  It is assumed that
+:module:`FindHdl` has already been loaded.  See :module:`FindHdl` for
+information on how to load Hdl into your CMake project.
+
+Creating And Installing JARs
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cmake
+
+  add_hdl(<target_name>
+          [SOURCES] <source1> [<source2>...] [<resource1>...]
+          [INCLUDE_JARS <jar1> [<jar2>...]]
+          [ENTRY_POINT <entry>]
+          [VERSION <version>]
+          [OUTPUT_NAME <name>]
+          [OUTPUT_DIR <dir>]
+          [GENERATE_NATIVE_HEADERS <target> [DESTINATION <dir>]]
+          )
+
+This command creates a ``<target_name>.jar``.  It compiles the given
+``<source>`` files and adds the given ``<resource>`` files to
+the jar file.  Source files can be java files or listing files
+(prefixed by ``@``).  If only resource files are given then just a jar file
+is created.  The list of ``INCLUDE_JARS`` are added to the classpath when
+compiling the java sources and also to the dependencies of the target.
+``INCLUDE_JARS`` also accepts other target names created by ``add_jar()``.
+For backwards compatibility, jar files listed as sources are ignored (as
+they have been since the first version of this module).
+
+The default ``OUTPUT_DIR`` can also be changed by setting the variable
+``CMAKE_JAVA_TARGET_OUTPUT_DIR``.
+
+Optionally, using option ``GENERATE_NATIVE_HEADERS``, native header files can
+be generated for methods declared as native.  These files provide the
+connective glue that allow your Java and C code to interact.  An INTERFACE
+target will be created for an easy usage of generated files.  Sub-option
+``DESTINATION`` can be used to specify the output directory for generated
+header files.
+
+``GENERATE_NATIVE_HEADERS`` option requires, at least, version 1.8 of the JDK.
+
+The ``add_jar()`` function sets the following target properties on
+``<target_name>``:
+
+``INSTALL_FILES``
+  The files which should be installed.  This is used by ``install_jar()``.
+``JNI_SYMLINK``
+  The JNI symlink which should be installed.  This is used by
+  ``install_jni_symlink()``.
+``JAR_FILE``
+  The location of the jar file so that you can include it.
+``CLASSDIR``
+  The directory where the class files can be found.  For example to use them
+  with ``javah``.
+
+
+Examples
+""""""""
+
+To add compile flags to the target you can set these flags with the following
+variable:
+
+.. code-block:: cmake
+
+  set(CMAKE_JAVA_COMPILE_FLAGS -nowarn)
+
+
+
+Finding Tools
+^^^^^^^^^^^^^
+
+.. code-block:: cmake
+
+  find_hdl(<VAR>
+           <name> | NAMES <name1> [<name2>...]
+           [PATHS <path1> [<path2>... ENV <var>]]
+           [VERSIONS <version1> [<version2>]]
+           [DOC "cache documentation string"]
+          )
+
+This command is used to find a full path to the named jar.  A cache
+entry named by ``<VAR>`` is created to store the result of this command.
+If the full path to a jar is found the result is stored in the
+variable and the search will not repeated unless the variable is
+cleared.  If nothing is found, the result will be ``<VAR>-NOTFOUND``, and
+the search will be attempted again next time ``find_jar()`` is invoked with
+the same variable.  The name of the full path to a file that is
+searched for is specified by the names listed after ``NAMES`` argument.
+Additional search locations can be specified after the ``PATHS`` argument.
+If you require special a version of a jar file you can specify it with
+the ``VERSIONS`` argument.  The argument after ``DOC`` will be used for the
+documentation string in the cache.
+

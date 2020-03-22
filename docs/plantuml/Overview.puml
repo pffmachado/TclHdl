@@ -1,0 +1,27 @@
+'-- 
+'-- Copyright (C) 2020 OpenBuild
+'--
+'-- This is free software, licensed under the GNU General Public License v2.
+'-- See /LICENSE for more information.
+'--
+
+@startuml
+
+!include ThemeSphinxDoc.ipuml
+
+'!define datatype(x) class x << (D,#FF7700) DataType>>
+
+!include TclHdlDefinitions.puml
+!include TclHdl.puml
+!include TclHdlQuartus.puml
+!include TclHdlVivado.puml
+!include TclHdlIse.puml
+!include TclHdlDiamond.puml
+'!include TclHdlUtils.puml
+
+tclhdl  <|-- quartus
+tclhdl  <|-- vivado
+tclhdl  <|-- ise
+tclhdl  <|-- diamond
+
+@enduml

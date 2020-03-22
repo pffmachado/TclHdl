@@ -1,0 +1,164 @@
+#!/usr/bin/env tclsh
+#------------------------------------------------------------------------------
+#-- Copyright (c) 2020 TclHdl
+#-- 
+#-- Permission is hereby granted, free of charge, to any person obtaining a copy
+#-- of this software and associated documentation files (the "Software"), to deal
+#-- in the Software without restriction, including without limitation the rights
+#-- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#-- copies of the Software, and to permit persons to whom the Software is
+#-- furnished to do so, subject to the following conditions:
+#-- 
+#-- The above copyright notice and this permission notice shall be included in all
+#-- copies or substantial portions of the Software.
+#-- 
+#-- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#-- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#-- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#-- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#-- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#-- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+#-- SOFTWARE.
+#------------------------------------------------------------------------------
+#-- Project  : TclHdl - Open HDL hub
+#-- Author   : Paulo Machado <pffmachado@yahoo.com> 
+#-- Filename : tclhdl
+#------------------------------------------------------------------------------
+#-- File Description:
+#--
+#--
+#--
+#--
+#------------------------------------------------------------------------------
+#-- ChangeLog:
+#--
+#--
+#--
+#--
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+#--  Banner
+#------------------------------------------------------------------------------
+puts "  _____ ____ _     _   _ ____           "
+puts " |_   _/ ___| |   | | | |  _ \\| |      "
+puts "   | || |   | |   | |_| | | | | |       "
+puts "   | || |___| |___|  _  | |_| | |__     "
+puts "   |_| \\____|_____|_| |_|____/|_____|  "
+puts " A Vendor Independent HDL Build Library "
+puts "                                        "
+
+set path_script [file normalize [info script]]
+set path_tclhdl [file normalize "$path_script/../.."]
+lappend auto_path "$path_tclhdl/src"
+
+#------------------------------------------------------------------------------
+#-- Added Required Packages
+#------------------------------------------------------------------------------
+package require Tcl
+package require cmdline
+package require log
+
+log::lvSuppress info 0
+
+#------------------------------------------------------------------------------
+#-- Get Runtime Program
+#------------------------------------------------------------------------------
+set runtime_prog ""
+
+if { [regexp {(quartus)} [info library]] } {
+    set runtime_prog "quartus"
+    log::log info "Known runtime program: $runtime_prog"
+} elseif { [regexp {(Vivado)} [info library]] } {
+    set runtime_prog "vivado"
+    log::log debug "Known runtime program: $runtime_prog"
+} elseif { [regexp {(ISE)} [info library]] } {
+    set runtime_prog "ise"
+    log::log debug "Known runtime program: $runtime_prog"
+} else {
+    log::log info "Unknown runtime program"
+}
+
+package require ::tclhdl
+
+#------------------------------------------------------------------------------
+#-- TclHdl Menu
+#------------------------------------------------------------------------------
+set options {
+    {debug                  "Enable Debug"}
+    {project.arg    ""      "Project Name"}
+    {generate               "Project Generator"}
+    {generateip             "Project IP Generator"}
+    {build                  "Project Build"}
+    {incremental            "Project Incremental Build"}
+    {report                 "Project Report"}
+    {bitstream              "Project Bitstream"}
+    {program                "Project Program"}
+    {verify                 "Project Verification"}
+    {shell                  "Project Shell"}
+    {clean                  "Project Clean"}
+}
+set usage ": tclhdl \[options] ...\noptions:"
+array set params [::cmdline::getoptions argv $options $usage]
+
+#------------------------------------------------------------------------------
+#-- TclHdl Menu - Execute Options
+#------------------------------------------------------------------------------
+if {  $params(debug) } {
+    log::lvSuppress debug 0
+}
+
+set has_p [expr {[string length $params(project)] > 0}]
+if { $has_p } {
+    #::tclhdl::get_project_list [pwd]
+    ::tclhdl::set_project_root $params(project)
+    ::tclhdl::get_project_list $params(project)
+}
+
+set has_g [expr {[string length $params(generate)] > 0}]
+if { $params(generate) } {
+    ::tclhdl::project_create $params(project)
+}
+
+set has_gi [expr {[string length $params(generateip)] > 0}]
+if { $params(generateip) } {
+    ::tclhdl::project_build $params(project) "ip"
+}
+
+set has_b [expr {[string length $params(build)] > 0}]
+if { $params(build) } {
+    ::tclhdl::project_build $params(project) "full"
+}
+
+set has_r [expr {[string length $params(report)] > 0}]
+if { $params(report) } {
+    ::tclhdl::project_build $params(project) "report"
+}
+
+set has_bit [expr {[string length $params(bitstream)] > 0}]
+if { $params(bitstream) } {
+    ::tclhdl::project_build $params(project) "bitstream"
+}
+
+set has_p [expr {[string length $params(program)] > 0}]
+if { $params(program) } {
+    ::tclhdl::project_program $params(program)
+}
+
+set has_v [expr {[string length $params(verify)] > 0}]
+if { $params(verify) } {
+    ::tclhdl::project_verify $params(project)
+}
+
+set has_s [expr {[string length $params(shell)] > 0}]
+if { $params(shell) } {
+    ::tclhdl::project_shell $params(project)
+}
+
+set has_c [expr {[string length $params(clean)] > 0}]
+if { $params(clean) } {
+    ::tclhdl::project_clean $params(project)
+}
+
+exit 0
+

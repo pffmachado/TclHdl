@@ -1,0 +1,182 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>UseHdl &#8212; TCLHDL  documentation</title>
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Doxygen" href="../_doxygen/Doxygen.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../_doxygen/Doxygen.html" title="Doxygen"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TCLHDL  documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">UseHdl</a><ul>
+<li><a class="reference internal" href="#creating-and-installing-jars">Creating And Installing JARs</a><ul>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#finding-tools">Finding Tools</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../_doxygen/Doxygen.html"
+                        title="previous chapter">Doxygen</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/_cmake/UseHdl.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="usehdl">
+<h1>UseHdl<a class="headerlink" href="#usehdl" title="Permalink to this headline">¶</a></h1>
+<p>Use Module for HDL</p>
+<p>This file provides functions for TclHdl.  It is assumed that
+<a href="#id1"><span class="problematic" id="id2">:module:`FindHdl`</span></a> has already been loaded.  See <a href="#id3"><span class="problematic" id="id4">:module:`FindHdl`</span></a> for
+information on how to load Hdl into your CMake project.</p>
+<div class="section" id="creating-and-installing-jars">
+<h2>Creating And Installing JARs<a class="headerlink" href="#creating-and-installing-jars" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">add_hdl</span><span class="p">(</span><span class="s">&lt;target_name&gt;</span>
+        <span class="s">[SOURCES]</span> <span class="s">&lt;source1&gt;</span> <span class="s">[&lt;source2&gt;...]</span> <span class="s">[&lt;resource1&gt;...]</span>
+        <span class="s">[INCLUDE_JARS</span> <span class="s">&lt;jar1&gt;</span> <span class="s">[&lt;jar2&gt;...]]</span>
+        <span class="s">[ENTRY_POINT</span> <span class="s">&lt;entry&gt;]</span>
+        <span class="s">[VERSION</span> <span class="s">&lt;version&gt;]</span>
+        <span class="s">[OUTPUT_NAME</span> <span class="s">&lt;name&gt;]</span>
+        <span class="s">[OUTPUT_DIR</span> <span class="s">&lt;dir&gt;]</span>
+        <span class="s">[GENERATE_NATIVE_HEADERS</span> <span class="s">&lt;target&gt;</span> <span class="s">[DESTINATION</span> <span class="s">&lt;dir&gt;]]</span>
+        <span class="p">)</span>
+</pre></div>
+</div>
+<p>This command creates a <code class="docutils literal notranslate"><span class="pre">&lt;target_name&gt;.jar</span></code>.  It compiles the given
+<code class="docutils literal notranslate"><span class="pre">&lt;source&gt;</span></code> files and adds the given <code class="docutils literal notranslate"><span class="pre">&lt;resource&gt;</span></code> files to
+the jar file.  Source files can be java files or listing files
+(prefixed by <code class="docutils literal notranslate"><span class="pre">&#64;</span></code>).  If only resource files are given then just a jar file
+is created.  The list of <code class="docutils literal notranslate"><span class="pre">INCLUDE_JARS</span></code> are added to the classpath when
+compiling the java sources and also to the dependencies of the target.
+<code class="docutils literal notranslate"><span class="pre">INCLUDE_JARS</span></code> also accepts other target names created by <code class="docutils literal notranslate"><span class="pre">add_jar()</span></code>.
+For backwards compatibility, jar files listed as sources are ignored (as
+they have been since the first version of this module).</p>
+<p>The default <code class="docutils literal notranslate"><span class="pre">OUTPUT_DIR</span></code> can also be changed by setting the variable
+<code class="docutils literal notranslate"><span class="pre">CMAKE_JAVA_TARGET_OUTPUT_DIR</span></code>.</p>
+<p>Optionally, using option <code class="docutils literal notranslate"><span class="pre">GENERATE_NATIVE_HEADERS</span></code>, native header files can
+be generated for methods declared as native.  These files provide the
+connective glue that allow your Java and C code to interact.  An INTERFACE
+target will be created for an easy usage of generated files.  Sub-option
+<code class="docutils literal notranslate"><span class="pre">DESTINATION</span></code> can be used to specify the output directory for generated
+header files.</p>
+<p><code class="docutils literal notranslate"><span class="pre">GENERATE_NATIVE_HEADERS</span></code> option requires, at least, version 1.8 of the JDK.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">add_jar()</span></code> function sets the following target properties on
+<code class="docutils literal notranslate"><span class="pre">&lt;target_name&gt;</span></code>:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">INSTALL_FILES</span></code></dt><dd><p>The files which should be installed.  This is used by <code class="docutils literal notranslate"><span class="pre">install_jar()</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">JNI_SYMLINK</span></code></dt><dd><p>The JNI symlink which should be installed.  This is used by
+<code class="docutils literal notranslate"><span class="pre">install_jni_symlink()</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">JAR_FILE</span></code></dt><dd><p>The location of the jar file so that you can include it.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">CLASSDIR</span></code></dt><dd><p>The directory where the class files can be found.  For example to use them
+with <code class="docutils literal notranslate"><span class="pre">javah</span></code>.</p>
+</dd>
+</dl>
+<div class="section" id="examples">
+<h3>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h3>
+<p>To add compile flags to the target you can set these flags with the following
+variable:</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">set</span><span class="p">(</span><span class="s">CMAKE_JAVA_COMPILE_FLAGS</span> <span class="s">-nowarn</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="finding-tools">
+<h2>Finding Tools<a class="headerlink" href="#finding-tools" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">find_hdl</span><span class="p">(</span><span class="s">&lt;VAR&gt;</span>
+         <span class="s">&lt;name&gt;</span> <span class="s">|</span> <span class="s">NAMES</span> <span class="s">&lt;name1&gt;</span> <span class="s">[&lt;name2&gt;...]</span>
+         <span class="s">[PATHS</span> <span class="s">&lt;path1&gt;</span> <span class="s">[&lt;path2&gt;...</span> <span class="s">ENV</span> <span class="s">&lt;var&gt;]]</span>
+         <span class="s">[VERSIONS</span> <span class="s">&lt;version1&gt;</span> <span class="s">[&lt;version2&gt;]]</span>
+         <span class="s">[DOC</span> <span class="s2">&quot;cache documentation string&quot;</span><span class="s">]</span>
+        <span class="p">)</span>
+</pre></div>
+</div>
+<p>This command is used to find a full path to the named jar.  A cache
+entry named by <code class="docutils literal notranslate"><span class="pre">&lt;VAR&gt;</span></code> is created to store the result of this command.
+If the full path to a jar is found the result is stored in the
+variable and the search will not repeated unless the variable is
+cleared.  If nothing is found, the result will be <code class="docutils literal notranslate"><span class="pre">&lt;VAR&gt;-NOTFOUND</span></code>, and
+the search will be attempted again next time <code class="docutils literal notranslate"><span class="pre">find_jar()</span></code> is invoked with
+the same variable.  The name of the full path to a file that is
+searched for is specified by the names listed after <code class="docutils literal notranslate"><span class="pre">NAMES</span></code> argument.
+Additional search locations can be specified after the <code class="docutils literal notranslate"><span class="pre">PATHS</span></code> argument.
+If you require special a version of a jar file you can specify it with
+the <code class="docutils literal notranslate"><span class="pre">VERSIONS</span></code> argument.  The argument after <code class="docutils literal notranslate"><span class="pre">DOC</span></code> will be used for the
+documentation string in the cache.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../_doxygen/Doxygen.html" title="Doxygen"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TCLHDL  documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Paulo Machado.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
+    </div>
+  </body>
+</html>
