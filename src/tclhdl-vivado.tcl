@@ -115,7 +115,8 @@ namespace eval ::tclhdl::vivado {
     variable project_fileset_source         "sources_1"
     variable project_fileset_constraint     "constrs_1"
     variable project_fileset_simulation     "sim_1"
-    variable project_jobs                   "6"
+    variable project_jobs                   "8"
+    variable project_threads                "8"
     variable project_tool_version
 
     variable ip_name          ""
@@ -198,6 +199,7 @@ proc ::tclhdl::vivado::open_project {args} {
             log::log debug "xilinx::open_project: Setting ip output - version $::tclhdl::vivado::project_tool_version"
             set_property "ip_cache_permissions" "read write" $obj
             set_property "ip_output_repo" "$::tclhdl::vivado::project_name.cache/ip" $obj
+            set_param general.maxThreads $::tclhdl::vivado::project_threads
         }
 
         #-- Set Project to Close
