@@ -328,7 +328,6 @@ function(add_hdl _TARGET_NAME)
     endforeach()
 
     message (STATUS "------- Parse files: TCLSETTINGS")
-    file (WRITE ${CMAKE_HDL_TCLHDL_FILE_POST} "")
     foreach(_HDL_SOURCE_FILE IN LISTS _HDL_TCLSETTINGS)
         set(_name "::tclhdl::fetch_settings ")
         string (CONCAT _name ${_name} "\"${_HDL_SOURCE_FILE}\"")
