@@ -745,6 +745,54 @@ proc ::tclhdl::project_shell {prj} {
         ::tclhdl::project_open [lindex $lst 0] [lindex $lst 1] [lindex $lst 2]
     }
 }
+
+
+#-------------------------------------------------------------------------------
+## Project Hardware Programming
+#
+#-------------------------------------------------------------------------------
+proc ::tclhdl::project_program {prj} {
+    #-- Verify Project
+    ::tclhdl::project_verify $prj
+
+    #-- Get Environment Variables
+    log::log debug "project_build: Setting enviornment"
+    set ::tclhdl::flag_project_create 0
+    source $::tclhdl::project_target_dir/project
+
+    #-- Build Project
+    log::log debug "project_build: Build Project"
+    foreach lst $::tclhdl::list_projects {
+        set project [lindex $lst 0]
+        set settings [lindex $lst 1]
+
+        #-- Move to build directory
+        log::log debug "project_build: Change Dir to $::tclhdl::project_target_dir/$project-$settings"
+        cd "$::tclhdl::project_target_dir/$project-$settings"
+
+        #-- Opennning the existent Project
+        log::log debug "project_build: Build Execute"
+        ::tclhdl::project_open [lindex $lst 0] [lindex $lst 1] [lindex $lst 2]
+         switch $::tclhdl::project_tool {
+            INTEL_QUARTUS {
+            }
+            XILINX_VIVADO {
+                log::log debug "project_program: Start Hardware Programming"
+                ::tclhdl::vivado::hw_programming
+            }
+            XILINX_ISE {
+            }
+            LATTICE_DIAMOND {
+            }
+            default {
+                log::logMsg "project_program: No supported tool define for the current project"
+            }
+        }
+        ::tclhdl::project_close [lindex $lst 0]
+    }
+}
+
+
 #-------------------------------------------------------------------------------
 ## Fetch Post Scripts
 #

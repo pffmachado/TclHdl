@@ -93,6 +93,8 @@ namespace eval ::tclhdl::vivado {
     namespace export ip_generate 
     namespace export ip_add
 
+    namespace export hw_programming
+
     #---------------------------------------------------------------------------
     #-- Member Variables 
     #---------------------------------------------------------------------------
@@ -113,7 +115,7 @@ namespace eval ::tclhdl::vivado {
     variable project_fileset_source         "sources_1"
     variable project_fileset_constraint     "constrs_1"
     variable project_fileset_simulation     "sim_1"
-    variable project_jobs                   "4"
+    variable project_jobs                   "6"
     variable project_tool_version
 
     variable ip_name          ""
@@ -437,6 +439,34 @@ proc ::tclhdl::vivado::constraint_add {type src} {
     set_property "file_type" $type $file_obj
     set_property "used_in_synthesis" "0" $file_obj
     set_property "used_in_implementation" "1" $file_obj
+}
+
+#-------------------------------------------------------------------------------
+## Adding Constraint Files
+#
+#-------------------------------------------------------------------------------
+#TODO: This is very incomplete!
+proc ::tclhdl::vivado::hw_programming {} {
+    log::log debug "xilinx::hw_programming: Start"
+    open_hw
+    connect_hw_server
+    open_hw_target
+
+    set hw_device [get_hw_devices]
+
+    current_hw_device $hw_device
+    refresh_hw_device -update_hw_probes false [lindex [get_hw_devices $hw_device] 0]
+
+    log::log debug "xilinx::hw_programming: Programming File $::tclhdl::vivado::project_name.out/$::tclhdl::vivado::project_name.bin"
+    set_property PROBES.FILE {} [get_hw_devices $hw_device]
+    set_property FULL_PROBES.FILE {} [get_hw_devices $hw_device]
+    set_property PROGRAM.FILE "$::tclhdl::vivado::project_name.out/$::tclhdl::vivado::project_name.bin" [get_hw_devices $hw_device]
+
+    log::log debug "xilinx::hw_programming: Program"
+    program_hw_devices [get_hw_devices $hw_device]
+    refresh_hw_device [lindex [get_hw_devices $hw_device] 0]
+
+    disconnect_hw_server
 }
 
 #------------------------------------------------------------------------------
