@@ -300,7 +300,9 @@ proc ::tclhdl::vivado::build_ip {} {
 #------------------------------------------------------------------------------
 proc ::tclhdl::vivado::build_synthesis {} {
     if { [get_property needs_refresh [get_runs $::tclhdl::vivado::project_synth]] } {
-        synth_design
+        #synth_design
+        reset_run $::tclhdl::vivado::project_synth
+        launch_runs $::tclhdl::vivado::project_synth -jobs $::tclhdl::vivado::project_jobs
     } else {
         reset_run $::tclhdl::vivado::project_synth
         launch_runs $::tclhdl::vivado::project_synth -jobs $::tclhdl::vivado::project_jobs
