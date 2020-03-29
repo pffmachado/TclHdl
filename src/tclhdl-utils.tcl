@@ -42,6 +42,8 @@
 #------------------------------------------------------------------------------
 #-- Tcl System Packages
 #------------------------------------------------------------------------------
+#TODO: This need to be review! Not all environments are shipped with md5
+package require md5
 
 #------------------------------------------------------------------------------
 ## Namespace Declaration
@@ -53,17 +55,36 @@ namespace eval ::tclhdl::utils {
     #--------------------------------------------------------------------------
     namespace export get_version
 
+    namespace export cat
     namespace export sed
     namespace export grep
+    namespace export ncpu
     namespace export diff
     namespace export patch
     namespace export git
+    namespace export date
+    namespace export checksum
+    namespace export semver
 
     #--------------------------------------------------------------------------
     #-- Namespace internal variables
     #--------------------------------------------------------------------------
     variable home [file join [pwd] [file dirname [info script]]]
     set version 1.0
+}
+
+#------------------------------------------------------------------------------
+## Cat like
+#
+#------------------------------------------------------------------------------
+proc ::tclhdl::utils::cat files {
+    set res ""
+    foreach file [eval glob $files] {
+        set fp [open $file]
+        append res [read $fp [file size $file]]
+        close $fp
+    }
+    set res
 }
 
 #------------------------------------------------------------------------------
@@ -114,22 +135,39 @@ proc ::tclhdl::utils::sed {script input} {
 ## Grep like
 #
 #------------------------------------------------------------------------------
-proc ::tclhdl::utils::grep {REset fp} {
-    while {[gets $fp line] >= 0} {
-        foreach RE $REset {
-            if {[regexp $RE $line]} {
-                puts $line
-                break
+proc ::tclhdl::utils::grep {pattern args} {
+    set match ""
+    if {[llength $args] == 0} {
+        # read from stdin
+        set lnum 0
+        while {[gets stdin line] >= 0} {
+            incr lnum
+            if {[regexp $pattern $line]} {
+                puts "${lnum}:${line}"
             }
         }
+    } else {
+        foreach filename $args {
+            set file [open $filename r]
+            set lnum 0
+            while {[gets $file line] >= 0} {
+                incr lnum
+                if {[regexp $pattern $line]} {
+                    puts "${filename}:${lnum}:${line}"
+                    lappend match $line
+                }
+            }
+            close $file
+        }
     }
+    return $match
 }
 
 #------------------------------------------------------------------------------
 ## CPU Number
 #
 #------------------------------------------------------------------------------
-proc ncpu {} {
+proc ::tclhdl::utils::ncpu {} {
     global tcl_platform env
     switch ${tcl_platform(platform)} {
         "windows" { 
@@ -155,6 +193,36 @@ proc ncpu {} {
         }
     }
 }
+
+#------------------------------------------------------------------------------
+## Unix Like Date
+#
+#------------------------------------------------------------------------------
+proc ::tclhdl::utils::date {frmt} {
+    set date [clock format [clock seconds] -format $frmt]
+    return $date
+}
+
+#------------------------------------------------------------------------------ 
+## Cheksum (MD5 file checksum)
+#
+#------------------------------------------------------------------------------
+proc ::tclhdl::utils::checksum {name} {
+    set fileId [open "$name.md5" "w"]
+    set fileName [file tail $name]
+    set checksum [string tolower [md5::md5 -hex -file $name]]
+    puts -nonewline $fileId "$checksum  $fileName"
+    close $fileId
+}
+
+#------------------------------------------------------------------------------
+## Get SemVer Version Number
+#
+#------------------------------------------------------------------------------
+proc ::tclhdl::utils::semver {major minor patch build} {
+   return "$major.$minor.$patch+$build"
+}
+
 
 #------------------------------------------------------------------------------
 ## Get Version

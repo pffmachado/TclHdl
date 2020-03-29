@@ -270,6 +270,7 @@ proc ::tclhdl::ise::build_fitting {} {
 #
 #------------------------------------------------------------------------------
 proc ::tclhdl::ise::build_timing {} {
+    log::log debug "ise::build_timing : launch timing analysis"
 }
 
 #------------------------------------------------------------------------------
@@ -286,6 +287,7 @@ proc ::tclhdl::ise::build_bitstream {} {
 #
 #------------------------------------------------------------------------------
 proc ::tclhdl::ise::build_report {} {
+    log::log debug "ise::build_report : launch report generation"
 }
 
 #------------------------------------------------------------------------------

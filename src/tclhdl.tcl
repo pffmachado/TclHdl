@@ -51,6 +51,7 @@ package require log
 #
 #------------------------------------------------------------------------------
 package require ::tclhdl::definitions
+package require ::tclhdl::utils
 
 if { $runtime_prog == "quartus" } {
     package require ::tclhdl::quartus
@@ -104,6 +105,10 @@ namespace eval ::tclhdl {
     namespace export set_project_dir
     namespace export set_project_type
     namespace export set_project_target_dir
+    namespace export set_project_build_number
+    namespace export set_project_version_major
+    namespace export set_project_version_minor
+    namespace export set_project_version_patch
     namespace export set_source_dir
     namespace export set_ip_dir
     namespace export set_ip_output_dir
@@ -142,6 +147,11 @@ namespace eval ::tclhdl {
     variable project_build_ip_dir
     variable project_build_full     1
     variable project_build_step     "full"
+    variable project_build_number
+    variable project_version        ""
+    variable project_version_major  ""
+    variable project_version_minor  ""
+    variable project_version_patch  ""
 
     variable list_projects
     variable list_source
@@ -936,6 +946,56 @@ proc ::tclhdl::set_project_target_dir {dir} {
     global ::tclhdl::project_target_dir
     set ::tclhdl::project_target_dir $dir
     log::log debug "set_project_type: Set Project target dir to $::tclhdl::project_target_dir"
+}
+
+#-------------------------------------------------------------------------------
+## Set Project Build Number
+#
+#-------------------------------------------------------------------------------
+proc ::tclhdl::set_project_build_number {number} {
+    global ::tclhdl::project_build_number
+    set ::tclhdl::project_build_number $number
+    log::log debug "set_project_build_number: Set Project build number to $::tclhdl::project_build_number"
+}
+
+#-------------------------------------------------------------------------------
+## Set Project Version
+#
+#-------------------------------------------------------------------------------
+proc ::tclhdl::set_project_version {version} {
+    global ::tclhdl::project_version
+    set ::tclhdl::project_version $version
+    log::log debug "set_project_version: Set Project Version to $::tclhdl::project_version"
+}
+
+#-------------------------------------------------------------------------------
+## Set Project Major Version
+#
+#-------------------------------------------------------------------------------
+proc ::tclhdl::set_project_version_major {number} {
+    global ::tclhdl::project_version_major
+    set ::tclhdl::project_version_major $number
+    log::log debug "set_project_version_major: Set Project Major Version to $::tclhdl::project_version_major"
+}
+
+#-------------------------------------------------------------------------------
+## Set Project Minor Version
+#
+#-------------------------------------------------------------------------------
+proc ::tclhdl::set_project_version_minor {number} {
+    global ::tclhdl::project_version_minor
+    set ::tclhdl::project_version_minor $number
+    log::log debug "set_project_version_minor: Set Project Minor Version to $::tclhdl::project_version_minor"
+}
+
+#-------------------------------------------------------------------------------
+## Set Project Patch Version
+#
+#-------------------------------------------------------------------------------
+proc ::tclhdl::set_project_version_patch {number} {
+    global ::tclhdl::project_version_patch
+    set ::tclhdl::project_version_patch $number
+    log::log debug "set_project_version_patch: Set Project Patch Version to $::tclhdl::project_version_patch"
 }
 
 #-------------------------------------------------------------------------------

@@ -44,6 +44,7 @@
 #
 #------------------------------------------------------------------------------
 package require ::tclhdl::definitions
+package require ::tclhdl::utils
 
 #------------------------------------------------------------------------------
 ## Namespace Declaration
@@ -300,7 +301,6 @@ proc ::tclhdl::vivado::build_ip {} {
 #------------------------------------------------------------------------------
 proc ::tclhdl::vivado::build_synthesis {} {
     if { [get_property needs_refresh [get_runs $::tclhdl::vivado::project_synth]] } {
-        #synth_design
         reset_run $::tclhdl::vivado::project_synth
         launch_runs $::tclhdl::vivado::project_synth -jobs $::tclhdl::vivado::project_jobs
     } else {
@@ -330,6 +330,7 @@ proc ::tclhdl::vivado::build_fitting {} {
 #
 #------------------------------------------------------------------------------
 proc ::tclhdl::vivado::build_timing {} {
+    log::log debug "xilinx::build_timing: launch timing analysis"
 }
 
 #------------------------------------------------------------------------------
@@ -337,11 +338,26 @@ proc ::tclhdl::vivado::build_timing {} {
 #
 #------------------------------------------------------------------------------
 proc ::tclhdl::vivado::build_bitstream {} {
-    log::log debug "xilinx::build_bitstream : launch bitstream"
     file mkdir "$::tclhdl::vivado::project_name.out"
+    foreach fileIdx [glob -nocomplain "$::tclhdl::vivado::project_name.out/*"] {
+        eval file delete -force $fileIdx
+    }
+
+    log::log debug "xilinx::build_bitstream : launch bitstream"
     open_impl_design $::tclhdl::vivado::project_impl
     write_bitstream -force -raw_bitfile -bin_file "$::tclhdl::vivado::project_name.out/$::tclhdl::vivado::project_name"
     close_design
+
+    log::log debug "xilinx::build_bitstream : add bitstream version"
+    set fileId [open "$::tclhdl::vivado::project_name.out/$::tclhdl::vivado::project_name.semver" "w"]
+    puts -nonewline $fileId $::tclhdl::project_version
+    close $fileId
+
+    log::log debug "xilinx::build_bitstream : compute checksums"
+    set file_list [glob "$::tclhdl::vivado::project_name.out/$::tclhdl::vivado::project_name*"]
+    foreach fileIdx $file_list {
+        ::tclhdl::utils::checksum $fileIdx
+    }
 }
 
 #------------------------------------------------------------------------------
@@ -349,6 +365,7 @@ proc ::tclhdl::vivado::build_bitstream {} {
 #
 #------------------------------------------------------------------------------
 proc ::tclhdl::vivado::build_report {} {
+    log::log debug "xilinx::build_report: launch report generation"
     #report_drc
     #report_timming
     #report_power
