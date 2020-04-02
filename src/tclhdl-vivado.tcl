@@ -468,20 +468,23 @@ proc ::tclhdl::vivado::constraint_add {type src} {
 #-------------------------------------------------------------------------------
 #TODO: This is very incomplete!
 proc ::tclhdl::vivado::hw_programming {} {
+    set obj [get_filesets $::tclhdl::vivado::project_fileset_source]
+    set artifact_name [get_property "top" $obj]
+
     log::log debug "xilinx::hw_programming: Start"
     open_hw
     connect_hw_server
     open_hw_target
 
+    log::log debug "xilinx::hw_programming: Get Hardware Device"
     set hw_device [get_hw_devices]
-
     current_hw_device $hw_device
     refresh_hw_device -update_hw_probes false [lindex [get_hw_devices $hw_device] 0]
 
-    log::log debug "xilinx::hw_programming: Programming File $::tclhdl::vivado::project_name.out/$::tclhdl::vivado::project_name.bin"
+    log::log debug "xilinx::hw_programming: Programming File $::tclhdl::vivado::project_name.out/$artifact_name.bin"
     set_property PROBES.FILE {} [get_hw_devices $hw_device]
     set_property FULL_PROBES.FILE {} [get_hw_devices $hw_device]
-    set_property PROGRAM.FILE "$::tclhdl::vivado::project_name.out/$::tclhdl::vivado::project_name.bin" [get_hw_devices $hw_device]
+    set_property PROGRAM.FILE "$::tclhdl::vivado::project_name.out/$artifact_name.bin" [get_hw_devices $hw_device]
 
     log::log debug "xilinx::hw_programming: Program"
     program_hw_devices [get_hw_devices $hw_device]
