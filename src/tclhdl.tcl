@@ -109,6 +109,7 @@ namespace eval ::tclhdl {
     namespace export set_project_version_major
     namespace export set_project_version_minor
     namespace export set_project_version_patch
+    namespace export set_project_revision
     namespace export set_source_dir
     namespace export set_ip_dir
     namespace export set_ip_output_dir
@@ -152,6 +153,7 @@ namespace eval ::tclhdl {
     variable project_version_major  ""
     variable project_version_minor  ""
     variable project_version_patch  ""
+    variable project_revision       ""
 
     variable list_projects
     variable list_source
@@ -998,6 +1000,15 @@ proc ::tclhdl::set_project_version_patch {number} {
     log::log debug "set_project_version_patch: Set Project Patch Version to $::tclhdl::project_version_patch"
 }
 
+#-------------------------------------------------------------------------------
+## Set Project Revision
+#
+#-------------------------------------------------------------------------------
+proc ::tclhdl::set_project_revision {number} {
+    global ::tclhdl::project_revision
+    set ::tclhdl::project_revision $number
+    log::log debug "set_project_revision: Set Project Revision to $::tclhdl::project_revision"
+}
 #-------------------------------------------------------------------------------
 ## Set Project Source Directory
 #

@@ -219,8 +219,8 @@ proc ::tclhdl::utils::checksum {name} {
 ## Get SemVer Version Number
 #
 #------------------------------------------------------------------------------
-proc ::tclhdl::utils::semver {major minor patch build} {
-   return "$major.$minor.$patch+$build"
+proc ::tclhdl::utils::semver {major minor patch pre_release build} {
+   return "$major.$minor.$patch-$pre_release+$build"
 }
 
 
