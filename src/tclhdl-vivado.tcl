@@ -365,10 +365,31 @@ proc ::tclhdl::vivado::build_bitstream {} {
 #
 #------------------------------------------------------------------------------
 proc ::tclhdl::vivado::build_report {} {
+    set obj [get_filesets $::tclhdl::vivado::project_fileset_source]
+    set project_top [get_property "top" $obj]
+    set impl_dir "$::tclhdl::vivado::project_name.runs/$::tclhdl::vivado::project_impl"
+    set synth_dir "$::tclhdl::vivado::project_name.runs/$::tclhdl::vivado::project_synth"
+
     log::log debug "xilinx::build_report: launch report generation"
     #report_drc
     #report_timming
     #report_power
+
+    file mkdir "$::tclhdl::vivado::project_name.rpt"
+
+    log::log debug "xilinx::build_report: synthesis copy reports to output folder"
+    set file_list [glob "$synth_dir/*.rpt"]
+    file copy -force "$synth_dir/runme.log" "$::tclhdl::vivado::project_name.rpt/${project_top}_synth.log"
+    foreach fileIdx $file_list {
+        eval file copy -force $fileIdx "$::tclhdl::vivado::project_name.rpt"
+    }
+
+    log::log debug "xilinx::build_report: implementation copy reports to output folder"
+    set file_list [glob "$impl_dir/*.rpt"]
+    file copy -force "$impl_dir/runme.log" "$::tclhdl::vivado::project_name.rpt/${project_top}_impl.log"
+    foreach fileIdx $file_list {
+        eval file copy -force $fileIdx "$::tclhdl::vivado::project_name.rpt"
+    }
 }
 
 #------------------------------------------------------------------------------

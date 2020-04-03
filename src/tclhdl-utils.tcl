@@ -42,8 +42,9 @@
 #------------------------------------------------------------------------------
 #-- Tcl System Packages
 #------------------------------------------------------------------------------
-#TODO: This need to be review! Not all environments are shipped with md5
+#TODO: This need to be review! Not all environments are shipped with md5  and tar
 package require md5
+package require tar
 
 #------------------------------------------------------------------------------
 ## Namespace Declaration

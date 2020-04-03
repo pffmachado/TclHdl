@@ -287,7 +287,20 @@ proc ::tclhdl::ise::build_bitstream {} {
 #
 #------------------------------------------------------------------------------
 proc ::tclhdl::ise::build_report {} {
-    log::log debug "ise::build_report : launch report generation"
+    set project_top  [string trim "[project get top]" "/"]
+    set report_dir "report"
+
+    log::log debug "xilinx::build_report: launch report generation"
+
+    log::log debug "xilinx::build_report: synthesis copy reports to output folder"
+    file mkdir "$report_dir"
+    file copy -force "${project_top}.syr" "$report_dir"
+    file copy -force "${project_top}.twr" "$report_dir"
+    file copy -force "${project_top}.par" "$report_dir"
+    file copy -force "${project_top}.bgn" "$report_dir"
+    file copy -force "${project_top}_map.map" "$report_dir"
+    file copy -force "${project_top}_map.mrp" "$report_dir"
+    file copy -force "${project_top}_map.psr" "$report_dir"
 }
 
 #------------------------------------------------------------------------------

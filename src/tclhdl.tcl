@@ -1269,10 +1269,13 @@ proc ::tclhdl::build_report {} {
             ::tclhdl::quartus::build_report
         }
         XILINX_VIVADO {
+            ::tclhdl::vivado::build_report
         }
         XILINX_ISE {
+            ::tclhdl::ise::build_report
         }
         LATTICE_DIAMOND {
+            ::tclhdl::diamond::build_report
         }
         default {
             log::logMsg "build_report: No supported tool define for the current project"
