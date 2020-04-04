@@ -138,7 +138,7 @@ function(add_hdl _TARGET_NAME)
         set(CMAKE_HDL_TARGET_OUTPUT_NAME)
     endif()
     if (NOT DEFINED _add_hdl_OUTPUT_DIR)
-        set(_add_hdl_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR})
+        set(_add_hdl_OUTPUT_DIR ${CMAKE_BINARY_DIR})
     else()
         get_filename_component(_add_hdl_OUTPUT_DIR ${_add_hdl_OUTPUT_DIR} ABSOLUTE)
     endif()
@@ -165,7 +165,7 @@ function(add_hdl _TARGET_NAME)
     set (_HDL_TCLSETTINGS 	    ${_add_hdl_TCL_SETTINGS})
     set (_HDL_SOURCE_FILES 	    ${_add_hdl_SOURCES} ${_add_hdl_UNPARSED_ARGUMENTS})
 
-    set (_HDL_PROJECT_DIR "${CMAKE_CURRENT_BINARY_DIR}/${_TARGET_NAME}")
+    set (_HDL_PROJECT_DIR "${CMAKE_BINARY_DIR}/${_TARGET_NAME}")
     set (_HDL_PROJECT_TYPE 	${_vendor_tool})
 
     set (CMAKE_HDL_TCLHDL_FILE_PROJECT      "${_HDL_PROJECT_DIR}/project")
@@ -383,49 +383,49 @@ function(add_hdl _TARGET_NAME)
     add_custom_target (${_TARGET_NAME}-shell
         COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
         ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_SHELL} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
     add_custom_target (${_TARGET_NAME}-ip
         COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
             ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_IP} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
     add_custom_target (${_TARGET_NAME}-generate
         COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
             ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_GENERATE} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
     add_custom_target (${_TARGET_NAME}-report
         COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
             ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_BUILD} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
     add_custom_target (${_TARGET_NAME}-bitstream
         COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
             ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_BITSTREAM} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
     add_custom_target (${_TARGET_NAME}-program
         COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
             ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_PROGRAM} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
     add_custom_target (${_TARGET_NAME}-clean
         COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
             ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_CLEAN} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
     add_custom_target (${_TARGET_NAME}
         COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
             ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_BUILD} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
 endfunction()
@@ -448,7 +448,7 @@ function(add_hdl_ip _TARGET_NAME)
         set(CMAKE_HDL_TARGET_OUTPUT_NAME)
     endif()
     if (NOT DEFINED _add_hdl_ip_OUTPUT_DIR)
-        set(_add_hdl_ip_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR})
+        set(_add_hdl_ip_OUTPUT_DIR ${CMAKE_BINARY_DIR})
     else()
         get_filename_component(_add_hdl_ip_OUTPUT_DIR ${_add_hdl_ip_OUTPUT_DIR} ABSOLUTE)
     endif()
@@ -458,7 +458,7 @@ function(add_hdl_ip _TARGET_NAME)
     set(_HDL_XCO_FILES 	        ${_add_hdl_ip_XCO})
     set(_HDL_XCO_UPGRADE_FILES 	${_add_hdl_ip_XCO_UPGRADE})
 
-    set (_HDL_PROJECT_DIR "${CMAKE_CURRENT_BINARY_DIR}/${_TARGET_NAME}")
+    set (_HDL_PROJECT_DIR "${CMAKE_BINARY_DIR}/${_TARGET_NAME}")
     set (CMAKE_HDL_TCLHDL_FILE_IP           "${_HDL_PROJECT_DIR}/ip")
 
     file (TOUCH ${CMAKE_HDL_TCLHDL_FILE_IP})
@@ -526,7 +526,7 @@ function(add_hdl_constraint _TARGET_NAME)
         set(CMAKE_HDL_TARGET_OUTPUT_NAME)
     endif()
     if (NOT DEFINED _add_hdl_constraint_OUTPUT_DIR)
-        set(_add_hdl_constraint_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR})
+        set(_add_hdl_constraint_OUTPUT_DIR ${CMAKE_BINARY_DIR})
     else()
         get_filename_component(_add_hdl_constraint_OUTPUT_DIR ${_add_hdl_constraint_OUTPUT_DIR} ABSOLUTE)
     endif()
@@ -534,7 +534,7 @@ function(add_hdl_constraint _TARGET_NAME)
     set(_HDL_UCF_FILES 	${_add_hdl_constraint_UCF})
     set(_HDL_XDC_FILES 	${_add_hdl_constraint_XDC})
 
-    set (_HDL_PROJECT_DIR "${CMAKE_CURRENT_BINARY_DIR}/${_TARGET_NAME}")
+    set (_HDL_PROJECT_DIR "${CMAKE_BINARY_DIR}/${_TARGET_NAME}")
 
     set (CMAKE_HDL_TCLHDL_FILE_CONSTRAINTS  "${_HDL_PROJECT_DIR}/constraints")
 
@@ -582,7 +582,7 @@ function(add_hdl_settings _TARGET_NAME)
         set(CMAKE_HDL_TARGET_OUTPUT_NAME)
     endif()
     if (NOT DEFINED _add_hdl_settings_OUTPUT_DIR)
-        set(_add_hdl_settings_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR})
+        set(_add_hdl_settings_OUTPUT_DIR ${CMAKE_BINARY_DIR})
     else()
         get_filename_component(_add_hdl_settings_OUTPUT_DIR ${_add_hdl_settings_OUTPUT_DIR} ABSOLUTE)
     endif()
@@ -590,7 +590,7 @@ function(add_hdl_settings _TARGET_NAME)
     set(_HDL_SETTINGS_NAME 	    ${_add_hdl_settings_NAME})
     set(_HDL_SETTINGS_FILES 	${_add_hdl_settings_SETTINGS})
 
-    set (_HDL_PROJECT_DIR "${CMAKE_CURRENT_BINARY_DIR}/${_TARGET_NAME}")
+    set (_HDL_PROJECT_DIR "${CMAKE_BINARY_DIR}/${_TARGET_NAME}")
 
     set (CMAKE_HDL_TCLHDL_FILE_SETTINGS  "${_HDL_PROJECT_DIR}/settings")
 
@@ -629,14 +629,14 @@ function(add_hdl_flow _TARGET_NAME)
         set(CMAKE_HDL_TARGET_OUTPUT_NAME)
     endif()
     if (NOT DEFINED _add_hdl_flow_OUTPUT_DIR)
-        set(_add_hdl_flow_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR})
+        set(_add_hdl_flow_OUTPUT_DIR ${CMAKE_BINARY_DIR})
     else()
         get_filename_component(_add_hdl_flow_OUTPUT_DIR ${_add_hdl_flow_OUTPUT_DIR} ABSOLUTE)
     endif()
 
     set(_HDL_FLOW_FILES 	${_add_hdl_flow_FLOW})
 
-    set (_HDL_PROJECT_DIR "${CMAKE_CURRENT_BINARY_DIR}/${_TARGET_NAME}")
+    set (_HDL_PROJECT_DIR "${CMAKE_BINARY_DIR}/${_TARGET_NAME}")
 
     set (CMAKE_HDL_TCLHDL_FILE_BUILD  "${_HDL_PROJECT_DIR}/build")
 
@@ -673,14 +673,14 @@ function(add_hdl_flow _TARGET_NAME)
         set(CMAKE_HDL_TARGET_OUTPUT_NAME)
     endif()
     if (NOT DEFINED _add_hdl_flow_OUTPUT_DIR)
-        set(_add_hdl_flow_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR})
+        set(_add_hdl_flow_OUTPUT_DIR ${CMAKE_BINARY_DIR})
     else()
         get_filename_component(_add_hdl_flow_OUTPUT_DIR ${_add_hdl_flow_OUTPUT_DIR} ABSOLUTE)
     endif()
 
     set(_HDL_FLOW_FILES 	${_add_hdl_flow_FLOW})
 
-    set (_HDL_PROJECT_DIR "${CMAKE_CURRENT_BINARY_DIR}/${_TARGET_NAME}")
+    set (_HDL_PROJECT_DIR "${CMAKE_BINARY_DIR}/${_TARGET_NAME}")
 
     set (CMAKE_HDL_TCLHDL_FILE_BUILD  "${_HDL_PROJECT_DIR}/build")
 
