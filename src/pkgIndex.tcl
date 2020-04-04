@@ -13,5 +13,6 @@ package ifneeded ::tclhdl::definitions 1.0 [list source [file join $dir tclhdl-d
 package ifneeded ::tclhdl::quartus 1.0 [list source [file join $dir tclhdl-quartus.tcl]]
 package ifneeded ::tclhdl::vivado 1.0 [list source [file join $dir tclhdl-vivado.tcl]]
 package ifneeded ::tclhdl::ise 1.0 [list source [file join $dir tclhdl-ise.tcl]]
+package ifneeded ::tclhdl::diamond 1.0 [list source [file join $dir tclhdl-diamond.tcl]]
 package ifneeded ::tclhdl::utils 1.0 [list source [file join $dir tclhdl-utils.tcl]]
 #package ifneeded ::tclhdl::log 1.0 [list source [file join $dir tclhdl-log.tcl]]

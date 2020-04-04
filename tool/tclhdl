@@ -50,7 +50,32 @@ puts "                                        "
 
 set path_script [file normalize [info script]]
 set path_tclhdl [file normalize "$path_script/../.."]
+set path_tcllib "/usr/lib/tcllib"
+
 lappend auto_path "$path_tclhdl/src"
+if { $tcl_platform(os) == "Linux" && [file isdirectory $path_tcllib] } {
+    lappend auto_path $path_tcllib
+}
+
+#------------------------------------------------------------------------------
+#-- Get Runtime Program
+#------------------------------------------------------------------------------
+set runtime_prog ""
+if { [regexp {(quartus)} [info library]] } {
+    set runtime_prog "quartus"
+    puts "Known runtime program: $runtime_prog"
+} elseif { [regexp {(Vivado)} [info library]] } {
+    set runtime_prog "vivado"
+    puts "Known runtime program: $runtime_prog"
+} elseif { [regexp {(ISE)} [info library]] } {
+    set runtime_prog "ise"
+    puts "Known runtime program: $runtime_prog"
+} elseif { [regexp {(diamond)} [info library]] } {
+    set runtime_prog "diamond"
+    puts "Known runtime program: $runtime_prog"
+} else {
+    puts info "Unknown runtime program"
+}
 
 #------------------------------------------------------------------------------
 #-- Added Required Packages
@@ -58,28 +83,12 @@ lappend auto_path "$path_tclhdl/src"
 package require Tcl
 package require cmdline
 package require log
-
-log::lvSuppress info 0
-
-#------------------------------------------------------------------------------
-#-- Get Runtime Program
-#------------------------------------------------------------------------------
-set runtime_prog ""
-
-if { [regexp {(quartus)} [info library]] } {
-    set runtime_prog "quartus"
-    log::log info "Known runtime program: $runtime_prog"
-} elseif { [regexp {(Vivado)} [info library]] } {
-    set runtime_prog "vivado"
-    log::log debug "Known runtime program: $runtime_prog"
-} elseif { [regexp {(ISE)} [info library]] } {
-    set runtime_prog "ise"
-    log::log debug "Known runtime program: $runtime_prog"
-} else {
-    log::log info "Unknown runtime program"
-}
-
 package require ::tclhdl
+
+#------------------------------------------------------------------------------
+#-- Set log preferences
+#------------------------------------------------------------------------------
+log::lvSuppress info 0
 
 #------------------------------------------------------------------------------
 #-- TclHdl Menu
@@ -110,7 +119,6 @@ if {  $params(debug) } {
 
 set has_p [expr {[string length $params(project)] > 0}]
 if { $has_p } {
-    #::tclhdl::get_project_list [pwd]
     ::tclhdl::set_project_root $params(project)
     ::tclhdl::get_project_list $params(project)
 }

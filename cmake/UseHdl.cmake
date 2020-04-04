@@ -362,6 +362,16 @@ function(add_hdl _TARGET_NAME)
         endif ()
         set (_VENDOR_TOOL_VERSION "")
         set (_VENDOR_SOURCE "${INTEL_SOURCE_SETTINGS}")
+    elseif ( ${_vendor} STREQUAL "LATTICE" )
+        message (STATUS "------------ Set tools: ${_vendor}")
+        #set (XILINX_SOURCE_SETTINGS ${CMAKE_HDL_TOOL_SETTINGS})
+        file (TO_NATIVE_PATH ${CMAKE_HDL_TOOL_SETTINGS} LATTICE_SOURCE_SETTINGS)
+        if ( ${_tool} STREQUAL "DIAMOND" )
+            set (_VENDOR_TOOL "diamondc")
+            set (_VENDOR_ARGS "")
+        endif ()
+        set (_VENDOR_TOOL_VERSION "")
+        set (_VENDOR_SOURCE "${LATTICE_SOURCE_SETTINGS}")
     endif ()
 
     #set (TCLHDL_TOOL ${CMAKE_HDL_TCLHDL})
@@ -435,7 +445,7 @@ function(add_hdl_ip _TARGET_NAME)
     cmake_parse_arguments(_add_hdl_ip
         ""
         "OUTPUT_DIR;OUTPUT_NAME"
-        "COREGEN;XCI;XCO;XCO_UPGRADE;QSYS;TCL;TCLHDL"
+        "COREGEN;XCI;XCO;XCO_UPGRADE;QSYS;IPX;TCL;TCLHDL"
         ${ARGN}
         )
 
@@ -457,6 +467,7 @@ function(add_hdl_ip _TARGET_NAME)
     set(_HDL_XCI_FILES 	        ${_add_hdl_ip_XCI})
     set(_HDL_XCO_FILES 	        ${_add_hdl_ip_XCO})
     set(_HDL_XCO_UPGRADE_FILES 	${_add_hdl_ip_XCO_UPGRADE})
+    set(_HDL_IPX_FILES 	        ${_add_hdl_ip_IPX})
 
     set (_HDL_PROJECT_DIR "${CMAKE_BINARY_DIR}/${_TARGET_NAME}")
     set (CMAKE_HDL_TCLHDL_FILE_IP           "${_HDL_PROJECT_DIR}/ip")
@@ -505,6 +516,15 @@ function(add_hdl_ip _TARGET_NAME)
         message (STATUS "------------ Parse files: ${_name}")
     endforeach()
 
+    message (STATUS "------- Parse files: IPX")
+    foreach(_HDL_SOURCE_FILE IN LISTS _HDL_IPX_FILES)
+        set(_name "::tclhdl::add_ip ")
+        string (CONCAT _name ${_name} "\"IPX\" ")
+        string (CONCAT _name ${_name} "\"${_HDL_SOURCE_FILE}\"")
+        string (CONCAT _name ${_name} "\n")
+        file (APPEND ${CMAKE_HDL_TCLHDL_FILE_IP} ${_name})
+        message (STATUS "------------ Parse files: ${_name}")
+    endforeach()
 
 endfunction()
 
@@ -533,6 +553,7 @@ function(add_hdl_constraint _TARGET_NAME)
 
     set(_HDL_UCF_FILES 	${_add_hdl_constraint_UCF})
     set(_HDL_XDC_FILES 	${_add_hdl_constraint_XDC})
+    set(_HDL_LPF_FILES 	${_add_hdl_constraint_LPF})
 
     set (_HDL_PROJECT_DIR "${CMAKE_BINARY_DIR}/${_TARGET_NAME}")
 
@@ -556,6 +577,16 @@ function(add_hdl_constraint _TARGET_NAME)
     foreach(_HDL_SOURCE_FILE IN LISTS _HDL_XDC_FILES)
         set(_name "::tclhdl::add_constraint ")
         string (CONCAT _name ${_name} "\"XDC\" ")
+        string (CONCAT _name ${_name} "\"${_HDL_SOURCE_FILE}\"")
+        string (CONCAT _name ${_name} "\n")
+        file (APPEND ${CMAKE_HDL_TCLHDL_FILE_CONSTRAINTS} ${_name})
+        message (STATUS "------------ Parse files: ${_name}")
+    endforeach()
+
+    message (STATUS "------- Parse files: LPF")
+    foreach(_HDL_SOURCE_FILE IN LISTS _HDL_LPF_FILES)
+        set(_name "::tclhdl::add_constraint ")
+        string (CONCAT _name ${_name} "\"LPF\" ")
         string (CONCAT _name ${_name} "\"${_HDL_SOURCE_FILE}\"")
         string (CONCAT _name ${_name} "\n")
         file (APPEND ${CMAKE_HDL_TCLHDL_FILE_CONSTRAINTS} ${_name})

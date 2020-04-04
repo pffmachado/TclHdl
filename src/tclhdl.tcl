@@ -59,6 +59,8 @@ if { $runtime_prog == "quartus" } {
     package require ::tclhdl::vivado
 } elseif { $runtime_prog == "ise" } {
     package require ::tclhdl::ise
+} elseif { $runtime_prog == "diamond" } {
+    package require ::tclhdl::diamond
 } else {
     puts "No Runtime Program Available"
 }
@@ -235,6 +237,10 @@ proc ::tclhdl::add_source {type src} {
             }
         }
         LATTICE_DIAMOND {
+            if { $::tclhdl::flag_project_create == 1} {
+                log::log debug "add_source: Lattice Diamond - Adding file type $type - $src"
+                ::tclhdl::diamond::source_add $type $src
+            }
         }
         default {
             log::logMsg "add_source: No supported tool define for the current project"
@@ -329,9 +335,9 @@ proc ::tclhdl::add_ip {type src} {
         }
         LATTICE_DIAMOND {
             switch $type {
-                LATTICE_DIAMOND_IP {
+                IPX {
                     log::log debug "add_ip: Adding ip type $type - $src"
-                    source $src
+                    ::tclhdl::diamond::ip_add $type $src
                 }
                 default {
                     log::logMsg "add_ip: No IP type defined for $ip_file"
@@ -371,6 +377,10 @@ proc ::tclhdl::add_constraint {type src} {
             }
         }
         LATTICE_DIAMOND {
+            if { $::tclhdl::flag_project_create == 1} {
+                log::log debug "add_constraint: Diamond - Adding file type $type - $src"
+                ::tclhdl::diamond::constraint_add $type $src
+            }
         }
         default {
             log::logMsg "add_constraint: No supported tool define for the current project"
@@ -432,6 +442,13 @@ proc ::tclhdl::add_settings {settings src} {
             }
         }
         LATTICE_DIAMOND {
+            if { $::tclhdl::flag_project_create == 1 } {
+                log::log debug "add_settings: Diamond - Adding file settings $settings - $src"
+                if { $::tclhdl::diamond::project_settings == $settings } {
+                    source $src
+                }
+            }
+
         }
         default {
             log::logMsg "add_source: No supported tool define for the current project"
@@ -463,6 +480,9 @@ proc ::tclhdl::add_project {prj settings rev} {
             }
         }
         LATTICE_DIAMOND {
+            if { $::tclhdl::flag_project_create == 0 } {
+                lappend ::tclhdl::list_projects [list $prj $settings $rev]
+            }
         }
         default {
             log::logMsg "add_project: No supported tool define for the current project"
@@ -674,6 +694,18 @@ proc ::tclhdl::project_open {args} {
             }
         }
         LATTICE_DIAMOND {
+            if { [llength $args] == 3 } {
+                set prj [lindex $args 0]
+                set settings [lindex $args 1]
+                set rev [lindex $args 2]
+                log::log debug "project_open: Adding Project $prj with settings $settings"
+                ::tclhdl::diamond::set_project_name $prj
+                ::tclhdl::diamond::set_project_settings $settings
+                ::tclhdl::diamond::set_project_revision $rev
+                ::tclhdl::diamond::open_project
+            } else {
+                log::Msg "project_open: Adding Project not correct"
+            }
         }
         default {
             log::logMsg "project_open: No supported tool define for the current project"
@@ -698,6 +730,7 @@ proc ::tclhdl::project_close {prj} {
             ::tclhdl::ise::close_project
         }
         LATTICE_DIAMOND {
+            ::tclhdl::diamond::close_project
         }
         default {
             log::logMsg "project_close: No supported tool define for the current project"
@@ -1125,6 +1158,7 @@ proc ::tclhdl::build_ip {} {
             ::tclhdl::ise::build_ip
         }
         LATTICE_DIAMOND {
+            ::tclhdl::diamond::build_ip
         }
         default {
             log::logMsg "build_ip: No supported tool define for the current project"
@@ -1153,6 +1187,7 @@ proc ::tclhdl::build_synthesis {} {
             ::tclhdl::ise::build_synthesis
         }
         LATTICE_DIAMOND {
+            ::tclhdl::diamond::build_synthesis
         }
         default {
             log::logMsg "build_synthesis: No supported tool define for the current project"
@@ -1181,6 +1216,7 @@ proc ::tclhdl::build_fitting {} {
             ::tclhdl::ise::build_fitting
         }
         LATTICE_DIAMOND {
+            ::tclhdl::diamond::build_fitting
         }
         default {
             log::logMsg "build_fitting: No supported tool define for the current project"
@@ -1247,6 +1283,7 @@ proc ::tclhdl::build_bitstream {} {
             ::tclhdl::ise::build_bitstream
         }
         LATTICE_DIAMOND {
+            ::tclhdl::diamond::build_bitstream
         }
         default {
             log::logMsg "build_bitstream: No supported tool define for the current project"
