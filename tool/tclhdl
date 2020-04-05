@@ -20,7 +20,7 @@
 #-- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #-- SOFTWARE.
 #------------------------------------------------------------------------------
-#-- Project  : TclHdl - Open HDL hub
+#-- Project  : TclHdl
 #-- Author   : Paulo Machado <pffmachado@yahoo.com> 
 #-- Filename : tclhdl
 #------------------------------------------------------------------------------
@@ -50,17 +50,24 @@ puts "                                        "
 
 set path_script [file normalize [info script]]
 set path_tclhdl [file normalize "$path_script/../.."]
-set path_tcllib "/usr/lib/tcllib"
+set path_tcllib_linux "/usr/lib/tcllib"
+set path_tcllib_windows "C:/ActiveTcl/lib/tcllib"
+set runtime_prog "tclsh"
+set runtime_system $tcl_platform(os)
 
 lappend auto_path "$path_tclhdl/src"
-if { $tcl_platform(os) == "Linux" && [file isdirectory $path_tcllib] } {
-    lappend auto_path $path_tcllib
+if { $runtime_system == "Linux" && [file isdirectory $path_tcllib_linux] } {
+    lappend auto_path $path_tcllib_linux
 }
+
+#TODO: ActiveTcl needs to be reviewed and tested
+#if { $runtime_system == "Windows NT" && [file isdirectory $path_tcllib_windows] } {
+#    lappend auto_path $path_tcllib_windows
+#}
 
 #------------------------------------------------------------------------------
 #-- Get Runtime Program
 #------------------------------------------------------------------------------
-set runtime_prog ""
 if { [regexp {(quartus)} [info library]] } {
     set runtime_prog "quartus"
     puts "Known runtime program: $runtime_prog"
@@ -72,6 +79,10 @@ if { [regexp {(quartus)} [info library]] } {
     puts "Known runtime program: $runtime_prog"
 } elseif { [regexp {(diamond)} [info library]] } {
     set runtime_prog "diamond"
+    if { $runtime_system == "Windows NT" } {
+        set path_tcllib_lattice [file normalize [info library]/../../../active-hdl/tcl/lib/tcl/tcllib]
+        lappend auto_path $path_tcllib_lattice
+    }
     puts "Known runtime program: $runtime_prog"
 } else {
     puts info "Unknown runtime program"

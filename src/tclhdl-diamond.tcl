@@ -248,7 +248,13 @@ proc ::tclhdl::diamond::build_synthesis {} {
     puts $hook "prj_run Synthesis -impl $::tclhdl::diamond::project_impl -forceAll"
     puts $hook "prj_project close"
     close $hook
-    exec diamondc hook.tcl
+    if { $::runtime_system == "Linux" } {
+        exec diamondc hook.tcl
+    } elseif { $::runtime_system == "Windows NT" } {
+        exec pnmainc hook.tcl
+    } else {
+        log::log debug "diamond::build_synthesis : Platform not identified"
+    }
 }
 
 #------------------------------------------------------------------------------
