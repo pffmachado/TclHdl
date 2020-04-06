@@ -284,9 +284,37 @@ proc ::tclhdl::diamond::build_timing {} {
 #
 #------------------------------------------------------------------------------
 proc ::tclhdl::diamond::build_bitstream {} {
+    set project_top $::tclhdl::diamond::project_name
+    set project_output "output"
+    set project_report "report"
+    set artifact_name $project_top
+    set artifact_dir $project_output
+
+    file mkdir "$project_output"
+    foreach fileIdx [glob -nocomplain "$project_output/*"] {
+        eval file delete -force $fileIdx
+    }
+
     log::log debug "diamond::build_bitstream : launch bitstream"
     prj_run Export -impl "$::tclhdl::diamond::project_impl" -task Bitgen
     prj_run Export -impl "$::tclhdl::diamond::project_impl" -task Jedecgen
+
+    set fileId [open $artifact_name.semver "w"]
+    puts -nonewline $fileId $::tclhdl::project_version
+    close $fileId
+
+    log::log debug "diamond::build_bitstream : copy artifacts to output dir"
+    file copy -force "$::tclhdl::diamond::project_impl/${artifact_name}_${::tclhdl::diamond::project_impl}.bit"\
+        "$artifact_dir/$artifact_name.bit"
+    file copy -force "$::tclhdl::diamond::project_impl/${artifact_name}_${::tclhdl::diamond::project_impl}.jed"\
+        "$artifact_dir/$artifact_name.jed"
+    file copy -force "$artifact_name.semver"      "$artifact_dir"
+
+    log::log debug "diamond::build_bitstream : adding checksum to artifacts"
+    set file_list [glob "$artifact_dir/$artifact_name*"]
+    foreach fileIdx $file_list {
+        ::tclhdl::utils::checksum $fileIdx
+    }
 }
 
 #------------------------------------------------------------------------------
@@ -294,20 +322,23 @@ proc ::tclhdl::diamond::build_bitstream {} {
 #
 #------------------------------------------------------------------------------
 proc ::tclhdl::diamond::build_report {} {
-    set project_top  [string trim "[project get top]" "/"]
+    set project_top "$::tclhdl::diamond::project_impl/$::tclhdl::diamond::project_name"
     set report_dir "report"
 
     log::log debug "lattice::build_report: launch report generation"
 
     log::log debug "lattice::build_report: synthesis copy reports to output folder"
     file mkdir "$report_dir"
-    file copy -force "${project_top}.syr" "$report_dir"
-    file copy -force "${project_top}.twr" "$report_dir"
-    file copy -force "${project_top}.par" "$report_dir"
-    file copy -force "${project_top}.bgn" "$report_dir"
-    file copy -force "${project_top}_map.map" "$report_dir"
-    file copy -force "${project_top}_map.mrp" "$report_dir"
-    file copy -force "${project_top}_map.psr" "$report_dir"
+    file copy -force "$::tclhdl::diamond::project_impl/stdout.log" "$report_dir"
+    file copy -force "$::tclhdl::diamond::project_impl/automake.log" "$report_dir"
+    file copy -force "${project_top}_${::tclhdl::diamond::project_impl}.twr" "$report_dir"
+    file copy -force "${project_top}_${::tclhdl::diamond::project_impl}.par" "$report_dir"
+    file copy -force "${project_top}_${::tclhdl::diamond::project_impl}.pad" "$report_dir"
+    file copy -force "${project_top}_${::tclhdl::diamond::project_impl}.mrp" "$report_dir"
+    file copy -force "${project_top}_${::tclhdl::diamond::project_impl}.bgn" "$report_dir"
+    file copy -force "${project_top}_${::tclhdl::diamond::project_impl}.srf" "$report_dir"
+    file copy -force "${project_top}_${::tclhdl::diamond::project_impl}.srr" "$report_dir"
+    file copy -force "${project_top}_${::tclhdl::diamond::project_impl}_map.hrr" "$report_dir"
 }
 
 #------------------------------------------------------------------------------
