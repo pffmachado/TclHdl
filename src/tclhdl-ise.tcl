@@ -253,7 +253,14 @@ proc ::tclhdl::ise::build_ip {} {
 #------------------------------------------------------------------------------
 proc ::tclhdl::ise::build_synthesis {} {
     log::log debug "ise::build_synthesis : launch synthesis"
-    process run "Synthesize - XST"
+    set step "Synthesize - XST"
+    process run $step
+
+    set error_code [process get $step status]
+    if { $error_code == "errors" } {
+        log::log error "ise::build_synthesis : synthesis failed"
+        exit 1
+    }
 }
 
 #------------------------------------------------------------------------------
@@ -262,7 +269,14 @@ proc ::tclhdl::ise::build_synthesis {} {
 #------------------------------------------------------------------------------
 proc ::tclhdl::ise::build_fitting {} {
     log::log debug "ise::build_fitting : launch implementation"
-    process run "Implement Design"
+    set step "Implement Design"
+    process run $step
+
+    set error_code [process get $step status]
+    if { $error_code == "errors" } {
+        log::log error "ise::build_fitting : implementation failed"
+        exit 1
+    }
 }
 
 #------------------------------------------------------------------------------
@@ -279,7 +293,14 @@ proc ::tclhdl::ise::build_timing {} {
 #------------------------------------------------------------------------------
 proc ::tclhdl::ise::build_bitstream {} {
     log::log debug "ise::build_bitstream : launch bitstream"
-    process run "Generate Programming File"
+    set step "Generate Programming File"
+    process run $step
+
+    set error_code [process get $step status]
+    if { $error_code == "errors" } {
+        log::log error "ise::build_bitstream : bitstream generation failed"
+        exit 1
+    }
 }
 
 #------------------------------------------------------------------------------
