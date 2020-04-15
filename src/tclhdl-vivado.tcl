@@ -300,6 +300,7 @@ proc ::tclhdl::vivado::build_ip {} {
 #
 #------------------------------------------------------------------------------
 proc ::tclhdl::vivado::build_synthesis {} {
+    log::log debug "xilinx::build_synthesis : launch synthesis"
     if { [get_property needs_refresh [get_runs $::tclhdl::vivado::project_synth]] } {
         reset_run $::tclhdl::vivado::project_synth
         launch_runs $::tclhdl::vivado::project_synth -jobs $::tclhdl::vivado::project_jobs
@@ -308,6 +309,13 @@ proc ::tclhdl::vivado::build_synthesis {} {
         launch_runs $::tclhdl::vivado::project_synth -jobs $::tclhdl::vivado::project_jobs
     }
     wait_on_run $::tclhdl::vivado::project_synth
+
+    set error_code ""
+    regexp {ERROR} [get_property status [get_runs $::tclhdl::vivado::project_synth]] error_code
+    if { "$error_code" == "ERROR" } {
+        log::log error "xilinx::build_synthesis : synthesis failed"
+        exit 1
+    }
 }
 
 #------------------------------------------------------------------------------
@@ -323,6 +331,21 @@ proc ::tclhdl::vivado::build_fitting {} {
         launch_runs $::tclhdl::vivado::project_impl -to_step write_bitstream -jobs $::tclhdl::vivado::project_jobs
     }
     wait_on_run $::tclhdl::vivado::project_impl
+
+    set error_code ""
+    regexp {ERROR} [get_property status [get_runs $::tclhdl::vivado::project_impl]] error_code
+    if { "$error_code" == "ERROR" } {
+        log::log error "xilinx::build_fitting : implementation  failed"
+        exit 1
+    }
+    
+    open_run $::tclhdl::vivado::project_impl
+    set error_code [get_property SLACK [get_timing_paths]]
+    if { [expr $error_code < 0] } {
+        log::log error "xilinx::build_fitting : Timing not met with Slack = $error_code"
+        exit 1
+    }
+
 }
 
 #------------------------------------------------------------------------------
@@ -331,6 +354,15 @@ proc ::tclhdl::vivado::build_fitting {} {
 #------------------------------------------------------------------------------
 proc ::tclhdl::vivado::build_timing {} {
     log::log debug "xilinx::build_timing: launch timing analysis"
+
+    #open_run $::tclhdl::vivado::project_impl 
+    #set wns [get_property status.wns [get_runs $::tclhdl::vivado::project_impl]]
+    #set whs [get_property status.whs [get_runs $::tclhdl::vivado::project_impl]]
+    #if { [expr $wns <= 0.0] || [expr $whs <= 0.0] } {
+    #    log::log error "xilinx::build_timing : Timing not met with WNS=$wns and WHS=$whs"
+    #    exit 1
+    #}
+
 }
 
 #------------------------------------------------------------------------------
