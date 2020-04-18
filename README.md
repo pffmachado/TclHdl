@@ -33,19 +33,18 @@ the UseHdl.cmake module intend to generate the TclHdl project structure.
 
 ## Status
 The project is under development and there is no release available.
-It is already possible to use for Quartus II, Vivado and ISE.
-The development environment is being done on Linux (Arch Linux).
+It is already possible to use for Quartus II, Vivado, ISE and Diamond.
+The development environment is being done on Linux (Arch Linux) and compatibility
+tests are being carried out on Windows 10.
 
 ### Roadmap
 
 * Provide documentation
 * Add Tests
-* Add support to Lattice
 * Add support to simulation
     * That includes support Modelsim, XSim, GHDL, Icarus
 * Add support to vunit
 * Refactoring and Clean Up
-* Provide a CMake Module
 * First Release
 * ...
 

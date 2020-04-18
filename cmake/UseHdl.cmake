@@ -16,41 +16,41 @@ Creating And Installing HDL
 
 .. code-block:: cmake
 
-  add_hdl(<target_name>
-          [VENDOR <vendor>]
-          [TOOL <tool>]
-          [SETTINGS <name> [FILES <file>]]
-          [REVISION <rev>]
-          [OUTPUT_DIR <dir>]
-          [OUTPUT_NAME <name>]
-          [SOURCES] <source1> [<source2>...]
-          [VHDL] <source1> [<source2>...]
-          [VHDL_2008] <source1> [<source2>...]
-          [VERILOG] <source1> [<source2>...]
-          [COEFF] <source1> [<source2>...]
-          [TCL] <source1> [<source2>...]
-          [TCLHDL] <source1> [<source2>...]
-          [PRE] <source1> [<source2>...]
-          [POST] <source1> [<source2>...]
-          [COREGEN] <source1> [<source2>...]
-          [XCI] <source1> [<source2>...]
-          [XCO] <source1> [<source2>...]
-          [XCO_UPGRADE] <source1> [<source2>...]
-          [QSYS] <source1> [<source2>...]
-          [IPX] <source1> [<source2>...]
-          [COREGEN] <source1> [<source2>...]
-          [XCI] <source1> [<source2>...]
-          [XCO] <source1> [<source2>...]
-          [XCO_UPGRADE] <source1> [<source2>...]
-          [QSYS] <source1> [<source2>...]
-          [IPX] <source1> [<source2>...]
-          [FLOW] <flow>
-          [SOURCE_DIR] <dir>
-          [IP_DIR] <dir>
-          [CONSTRAINT_DIR] <dir>
-          [SETTING_DIR] <dir>
-          [SCRIPT_DIR] <dir>
-          )
+add_hdl(<target_name>
+    [VENDOR <vendor>]
+    [TOOL <tool>]
+    [SETTINGS <name> [FILES <file>]]
+    [REVISION <rev>]
+    [OUTPUT_DIR <dir>]
+    [OUTPUT_NAME <name>]
+    [SOURCES] <source1> [<source2>...]
+    [VHDL] <source1> [<source2>...]
+    [VHDL_2008] <source1> [<source2>...]
+    [VERILOG] <source1> [<source2>...]
+    [COEFF] <source1> [<source2>...]
+    [TCL] <source1> [<source2>...]
+    [TCLHDL] <source1> [<source2>...]
+    [PRE] <source1> [<source2>...]
+    [POST] <source1> [<source2>...]
+    [COREGEN] <source1> [<source2>...]
+    [XCI] <source1> [<source2>...]
+    [XCO] <source1> [<source2>...]
+    [XCO_UPGRADE] <source1> [<source2>...]
+    [QSYS] <source1> [<source2>...]
+    [IPX] <source1> [<source2>...]
+    [COREGEN] <source1> [<source2>...]
+    [XCI] <source1> [<source2>...]
+    [XCO] <source1> [<source2>...]
+    [XCO_UPGRADE] <source1> [<source2>...]
+    [QSYS] <source1> [<source2>...]
+    [IPX] <source1> [<source2>...]
+    [FLOW] <flow>
+    [SOURCE_DIR] <dir>
+    [IP_DIR] <dir>
+    [CONSTRAINT_DIR] <dir>
+    [SETTING_DIR] <dir>
+    [SCRIPT_DIR] <dir>
+    )
 
 
 Examples
@@ -66,12 +66,12 @@ Finding Tools
 
 .. code-block:: cmake
 
-  find_hdl(<VAR>
-           <name> | NAMES <name1> [<name2>...]
-           [PATHS <path1> [<path2>... ENV <var>]]
-           [VERSIONS <version1> [<version2>]]
-           [DOC "cache documentation string"]
-          )
+find_hdl(<VAR>
+    <name> | NAMES <name1> [<name2>...]
+    [PATHS <path1> [<path2>... ENV <var>]]
+    [VERSIONS <version1> [<version2>]]
+    [DOC "cache documentation string"]
+    )
 
 
 #]=======================================================================]
@@ -296,17 +296,17 @@ function(add_hdl _TARGET_NAME)
     #set (TCLHDL_TOOL ${CMAKE_HDL_TCLHDL})
     file (TO_NATIVE_PATH ${CMAKE_HDL_TCLHDL} TCLHDL_TOOL)
     #if ( ${HAS_TCLHDL} )
-        set (_TCLHDL_TOOL       "${TCLHDL_TOOL}")
-        set (_TCLHDL_IP         "-generateip")
-        set (_TCLHDL_DEBUG      "-debug")
-        set (_TCLHDL_PROJECT    "-project")
-        set (_TCLHDL_GENERATE   "-generate")
-        set (_TCLHDL_BUILD      "-build")
-        set (_TCLHDL_REPORT     "-report")
-        set (_TCLHDL_BITSTREAM  "-bitstream")
-        set (_TCLHDL_PROGRAM    "-program")
-        set (_TCLHDL_SHELL      "-shell")
-        set (_TCLHDL_CLEAN      "-clean")
+    set (_TCLHDL_TOOL       "${TCLHDL_TOOL}")
+    set (_TCLHDL_IP         "-generateip")
+    set (_TCLHDL_DEBUG      "-debug")
+    set (_TCLHDL_PROJECT    "-project")
+    set (_TCLHDL_GENERATE   "-generate")
+    set (_TCLHDL_BUILD      "-build")
+    set (_TCLHDL_REPORT     "-report")
+    set (_TCLHDL_BITSTREAM  "-bitstream")
+    set (_TCLHDL_PROGRAM    "-program")
+    set (_TCLHDL_SHELL      "-shell")
+    set (_TCLHDL_CLEAN      "-clean")
     #endif ()
 
     add_custom_target (${_TARGET_NAME}-shell
@@ -317,43 +317,43 @@ function(add_hdl _TARGET_NAME)
 
     add_custom_target (${_TARGET_NAME}-ip
         COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
-            ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_IP} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
+        ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_IP} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
     add_custom_target (${_TARGET_NAME}-generate
         COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
-            ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_GENERATE} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
+        ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_GENERATE} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
     add_custom_target (${_TARGET_NAME}-report
         COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
-            ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_BUILD} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
+        ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_BUILD} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
     add_custom_target (${_TARGET_NAME}-bitstream
         COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
-            ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_BITSTREAM} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
+        ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_BITSTREAM} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
     add_custom_target (${_TARGET_NAME}-program
         COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
-            ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_PROGRAM} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
+        ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_PROGRAM} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
     add_custom_target (${_TARGET_NAME}-clean
         COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
-            ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_CLEAN} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
+        ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_CLEAN} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
     add_custom_target (${_TARGET_NAME}
         COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
-            ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_BUILD} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
+        ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_BUILD} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 endfunction()
