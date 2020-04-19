@@ -103,7 +103,7 @@ function(add_hdl _TARGET_NAME)
     cmake_parse_arguments(_add_hdl
         ""
         "VENDOR;TOOL;REVISION;OUTPUT_DIR;OUTPUT_NAME"
-        "VHDL;VHDL_2008;VERILOG;COEFF;TCL;TCLHDL;SOURCES;PRE;POST;SETTINGS;FLOW;SOURCEDIR;IPDIR;CONSTRAINTDIR;SETTINGDIR;SCRIPTDIR;COREGEN;XCI;XCO;XCO_UPGRADE;QSYS;IPX;UCF;XDC;SDF;LPF"
+        "VHDL;VHDL_2008;VERILOG;COEFF;TCL;TCLHDL;SOURCES;PRE;POST;SETTINGS;TCL_SETTINGS;FLOW;SOURCEDIR;IPDIR;CONSTRAINTDIR;SETTINGDIR;SCRIPTDIR;COREGEN;XCI;XCO;XCO_UPGRADE;QSYS;IPX;UCF;XDC;SDF;LPF"
         ${ARGN}
         )
 
@@ -145,6 +145,7 @@ function(add_hdl _TARGET_NAME)
     set (_HDL_FLOW_FILES 	    ${_add_hdl_FLOW})
     set (_HDL_SETTINGS_NAME 	${_add_hdl_SETTINGS_NAME})
     set (_HDL_SETTINGS_FILES 	${_add_hdl_SETTINGS_FILES})
+    set (_HDL_TCL_SETTINGS 	    ${_add_hdl_TCL_SETTINGS})
     set (_HDL_COREGEN_FILES 	${_add_hdl_COREGEN})
     set (_HDL_XCI_FILES 	    ${_add_hdl_XCI})
     set (_HDL_XCO_FILES 	    ${_add_hdl_XCO})
@@ -245,6 +246,7 @@ function(add_hdl _TARGET_NAME)
     _tclhdl_add_file (FUNCTION "add_constraint" TYPE "XDC"                 FILES ${_HDL_XDC_FILES}         OUTPUT ${CMAKE_HDL_TCLHDL_FILE_CONSTRAINTS})
     _tclhdl_add_file (FUNCTION "add_constraint" TYPE "LPF"                 FILES ${_HDL_LPF_FILES}         OUTPUT ${CMAKE_HDL_TCLHDL_FILE_CONSTRAINTS})
     _tclhdl_add_file (FUNCTION "add_settings"   TYPE ${_HDL_SETTINGS_NAME} FILES ${_HDL_SETTINGS_FILES}    OUTPUT ${CMAKE_HDL_TCLHDL_FILE_SETTINGS})
+    _tclhdl_add_file (FUNCTION "fetch_settings" TYPE ""                    FILES ${_HDL_TCL_SETTINGS}      OUTPUT ${CMAKE_HDL_TCLHDL_FILE_PROJECT})
 
     #-- Add build flow
     foreach(_HDL_SOURCE_FILE IN LISTS _HDL_FLOW_FILES)
