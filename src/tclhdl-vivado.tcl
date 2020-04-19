@@ -116,8 +116,8 @@ namespace eval ::tclhdl::vivado {
     variable project_fileset_source         "sources_1"
     variable project_fileset_constraint     "constrs_1"
     variable project_fileset_simulation     "sim_1"
-    variable project_jobs                   "8"
-    variable project_threads                "8"
+    variable project_jobs                   "6"
+    variable project_threads                "6"
     variable project_tool_version
 
     variable ip_name          ""
@@ -138,6 +138,7 @@ namespace eval ::tclhdl::vivado {
     #---------------------------------------------------------------------------
     variable home [file join [pwd] [file dirname [info script]]]
     set version 1.0
+
 }
  
 

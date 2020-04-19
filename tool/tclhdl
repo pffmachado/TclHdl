@@ -84,6 +84,9 @@ if { [regexp {(quartus)} [info library]] } {
         lappend auto_path $path_tcllib_lattice
     }
     puts "Known runtime program: $runtime_prog"
+} elseif { [regexp {(mtitcl)} [info library]] } {
+    set runtime_prog "modelsim"
+    puts "Known runtime program: $runtime_prog"
 } else {
     puts info "Unknown runtime program"
 }

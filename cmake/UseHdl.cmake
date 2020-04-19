@@ -139,7 +139,7 @@ function(add_hdl _TARGET_NAME)
     set (_HDL_POST_FILES 	    ${_add_hdl_POST})
     set (_HDL_SOURCEDIR 	    ${_add_hdl_SOURCEDIR})
     set (_HDL_IPDIR 	        ${_add_hdl_IPDIR})
-    set (_HDL_CONSTRAINT 	    ${_add_hdl_CONSTRAINTDIR})
+    set (_HDL_CONSTRAINTDIR 	${_add_hdl_CONSTRAINTDIR})
     set (_HDL_SETTINGDIR 	    ${_add_hdl_SETTINGDIR})
     set (_HDL_SCRIPTDIR 	    ${_add_hdl_SCRIPTDIR})
     set (_HDL_FLOW_FILES 	    ${_add_hdl_FLOW})
@@ -202,7 +202,7 @@ function(add_hdl _TARGET_NAME)
     file (APPEND ${CMAKE_HDL_TCLHDL_FILE_PROJECT} ${_name})
     set (_name "::tclhdl::set_ip_dir \"${_HDL_IPDIR}\"\n\n")
     file (APPEND ${CMAKE_HDL_TCLHDL_FILE_PROJECT} ${_name})
-    set (_name "::tclhdl::set_constraint_dir \"${_HDL_CONSTRAINT}\"\n\n")
+    set (_name "::tclhdl::set_constraint_dir \"${_HDL_CONSTRAINTDIR}\"\n\n")
     file (APPEND ${CMAKE_HDL_TCLHDL_FILE_PROJECT} ${_name})
     set (_name "::tclhdl::set_settings_dir \"${_HDL_SETTINGDIR}\"\n\n")
     file (APPEND ${CMAKE_HDL_TCLHDL_FILE_PROJECT} ${_name})
@@ -358,5 +358,122 @@ function(add_hdl _TARGET_NAME)
         ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_BUILD} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
+endfunction()
+
+#------------------------------------------------------------------------------
+#-- TCLHDL Simulation Project Setup
+#------------------------------------------------------------------------------
+function(add_hdl_simulation _TARGET_NAME)
+
+    cmake_parse_arguments(_add_hdl_simulation
+        ""
+        "VENDOR;TOOL;REVISION;OUTPUT_DIR;OUTPUT_NAME"
+        "VHDL;VHDL_2008;VERILOG;TCL;TCLHDL;SOURCES;PRE;POST;SOURCEDIR;SCRIPTDIR"
+        ${ARGN}
+        )
+
+    if(NOT DEFINED _add_hdl_simulation_OUTPUT_DIR AND DEFINED CMAKE_HDL_TARGET_OUTPUT_DIR)
+        set(_add_hdl_simulation_OUTPUT_DIR "${CMAKE_HDL_TARGET_OUTPUT_DIR}")
+    endif()
+    if(NOT DEFINED _add_hdl_simulation_OUTPUT_NAME AND DEFINED CMAKE_HDL_TARGET_OUTPUT_NAME)
+        set(_add_hdl_simulation_OUTPUT_NAME "${CMAKE_HDL_TARGET_OUTPUT_NAME}")
+        set(CMAKE_HDL_TARGET_OUTPUT_NAME)
+    endif()
+    if (NOT DEFINED _add_hdl_simulation_OUTPUT_DIR)
+        set(_add_hdl_simulation_OUTPUT_DIR ${CMAKE_BINARY_DIR})
+    else()
+        get_filename_component(_add_hdl_simulation_OUTPUT_DIR ${_add_hdl_simulation_OUTPUT_DIR} ABSOLUTE)
+    endif()
+
+    string(TOUPPER ${_add_hdl_simulation_VENDOR} _vendor)
+    string(TOUPPER ${_add_hdl_simulation_TOOL} _tool)
+    string(CONCAT  _vendor_tool ${_vendor} "_" ${_tool})
+
+    set (_HDL_REVISION 	        ${_add_hdl_simulation_REVISION})
+    set (_HDL_VHDL_FILES 	    ${_add_hdl_simulation_VHDL})
+    set (_HDL_VHDL2008_FILES 	${_add_hdl_simulation_VHDL_2008})
+    set (_HDL_VERILOG_FILES	    ${_add_hdl_simulation_VERILOG})
+    set (_HDL_TCL_FILES 	    ${_add_hdl_simulation_TCL})
+    set (_HDL_TCLHDL_FILES 	    ${_add_hdl_simulation_TCLHDL})
+    set (_HDL_PRE_FILES 	    ${_add_hdl_simulation_PRE})
+    set (_HDL_POST_FILES 	    ${_add_hdl_simulation_POST})
+    set (_HDL_SOURCEDIR 	    ${_add_hdl_simulation_SOURCEDIR})
+    set (_HDL_SCRIPTDIR 	    ${_add_hdl_simulation_SCRIPTDIR})
+    set (_HDL_TCL_SETTINGS 	    ${_add_hdl_simulation_TCL_SETTINGS})
+    set (_HDL_SOURCE_FILES 	    ${_add_hdl_simulation_SOURCES} ${_add_hdl_simulation_UNPARSED_ARGUMENTS})
+
+    set (_HDL_PROJECT_DIR "${CMAKE_BINARY_DIR}/${_TARGET_NAME}")
+    set (_HDL_PROJECT_TYPE 	${_vendor_tool})
+
+    set (CMAKE_HDL_TCLHDL_FILE_PROJECT      "${_HDL_PROJECT_DIR}/project")
+    set (CMAKE_HDL_TCLHDL_FILE_SIMULATION   "${_HDL_PROJECT_DIR}/simulation")
+    set (CMAKE_HDL_TCLHDL_FILE_PRE          "${_HDL_PROJECT_DIR}/pre")
+    set (CMAKE_HDL_TCLHDL_FILE_POST         "${_HDL_PROJECT_DIR}/post")
+
+    #-- Add sources
+    _tclhdl_add_file (FUNCTION "add_source"     TYPE "VHDL"                FILES ${_HDL_VHDL_FILES}        OUTPUT ${CMAKE_HDL_TCLHDL_FILE_SOURCE})
+    _tclhdl_add_file (FUNCTION "add_source"     TYPE "VHDL 2008"           FILES ${_HDL_VHDL2008_FILES}    OUTPUT ${CMAKE_HDL_TCLHDL_FILE_SOURCE})
+    _tclhdl_add_file (FUNCTION "add_source"     TYPE "VERILOG"             FILES ${_HDL_VERILOG_FILES}     OUTPUT ${CMAKE_HDL_TCLHDL_FILE_SOURCE})
+    _tclhdl_add_file (FUNCTION "add_source"     TYPE "COEFF"               FILES ${_HDL_COEFF_FILES}       OUTPUT ${CMAKE_HDL_TCLHDL_FILE_SOURCE})
+    _tclhdl_add_file (FUNCTION "add_source"     TYPE "TCL"                 FILES ${_HDL_TCL_FILES}         OUTPUT ${CMAKE_HDL_TCLHDL_FILE_SOURCE})
+    _tclhdl_add_file (FUNCTION "add_source"     TYPE "TCLHDL"              FILES ${_HDL_TCLHDL_FILES}      OUTPUT ${CMAKE_HDL_TCLHDL_FILE_SOURCE})
+    _tclhdl_add_file (FUNCTION "add_pre"        TYPE ""                    FILES ${_HDL_PRE_FILES}         OUTPUT ${CMAKE_HDL_TCLHDL_FILE_PRE})
+    _tclhdl_add_file (FUNCTION "add_post"       TYPE ""                    FILES ${_HDL_POST_FILES}        OUTPUT ${CMAKE_HDL_TCLHDL_FILE_POST})
+    _tclhdl_add_file (FUNCTION "fetch_settings" TYPE ""                    FILES ${_HDL_TCL_SETTINGS}      OUTPUT ${CMAKE_HDL_TCLHDL_FILE_PROJECT})
+
+    #-- Set different tools invoke depending upon OS
+    set (CMAKE_HDL_SYSTEM_SOURCE "")
+    if (UNIX)
+        set (CMAKE_HDL_SYSTEM_SOURCE "source")
+    endif ()
+
+    #-- Set the different vendor specific calls
+    if ( ${_vendor} STREQUAL "XILINX" )
+        #set (XILINX_SOURCE_SETTINGS ${CMAKE_HDL_TOOL_SETTINGS})
+        file (TO_NATIVE_PATH ${CMAKE_HDL_TOOL_SETTINGS} XILINX_SOURCE_SETTINGS)
+        if ( ${_tool} STREQUAL "VIVADO" )
+            set (_VENDOR_TOOL "vivado" "-mode" "tcl" "-notrace" "-source")
+            set (_VENDOR_ARGS "-tclargs")
+        elseif ( ${_tool} STREQUAL "ISE" )
+            set (_VENDOR_TOOL "xtclsh")
+            set (_VENDOR_ARGS "")
+        endif ()
+        set (_VENDOR_TOOL_VERSION "")
+        set (_VENDOR_SOURCE "${XILINX_SOURCE_SETTINGS}")
+    elseif ( ${_vendor} MATCHES "Altera|Intel" )
+        if ( ${_tool} EQUAL "Quartus" )
+            set (_VENDOR_TOOL "quartus_sh")
+        endif ()
+        set (_VENDOR_TOOL_VERSION "")
+        set (_VENDOR_SOURCE "${INTEL_SOURCE_SETTINGS}")
+    elseif ( ${_vendor} STREQUAL "LATTICE" )
+        #set (XILINX_SOURCE_SETTINGS ${CMAKE_HDL_TOOL_SETTINGS})
+        file (TO_NATIVE_PATH ${CMAKE_HDL_TOOL_SETTINGS} LATTICE_SOURCE_SETTINGS)
+        if ( ${_tool} STREQUAL "DIAMOND" )
+            set (_VENDOR_TOOL "pnmainc")
+            if (UNIX)
+                set (_VENDOR_TOOL "diamondc")
+            endif ()
+            set (_VENDOR_ARGS "")
+        endif ()
+        set (_VENDOR_TOOL_VERSION "")
+        set (_VENDOR_SOURCE "${LATTICE_SOURCE_SETTINGS}")
+    endif ()
+
+    #set (TCLHDL_TOOL ${CMAKE_HDL_TCLHDL})
+    file (TO_NATIVE_PATH ${CMAKE_HDL_TCLHDL} TCLHDL_TOOL)
+    #if ( ${HAS_TCLHDL} )
+    set (_TCLHDL_TOOL       "${TCLHDL_TOOL}")
+    set (_TCLHDL_DEBUG      "-debug")
+    set (_TCLHDL_PROJECT    "-project")
+    set (_TCLHDL_CLEAN      "-simulation")
+    #endif ()
+
+    add_custom_target (${_TARGET_NAME}-simulation
+        COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
+        ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_SIMULATION} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )
+
 endfunction()
 

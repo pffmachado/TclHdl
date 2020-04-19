@@ -61,10 +61,26 @@ if { $runtime_prog == "quartus" } {
     package require ::tclhdl::ise
 } elseif { $runtime_prog == "diamond" } {
     package require ::tclhdl::diamond
+} elseif { $runtime_prog == "modelsim" } {
+    package require ::tclhdl::modelsim
+} elseif { $runtime_prog == "ghdl" } {
+    package require ::tclhdl::ghdl
+} elseif { $runtime_prog == "icarus" } {
+    package require ::tclhdl::icarus
 } else {
     puts "No Runtime Program Available"
 }
 
+#---------------------------------------------------------------------------
+#-- Alias definitions
+#---------------------------------------------------------------------------
+interp alias {} check_quartus  {} if { $::runtime_prog != "quartus"  } { return 0 }
+interp alias {} check_vivado   {} if { $::runtime_prog != "vivado"   } { return 0 }
+interp alias {} check_ise      {} if { $::runtime_prog != "ise"      } { return 0 }
+interp alias {} check_diamond  {} if { $::runtime_prog != "diamond"  } { return 0 }
+interp alias {} check_modelsim {} if { $::runtime_prog != "modelsim" } { return 0 }
+
+interp alias {} check_project_created {} if { $::tclhdl::flag_project_create == 0} { return 0 }
 
 #------------------------------------------------------------------------------
 ## Namespace Declaration
@@ -137,6 +153,7 @@ namespace eval ::tclhdl {
     variable project_dir
     variable project_type
     variable project_tool
+    variable project_tool_simulation
     variable project_part
     variable project_jobs
     variable project_target_dir
@@ -157,20 +174,21 @@ namespace eval ::tclhdl {
     variable project_version_patch  ""
     variable project_revision       ""
 
-    variable list_projects
-    variable list_source
-    variable list_ip
-    variable list_constraint
-    variable list_settings
+    variable list_projects ""
+    variable list_source ""
+    variable list_ip ""
+    variable list_constraint ""
+    variable list_settings ""
     variable list_target_dir ""
-    variable list_pre_scripts
-    variable list_post_scripts
+    variable list_pre_scripts ""
+    variable list_post_scripts ""
 
     variable flag_project_create
 
     #-- Namespace internal variables
     variable home [file join [pwd] [file dirname [info script]]]
     set version 1.0
+
 }
 
 #------------------------------------------------------------------------------
@@ -217,30 +235,27 @@ proc ::tclhdl::get_project_list {tclhdl_dir} {
 #
 #-------------------------------------------------------------------------------
 proc ::tclhdl::add_source {type src} {
+    check_project_created
     switch $::tclhdl::project_tool {
         INTEL_QUARTUS {
-            if { $::tclhdl::flag_project_create == 1} {
-                log::log debug "add_source: Intel - Adding file type $type - $src"
-                set_global_assignment -name "${type}_FILE" $src
-            }
+            check_quartus
+            log::log debug "add_source: Intel - Adding file type $type - $src"
+            set_global_assignment -name "${type}_FILE" $src
         }
         XILINX_VIVADO {
-            if { $::tclhdl::flag_project_create == 1} {
-                log::log debug "add_source: Xilinx Vivado - Adding file type $type - $src"
-                ::tclhdl::vivado::source_add $type $src
-            }
+            check_vivado
+            log::log debug "add_source: Xilinx Vivado - Adding file type $type - $src"
+            ::tclhdl::vivado::source_add $type $src
         }
         XILINX_ISE {
-            if { $::tclhdl::flag_project_create == 1} {
-                log::log debug "add_source: Xilinx ISE - Adding file type $type - $src"
-                ::tclhdl::ise::source_add $type $src
-            }
+            check_ise
+            log::log debug "add_source: Xilinx ISE - Adding file type $type - $src"
+            ::tclhdl::ise::source_add $type $src
         }
         LATTICE_DIAMOND {
-            if { $::tclhdl::flag_project_create == 1} {
-                log::log debug "add_source: Lattice Diamond - Adding file type $type - $src"
-                ::tclhdl::diamond::source_add $type $src
-            }
+            check_diamond
+            log::log debug "add_source: Lattice Diamond - Adding file type $type - $src"
+            ::tclhdl::diamond::source_add $type $src
         }
         default {
             log::logMsg "add_source: No supported tool define for the current project"
@@ -262,45 +277,43 @@ proc ::tclhdl::add_tcl {src} {
 #
 #-------------------------------------------------------------------------------
 proc ::tclhdl::add_ip {type src} {
+    check_project_created
     switch $::tclhdl::project_tool {
         INTEL_QUARTUS {
+            check_quartus
             switch $type {
                 INTEL_QUARTUS_IP {
-                    if { $::tclhdl::flag_project_create == 1} {
-                        log::log debug "add_ip: Adding ip type $type - $src"
-                        cd $::tclhdl::quartus::output_root
-                        ::tclhdl::quartus::ip_reset
-                        ::tclhdl::quartus::ip_set_type $type
-                        source $src
-                        ::tclhdl::quartus::ip_generate
-                    }
+                    log::log debug "add_ip: Adding ip type $type - $src"
+                    cd $::tclhdl::quartus::output_root
+                    ::tclhdl::quartus::ip_reset
+                    ::tclhdl::quartus::ip_set_type $type
+                    source $src
+                    ::tclhdl::quartus::ip_generate
                 }
                 INTEL_QUARTUS_QSYS {
-                    if { $::tclhdl::flag_project_create == 1} {
-                        log::log debug "add_ip: Adding QSYS ip type $type - $src"
-                        ::tclhdl::quartus::ip_reset
-                        ::tclhdl::quartus::ip_set_type $type
-                        source $src
+                    log::log debug "add_ip: Adding QSYS ip type $type - $src"
+                    ::tclhdl::quartus::ip_reset
+                    ::tclhdl::quartus::ip_set_type $type
+                    source $src
 
-                        log::log debug "add_ip: Adding QSYS ip $::tclhdl::quartus::output_root"
-                        set ip_name "$::tclhdl::quartus::output_root/$::tclhdl::quartus::ip_name"
-                        file mkdir $ip_name
-                        cd $ip_name
+                    log::log debug "add_ip: Adding QSYS ip $::tclhdl::quartus::output_root"
+                    set ip_name "$::tclhdl::quartus::output_root/$::tclhdl::quartus::ip_name"
+                    file mkdir $ip_name
+                    cd $ip_name
 
-                        foreach dir $::tclhdl::quartus::qsys_component {
-                            log::log debug "add_ip: Adding QSYS component - $dir"
-                            set name [file tail $dir]
-                            file link -symbolic $name $dir
-                        }
-
-                        foreach hw $::tclhdl::quartus::qsys_hw {
-                            log::log debug "add_ip: Adding QSYS hw - $hw"
-                            set name [file tail $hw]
-                            file copy -force  $hw "$ip_name/$name"
-                        }
-
-                        ::tclhdl::quartus::ip_generate
+                    foreach dir $::tclhdl::quartus::qsys_component {
+                        log::log debug "add_ip: Adding QSYS component - $dir"
+                        set name [file tail $dir]
+                        file link -symbolic $name $dir
                     }
+
+                    foreach hw $::tclhdl::quartus::qsys_hw {
+                        log::log debug "add_ip: Adding QSYS hw - $hw"
+                        set name [file tail $hw]
+                        file copy -force  $hw "$ip_name/$name"
+                    }
+
+                    ::tclhdl::quartus::ip_generate
                 }
                 default {
                     log::logMsg "add_ip: No IP type defined for $ip_file"
@@ -308,6 +321,7 @@ proc ::tclhdl::add_ip {type src} {
             }
         }
         XILINX_VIVADO {
+            check_vivado
             switch $type {
                 XCI {
                     log::log debug "add_ip: Adding ip type $type - $src"
@@ -319,6 +333,7 @@ proc ::tclhdl::add_ip {type src} {
             }
         }
         XILINX_ISE {
+            check_ise
             switch $type {
                 COREGEN {
                     log::log debug "add_ip: Adding ip type $type - $src"
@@ -334,6 +349,7 @@ proc ::tclhdl::add_ip {type src} {
             }
         }
         LATTICE_DIAMOND {
+            check_diamond
             switch $type {
                 IPX {
                     log::log debug "add_ip: Adding ip type $type - $src"
@@ -357,30 +373,27 @@ proc ::tclhdl::add_ip {type src} {
 #
 #-------------------------------------------------------------------------------
 proc ::tclhdl::add_constraint {type src} {
+    check_project_created
     switch $::tclhdl::project_tool {
         INTEL_QUARTUS {
-            if { $::tclhdl::flag_project_create == 1 } {
-                log::log debug "add_constraint: Intel - Adding file tyepe $type -$src"
-                source $src
-            }
+            check_quartus
+            log::log debug "add_constraint: Intel - Adding file tyepe $type -$src"
+            source $src
         }
         XILINX_VIVADO {
-            if { $::tclhdl::flag_project_create == 1} {
-                log::log debug "add_constraint: Vivado - Adding file type $type - $src"
-                ::tclhdl::vivado::constraint_add $type $src
-            }
+            check_vivado
+            log::log debug "add_constraint: Vivado - Adding file type $type - $src"
+            ::tclhdl::vivado::constraint_add $type $src
         }
         XILINX_ISE {
-            if { $::tclhdl::flag_project_create == 1} {
-                log::log debug "add_constraint: ISE - Adding file type $type - $src"
-                ::tclhdl::ise::constraint_add $type $src
-            }
+            check_ise
+            log::log debug "add_constraint: ISE - Adding file type $type - $src"
+            ::tclhdl::ise::constraint_add $type $src
         }
         LATTICE_DIAMOND {
-            if { $::tclhdl::flag_project_create == 1} {
-                log::log debug "add_constraint: Diamond - Adding file type $type - $src"
-                ::tclhdl::diamond::constraint_add $type $src
-            }
+            check_diamond
+            log::log debug "add_constraint: Diamond - Adding file type $type - $src"
+            ::tclhdl::diamond::constraint_add $type $src
         }
         default {
             log::logMsg "add_constraint: No supported tool define for the current project"
@@ -395,15 +408,16 @@ proc ::tclhdl::add_constraint {type src} {
 proc ::tclhdl::add_simulation {} {
     switch $::tclhdl::project_tool {
         INTEL_QUARTUS {
-            if { $::tclhdl::flag_project_create == 1} {
-                log::log debug "add_simulation: Intel - Adding file $src"
-            }
+            check_quartus
         }
         XILINX_VIVADO {
+            check_vivado
         }
         XILINX_ISE {
+            check_ise
         }
         LATTICE_DIAMOND {
+            check_diamond
         }
         default {
             log::logMsg "add_simulation: No supported tool define for the current project"
@@ -418,37 +432,32 @@ proc ::tclhdl::add_simulation {} {
 proc ::tclhdl::add_settings {settings src} {
     switch $::tclhdl::project_tool {
         INTEL_QUARTUS {
-            if { $::tclhdl::flag_project_create == 1 } {
-                log::log debug "add_settings: Quartus - Adding file settings $settings - $src"
-                if { $::tclhdl::quartus::project_settings == $settings } {
-                    source $src
-                }
+            check_quartus
+            log::log debug "add_settings: Quartus - Adding file settings $settings - $src"
+            if { $::tclhdl::quartus::project_settings == $settings } {
+                source $src
             }
         }
         XILINX_VIVADO {
-            if { $::tclhdl::flag_project_create == 1 } {
-                log::log debug "add_settings: Vivado - Adding file settings $settings - $src"
-                if { $::tclhdl::vivado::project_settings == $settings } {
-                    source $src
-                }
+            check_vivado
+            log::log debug "add_settings: Vivado - Adding file settings $settings - $src"
+            if { $::tclhdl::vivado::project_settings == $settings } {
+                source $src
             }
         }
         XILINX_ISE {
-            if { $::tclhdl::flag_project_create == 1 } {
-                log::log debug "add_settings: ISE - Adding file settings $settings - $src"
-                if { $::tclhdl::ise::project_settings == $settings } {
-                    source $src
-                }
+            check_ise
+            log::log debug "add_settings: ISE - Adding file settings $settings - $src"
+            if { $::tclhdl::ise::project_settings == $settings } {
+                source $src
             }
         }
         LATTICE_DIAMOND {
-            if { $::tclhdl::flag_project_create == 1 } {
-                log::log debug "add_settings: Diamond - Adding file settings $settings - $src"
-                if { $::tclhdl::diamond::project_settings == $settings } {
-                    source $src
-                }
+            check_diamond
+            log::log debug "add_settings: Diamond - Adding file settings $settings - $src"
+            if { $::tclhdl::diamond::project_settings == $settings } {
+                source $src
             }
-
         }
         default {
             log::logMsg "add_source: No supported tool define for the current project"
@@ -460,29 +469,25 @@ proc ::tclhdl::add_settings {settings src} {
 #
 #-------------------------------------------------------------------------------
 proc ::tclhdl::add_project {prj settings rev} {
-    global ::tclhdl::list_projects
-
     log::log debug "add_project: Adding Project $prj with revision $rev and settings $settings"
+    global ::tclhdl::list_projects
+    if { $::tclhdl::flag_project_create == 1 } { return 0 }
     switch $::tclhdl::project_tool {
         INTEL_QUARTUS {
-            if { $::tclhdl::flag_project_create == 0 } {
-                lappend ::tclhdl::list_projects [list $prj $settings $rev]
-            }
+            check_quartus
+            lappend ::tclhdl::list_projects [list $prj $settings $rev]
         }
         XILINX_VIVADO {
-            if { $::tclhdl::flag_project_create == 0 } {
-                lappend ::tclhdl::list_projects [list $prj $settings $rev]
-            }
+            check_vivado
+            lappend ::tclhdl::list_projects [list $prj $settings $rev]
         }
         XILINX_ISE {
-            if { $::tclhdl::flag_project_create == 0 } {
-                lappend ::tclhdl::list_projects [list $prj $settings $rev]
-            }
+            check_ise
+            lappend ::tclhdl::list_projects [list $prj $settings $rev]
         }
         LATTICE_DIAMOND {
-            if { $::tclhdl::flag_project_create == 0 } {
-                lappend ::tclhdl::list_projects [list $prj $settings $rev]
-            }
+            check_diamond
+            lappend ::tclhdl::list_projects [list $prj $settings $rev]
         }
         default {
             log::logMsg "add_project: No supported tool define for the current project"
@@ -652,6 +657,7 @@ proc ::tclhdl::project_info {prj} {
 proc ::tclhdl::project_open {args} {
     switch $::tclhdl::project_tool {
         INTEL_QUARTUS {
+            check_quartus
             if { [llength $args] == 3 } {
                 set prj [lindex $args 0]
                 set settings [lindex $args 1]
@@ -666,6 +672,7 @@ proc ::tclhdl::project_open {args} {
             }
         }
         XILINX_VIVADO {
+            check_vivado
             if { [llength $args] == 3 } {
                 set prj [lindex $args 0]
                 set settings [lindex $args 1]
@@ -680,6 +687,7 @@ proc ::tclhdl::project_open {args} {
             }
         }
         XILINX_ISE {
+            check_ise
             if { [llength $args] == 3 } {
                 set prj [lindex $args 0]
                 set settings [lindex $args 1]
@@ -694,6 +702,7 @@ proc ::tclhdl::project_open {args} {
             }
         }
         LATTICE_DIAMOND {
+            check_diamond
             if { [llength $args] == 3 } {
                 set prj [lindex $args 0]
                 set settings [lindex $args 1]
@@ -721,15 +730,19 @@ proc ::tclhdl::project_close {prj} {
     log::log debug "project_close: Closing project $prj"
     switch $::tclhdl::project_tool {
         INTEL_QUARTUS {
+            check_quartus
             ::tclhdl::quartus::close_project
         }
         XILINX_VIVADO {
+            check_vivado
             ::tclhdl::vivado::close_project
         }
         XILINX_ISE {
+            check_ise
             ::tclhdl::ise::close_project
         }
         LATTICE_DIAMOND {
+            check_diamond
             ::tclhdl::diamond::close_project
         }
         default {
@@ -744,7 +757,6 @@ proc ::tclhdl::project_close {prj} {
 #-------------------------------------------------------------------------------
 proc ::tclhdl::project_clean {prj} {
     set path [pwd]
-
     log::log debug "project_clean: Cleaning project $path/$prj"
     file delete -force [glob -type d $path/$prj/$prj-*]
 }
@@ -758,7 +770,6 @@ proc ::tclhdl::is_project_created {} {
     if { $::tclhdl::flag_project_create == 0 } {
         return 1
     }
-
     return 0
 }
 
@@ -822,6 +833,7 @@ proc ::tclhdl::project_program {prj} {
             INTEL_QUARTUS {
             }
             XILINX_VIVADO {
+                check_vivado
                 log::log debug "project_program: Start Hardware Programming"
                 ::tclhdl::vivado::hw_programming
             }
@@ -1076,6 +1088,7 @@ proc ::tclhdl::set_ip_output_dir {dir} {
             $::tclhdl::quartus::set_ip_output_dir $dir
         }
         XILINX_VIVADO {
+            check_vivado
         }
         XILINX_ISE {
         }
@@ -1150,14 +1163,18 @@ proc ::tclhdl::build_ip {} {
     log::log debug "build_ip: Build Ip Cores"
     switch $::tclhdl::project_tool {
         INTEL_QUARTUS {
+            check_quartus
         }
         XILINX_VIVADO {
+            check_vivado
             ::tclhdl::vivado::build_ip
         }
         XILINX_ISE {
+            check_ise
             ::tclhdl::ise::build_ip
         }
         LATTICE_DIAMOND {
+            check_diamond
             ::tclhdl::diamond::build_ip
         }
         default {
@@ -1178,15 +1195,19 @@ proc ::tclhdl::build_synthesis {} {
     log::log debug "build_synthesis: Synthesis"
     switch $::tclhdl::project_tool {
         INTEL_QUARTUS {
+            check_quartus
             ::tclhdl::quartus::build_synthesis
         }
         XILINX_VIVADO {
+            check_vivado
             ::tclhdl::vivado::build_synthesis
         }
         XILINX_ISE {
+            check_diamond
             ::tclhdl::ise::build_synthesis
         }
         LATTICE_DIAMOND {
+            check_diamond
             ::tclhdl::diamond::build_synthesis
         }
         default {
@@ -1207,15 +1228,19 @@ proc ::tclhdl::build_fitting {} {
     log::log debug "build_fitting: Place and Route"
     switch $::tclhdl::project_tool {
         INTEL_QUARTUS {
+            check_quartus
             ::tclhdl::quartus::build_fitting
         }
         XILINX_VIVADO {
+            check_vivado
             ::tclhdl::vivado::build_fitting
         }
         XILINX_ISE {
+            check_ise
             ::tclhdl::ise::build_fitting
         }
         LATTICE_DIAMOND {
+            check_diamond
             ::tclhdl::diamond::build_fitting
         }
         default {
@@ -1236,14 +1261,18 @@ proc ::tclhdl::build_timing {} {
     log::log debug "build_timing: Timming Analysis"
     switch $::tclhdl::project_tool {
         INTEL_QUARTUS {
+            check_quartus
             ::tclhdl::quartus::build_timing
         }
         XILINX_VIVADO {
+            check_vivado
             ::tclhdl::vivado::build_timing
         }
         XILINX_ISE {
+            check_ise
         }
         LATTICE_DIAMOND {
+            check_diamond
         }
         default {
             log::logMsg "build_timing: No supported tool define for the current project"
@@ -1274,15 +1303,19 @@ proc ::tclhdl::build_bitstream {} {
     log::log debug "build_bitstream: Generate Bitstream"
     switch $::tclhdl::project_tool {
         INTEL_QUARTUS {
+            check_quartus
             ::tclhdl::quartus::build_bitstream
         }
         XILINX_VIVADO {
+            check_vivado
             ::tclhdl::vivado::build_bitstream
         }
         XILINX_ISE {
+            check_ise
             ::tclhdl::ise::build_bitstream
         }
         LATTICE_DIAMOND {
+            check_diamond
             ::tclhdl::diamond::build_bitstream
         }
         default {
@@ -1303,15 +1336,19 @@ proc ::tclhdl::build_report {} {
     log::log debug "build_report: Generate Report"
     switch $::tclhdl::project_tool {
         INTEL_QUARTUS {
+            check_quartus
             ::tclhdl::quartus::build_report
         }
         XILINX_VIVADO {
+            check_vivado
             ::tclhdl::vivado::build_report
         }
         XILINX_ISE {
+            check_ise
             ::tclhdl::ise::build_report
         }
         LATTICE_DIAMOND {
+            check_diamond
             ::tclhdl::diamond::build_report
         }
         default {
