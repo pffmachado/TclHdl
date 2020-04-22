@@ -339,14 +339,6 @@ proc ::tclhdl::vivado::build_fitting {} {
         log::log error "xilinx::build_fitting : implementation  failed"
         exit 1
     }
-    
-    open_run $::tclhdl::vivado::project_impl
-    set error_code [get_property SLACK [get_timing_paths]]
-    if { [expr $error_code < 0] } {
-        log::log error "xilinx::build_fitting : Timing not met with Slack = $error_code"
-        exit 1
-    }
-
 }
 
 #------------------------------------------------------------------------------
@@ -363,7 +355,13 @@ proc ::tclhdl::vivado::build_timing {} {
     #    log::log error "xilinx::build_timing : Timing not met with WNS=$wns and WHS=$whs"
     #    exit 1
     #}
-
+    
+    open_run $::tclhdl::vivado::project_impl
+    set error_code [get_property SLACK [get_timing_paths]]
+    if { [expr $error_code < 0] } {
+        log::log error "xilinx::build_fitting : Timing not met with Slack = $error_code"
+        exit 1
+    }
 }
 
 #------------------------------------------------------------------------------
