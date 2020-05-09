@@ -1343,6 +1343,7 @@ proc ::tclhdl::build_timing {} {
         }
         XILINX_ISE {
             check_ise
+            ::tclhdl::ise::build_timing
         }
         LATTICE_DIAMOND {
             check_diamond

@@ -37,6 +37,7 @@
 #------------------------------------------------------------------------------
 
 package require ::tclhdl::definitions
+package require ::tclhdl::utils
 
 #------------------------------------------------------------------------------
 ## Namespace Declaration
@@ -295,6 +296,17 @@ proc ::tclhdl::ise::build_fitting {} {
 #------------------------------------------------------------------------------
 proc ::tclhdl::ise::build_timing {} {
     log::log debug "ise::build_timing : launch timing analysis"
+
+    set timing_file "$::tclhdl::ise::project_name.twr"
+    set timing_rpt [::tclhdl::utils::grep "Timing errors:" $timing_file]
+    set timing_errors ""
+    regexp "Timing errors: (\[0-9\]+) *" $timing_rpt match timing_errors
+
+    if { [expr $timing_errors > 0] } {
+        log::log error "xilinx::build_timing : Timing not met with $timing_errors errors"
+        exit 1
+    }
+
 }
 
 #------------------------------------------------------------------------------
