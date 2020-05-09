@@ -81,6 +81,7 @@ interp alias {} check_diamond  {} if { $::runtime_prog != "diamond"  } { return 
 interp alias {} check_modelsim {} if { $::runtime_prog != "modelsim" } { return 0 }
 
 interp alias {} check_project_created {} if { $::tclhdl::flag_project_create == 0} { return 0 }
+interp alias {} check_simulation {} if { $::tclhdl::flag_is_simulation == 1} { return 0 }
 
 #------------------------------------------------------------------------------
 ## Namespace Declaration
@@ -109,6 +110,7 @@ namespace eval ::tclhdl {
     namespace export project_clean
     namespace export project_open
     namespace export project_close
+    namespace export project_simulation
 
     namespace export fetch_pre
     namespace export fetch_ips
@@ -128,6 +130,7 @@ namespace eval ::tclhdl {
     namespace export set_project_version_minor
     namespace export set_project_version_patch
     namespace export set_project_revision
+    namespace export set_project_simulation_type
     namespace export set_source_dir
     namespace export set_ip_dir
     namespace export set_ip_output_dir
@@ -146,6 +149,7 @@ namespace eval ::tclhdl {
     namespace export build_bitstream
     namespace export build_report
     namespace export build_post
+    namespace export build_custom
 
     #-- Member Variables
     variable project_root
@@ -153,7 +157,8 @@ namespace eval ::tclhdl {
     variable project_dir
     variable project_type
     variable project_tool
-    variable project_tool_simulation
+    variable project_simulation_type
+    variable project_simulation_tool
     variable project_part
     variable project_jobs
     variable project_target_dir
@@ -184,6 +189,7 @@ namespace eval ::tclhdl {
     variable list_post_scripts ""
 
     variable flag_project_create
+    variable flag_is_simulation     0
 
     #-- Namespace internal variables
     variable home [file join [pwd] [file dirname [info script]]]
@@ -235,6 +241,7 @@ proc ::tclhdl::get_project_list {tclhdl_dir} {
 #
 #-------------------------------------------------------------------------------
 proc ::tclhdl::add_source {type src} {
+    check_simulation
     check_project_created
     switch $::tclhdl::project_tool {
         INTEL_QUARTUS {
@@ -277,6 +284,7 @@ proc ::tclhdl::add_tcl {src} {
 #
 #-------------------------------------------------------------------------------
 proc ::tclhdl::add_ip {type src} {
+    check_simulation
     check_project_created
     switch $::tclhdl::project_tool {
         INTEL_QUARTUS {
@@ -373,6 +381,7 @@ proc ::tclhdl::add_ip {type src} {
 #
 #-------------------------------------------------------------------------------
 proc ::tclhdl::add_constraint {type src} {
+    check_simulation
     check_project_created
     switch $::tclhdl::project_tool {
         INTEL_QUARTUS {
@@ -430,6 +439,7 @@ proc ::tclhdl::add_simulation {} {
 #
 #-------------------------------------------------------------------------------
 proc ::tclhdl::add_settings {settings src} {
+    check_simulation
     switch $::tclhdl::project_tool {
         INTEL_QUARTUS {
             check_quartus
@@ -469,6 +479,7 @@ proc ::tclhdl::add_settings {settings src} {
 #
 #-------------------------------------------------------------------------------
 proc ::tclhdl::add_project {prj settings rev} {
+    check_simulation
     log::log debug "add_project: Adding Project $prj with revision $rev and settings $settings"
     global ::tclhdl::list_projects
     if { $::tclhdl::flag_project_create == 1 } { return 0 }
@@ -499,6 +510,7 @@ proc ::tclhdl::add_project {prj settings rev} {
 #
 #-------------------------------------------------------------------------------
 proc ::tclhdl::add_pre {src} {
+    check_simulation
     global ::tclhdl::list_pre_scripts
     log::log debug "add_pre: Add Pre File to Project $src"
 
@@ -510,6 +522,7 @@ proc ::tclhdl::add_pre {src} {
 #
 #-------------------------------------------------------------------------------
 proc ::tclhdl::add_post {src} {
+    check_simulation
     global ::tclhdl::list_post_scripts
     log::log debug "add_post: Add Post File to Project $src"
 
@@ -752,6 +765,48 @@ proc ::tclhdl::project_close {prj} {
 }
 
 #-------------------------------------------------------------------------------
+## Simulation  Project
+#
+#-------------------------------------------------------------------------------
+proc ::tclhdl::project_simulation {prj step} {
+    global ::tclhdl::project_simulation_full
+    global ::tclhdl::project_simulation_step
+    
+    log::log debug "project_simulation: Building $prj with Flow $step"
+    #-- Get build step
+    set ::tclhdl::project_simulation_full 0
+    set ::tclhdl::project_simulation_step $step
+    if { $step == "full" } {
+        set ::tclhdl::project_simulation_full 1
+    }
+
+    #-- Verify Project
+    ::tclhdl::project_verify $prj
+
+    #-- Get Environment Variables
+    log::log debug "project_simulation: Setting enviornment"
+    set ::tclhdl::flag_project_create 0
+    source $::tclhdl::project_target_dir/project
+
+    #-- Build Project
+    log::log debug "project_simulation: Build Project"
+    foreach lst $::tclhdl::list_projects {
+        set project [lindex $lst 0]
+        set settings [lindex $lst 1]
+
+        #-- Move to build directory
+        log::log debug "project_simulation: Change Dir to $::tclhdl::project_target_dir/$project-$settings"
+        cd "$::tclhdl::project_target_dir/$project-$settings"
+
+        #-- Opennning the existent Project
+        log::log debug "project_simulation: Build Execute"
+        ::tclhdl::project_open [lindex $lst 0] [lindex $lst 1] [lindex $lst 2]
+        source $::tclhdl::project_target_dir/build
+        ::tclhdl::project_close [lindex $lst 0]
+    }
+}
+
+#-------------------------------------------------------------------------------
 ## Clean Project
 #
 #-------------------------------------------------------------------------------
@@ -855,6 +910,7 @@ proc ::tclhdl::project_program {prj} {
 #
 #-------------------------------------------------------------------------------
 proc ::tclhdl::fetch_pre {} {
+    check_simulation
     log::log debug "fetch_pre: Fetching Pre build"
     source $::tclhdl::project_target_dir/pre
 }
@@ -864,6 +920,7 @@ proc ::tclhdl::fetch_pre {} {
 #
 #-------------------------------------------------------------------------------
 proc ::tclhdl::fetch_ips {} {
+    check_simulation
     if { [::tclhdl::is_project_created] } {
         return 0
     }
@@ -877,6 +934,7 @@ proc ::tclhdl::fetch_ips {} {
 #
 #-------------------------------------------------------------------------------
 proc ::tclhdl::fetch_sources {} {
+    check_simulation
     if { [::tclhdl::is_project_created] } {
         return 0
     }
@@ -890,6 +948,7 @@ proc ::tclhdl::fetch_sources {} {
 #
 #-------------------------------------------------------------------------------
 proc ::tclhdl::fetch_constraints {} {
+    check_simulation
     if { [::tclhdl::is_project_created] } {
         return 0
     }
@@ -916,6 +975,7 @@ proc ::tclhdl::fetch_simulations {} {
 #
 #-------------------------------------------------------------------------------
 proc ::tclhdl::fetch_settings {src} {
+    check_simulation
     if { [::tclhdl::is_project_created] } {
         return 0
     }
@@ -929,6 +989,7 @@ proc ::tclhdl::fetch_settings {src} {
 #
 #-------------------------------------------------------------------------------
 proc ::tclhdl::fetch_post {} {
+    check_simulation
     log::log debug "fetch_post: Fetching Post Buiding"
     source $::tclhdl::project_target_dir/post
 }
@@ -1138,6 +1199,18 @@ proc ::tclhdl::set_scripts_dir {dir} {
     global ::tclhdl::project_scripts_dir
     set ::tclhdl::project_scripts_dir $dir
     log::log debug "set_scripts_dir: Set Project scripts dir to $::tclhdl::project_scripts_dir"
+}
+
+#-------------------------------------------------------------------------------
+## Set Project Simulation Type
+#
+#-------------------------------------------------------------------------------
+proc ::tclhdl::set_project_simulation_type {type} {
+    global ::tclhdl::project_simulation_type
+    global ::tclhdl::project_simulation_tool
+    set ::tclhdl::project_simulation_type $type
+    set ::tclhdl::project_simulation_tool $type
+    log::log debug "set_project_simulation_type: Set Project Simulation type to $::tclhdl::project_simulation_type"
 }
 
 #-------------------------------------------------------------------------------
@@ -1355,6 +1428,19 @@ proc ::tclhdl::build_report {} {
             log::logMsg "build_report: No supported tool define for the current project"
         }
     }
+}
+
+#-------------------------------------------------------------------------------
+## Build Custom
+#
+#-------------------------------------------------------------------------------
+proc ::tclhdl::build_custom {src} {
+    if { $::tclhdl::project_build_full == 0 && $::tclhdl::project_build_step != "custom" } {
+        return 0
+    }
+
+    log::log debug "build_custom: Custom Build Flow"
+    source $src
 }
 
 #------------------------------------------------------------------------------
