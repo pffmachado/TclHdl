@@ -367,7 +367,7 @@ function(add_hdl_simulation _TARGET_NAME)
 
     cmake_parse_arguments(_add_hdl_simulation
         ""
-        "VENDOR;TOOL;REVISION;OUTPUT_DIR;OUTPUT_NAME"
+        "SIMULATION;VENDOR;TOOL;REVISION;OUTPUT_DIR;OUTPUT_NAME"
         "VHDL;VHDL_2008;VERILOG;TCL;TCLHDL;SOURCES;PRE;POST;SOURCEDIR;SCRIPTDIR"
         ${ARGN}
         )
@@ -384,11 +384,16 @@ function(add_hdl_simulation _TARGET_NAME)
     else()
         get_filename_component(_add_hdl_simulation_OUTPUT_DIR ${_add_hdl_simulation_OUTPUT_DIR} ABSOLUTE)
     endif()
+    if (_add_hdl_SIMULATION)
+        list (GET _add_hdl_SIMULATION 0 _add_hdl_SIMULATION_NAME)
+        cmake_parse_arguments (_add_hdl_SIMULATION "" "" "FILES" ${_add_hdl_SIMULATION})
+    endif()
 
     string(TOUPPER ${_add_hdl_simulation_VENDOR} _vendor)
     string(TOUPPER ${_add_hdl_simulation_TOOL} _tool)
     string(CONCAT  _vendor_tool ${_vendor} "_" ${_tool})
 
+    set (_HDL_NAME  	        ${_add_hdl_simulation_SIMULATION})
     set (_HDL_REVISION 	        ${_add_hdl_simulation_REVISION})
     set (_HDL_VHDL_FILES 	    ${_add_hdl_simulation_VHDL})
     set (_HDL_VHDL2008_FILES 	${_add_hdl_simulation_VHDL_2008})
@@ -405,21 +410,19 @@ function(add_hdl_simulation _TARGET_NAME)
     set (_HDL_PROJECT_DIR "${CMAKE_BINARY_DIR}/${_TARGET_NAME}")
     set (_HDL_PROJECT_TYPE 	${_vendor_tool})
 
-    set (CMAKE_HDL_TCLHDL_FILE_PROJECT      "${_HDL_PROJECT_DIR}/project")
     set (CMAKE_HDL_TCLHDL_FILE_SIMULATION   "${_HDL_PROJECT_DIR}/simulation")
-    set (CMAKE_HDL_TCLHDL_FILE_PRE          "${_HDL_PROJECT_DIR}/pre")
-    set (CMAKE_HDL_TCLHDL_FILE_POST         "${_HDL_PROJECT_DIR}/post")
+
+    #-- Set simulation file environment
+    set (_name "::tclhdl::set_project_simulation_type \"${_HDL_PROJECT_TYPE}\"\n\n")
+    file (APPEND ${CMAKE_HDL_TCLHDL_FILE_SIMULATION} ${_name})
 
     #-- Add sources
-    _tclhdl_add_file (FUNCTION "add_source"     TYPE "VHDL"                FILES ${_HDL_VHDL_FILES}        OUTPUT ${CMAKE_HDL_TCLHDL_FILE_SOURCE})
-    _tclhdl_add_file (FUNCTION "add_source"     TYPE "VHDL 2008"           FILES ${_HDL_VHDL2008_FILES}    OUTPUT ${CMAKE_HDL_TCLHDL_FILE_SOURCE})
-    _tclhdl_add_file (FUNCTION "add_source"     TYPE "VERILOG"             FILES ${_HDL_VERILOG_FILES}     OUTPUT ${CMAKE_HDL_TCLHDL_FILE_SOURCE})
-    _tclhdl_add_file (FUNCTION "add_source"     TYPE "COEFF"               FILES ${_HDL_COEFF_FILES}       OUTPUT ${CMAKE_HDL_TCLHDL_FILE_SOURCE})
-    _tclhdl_add_file (FUNCTION "add_source"     TYPE "TCL"                 FILES ${_HDL_TCL_FILES}         OUTPUT ${CMAKE_HDL_TCLHDL_FILE_SOURCE})
-    _tclhdl_add_file (FUNCTION "add_source"     TYPE "TCLHDL"              FILES ${_HDL_TCLHDL_FILES}      OUTPUT ${CMAKE_HDL_TCLHDL_FILE_SOURCE})
-    _tclhdl_add_file (FUNCTION "add_pre"        TYPE ""                    FILES ${_HDL_PRE_FILES}         OUTPUT ${CMAKE_HDL_TCLHDL_FILE_PRE})
-    _tclhdl_add_file (FUNCTION "add_post"       TYPE ""                    FILES ${_HDL_POST_FILES}        OUTPUT ${CMAKE_HDL_TCLHDL_FILE_POST})
-    _tclhdl_add_file (FUNCTION "fetch_settings" TYPE ""                    FILES ${_HDL_TCL_SETTINGS}      OUTPUT ${CMAKE_HDL_TCLHDL_FILE_PROJECT})
+    _tclhdl_add_file (FUNCTION "add_simulation"     TYPE "VHDL"                FILES ${_HDL_VHDL_FILES}        OUTPUT ${CMAKE_HDL_TCLHDL_FILE_SIMULATION})
+    _tclhdl_add_file (FUNCTION "add_simulation"     TYPE "VHDL 2008"           FILES ${_HDL_VHDL2008_FILES}    OUTPUT ${CMAKE_HDL_TCLHDL_FILE_SIMULATION})
+    _tclhdl_add_file (FUNCTION "add_simulation"     TYPE "VERILOG"             FILES ${_HDL_VERILOG_FILES}     OUTPUT ${CMAKE_HDL_TCLHDL_FILE_SIMULATION})
+    _tclhdl_add_file (FUNCTION "add_simulation"     TYPE "COEFF"               FILES ${_HDL_COEFF_FILES}       OUTPUT ${CMAKE_HDL_TCLHDL_FILE_SIMULATION})
+    _tclhdl_add_file (FUNCTION "add_simulation"     TYPE "TCL"                 FILES ${_HDL_TCL_FILES}         OUTPUT ${CMAKE_HDL_TCLHDL_FILE_SIMULATION})
+    _tclhdl_add_file (FUNCTION "add_simulation"     TYPE "TCLHDL"              FILES ${_HDL_TCLHDL_FILES}      OUTPUT ${CMAKE_HDL_TCLHDL_FILE_SIMULATION})
 
     #-- Set different tools invoke depending upon OS
     set (CMAKE_HDL_SYSTEM_SOURCE "")
@@ -429,8 +432,7 @@ function(add_hdl_simulation _TARGET_NAME)
 
     #-- Set the different vendor specific calls
     if ( ${_vendor} STREQUAL "XILINX" )
-        #set (XILINX_SOURCE_SETTINGS ${CMAKE_HDL_TOOL_SETTINGS})
-        file (TO_NATIVE_PATH ${CMAKE_HDL_TOOL_SETTINGS} XILINX_SOURCE_SETTINGS)
+        file (TO_NATIVE_PATH ${CMAKE_HDL_SIMULATION_SETTINGS} XILINX_SOURCE_SETTINGS)
         if ( ${_tool} STREQUAL "VIVADO" )
             set (_VENDOR_TOOL "vivado" "-mode" "tcl" "-notrace" "-source")
             set (_VENDOR_ARGS "-tclargs")
@@ -447,8 +449,7 @@ function(add_hdl_simulation _TARGET_NAME)
         set (_VENDOR_TOOL_VERSION "")
         set (_VENDOR_SOURCE "${INTEL_SOURCE_SETTINGS}")
     elseif ( ${_vendor} STREQUAL "LATTICE" )
-        #set (XILINX_SOURCE_SETTINGS ${CMAKE_HDL_TOOL_SETTINGS})
-        file (TO_NATIVE_PATH ${CMAKE_HDL_TOOL_SETTINGS} LATTICE_SOURCE_SETTINGS)
+        file (TO_NATIVE_PATH ${CMAKE_HDL_SIMULATION_SETTINGS} LATTICE_SOURCE_SETTINGS)
         if ( ${_tool} STREQUAL "DIAMOND" )
             set (_VENDOR_TOOL "pnmainc")
             if (UNIX)
@@ -458,6 +459,14 @@ function(add_hdl_simulation _TARGET_NAME)
         endif ()
         set (_VENDOR_TOOL_VERSION "")
         set (_VENDOR_SOURCE "${LATTICE_SOURCE_SETTINGS}")
+    elseif ( ${_vendor} STREQUAL "MENTOR" )
+        file (TO_NATIVE_PATH ${CMAKE_HDL_SIMULATION_SETTINGS} MENTOR_SOURCE_SETTINGS)
+        if ( ${_tool} STREQUAL "MENTOR" )
+            set (_VENDOR_TOOL "vsim")
+            set (_VENDOR_ARGS "")
+        endif ()
+        set (_VENDOR_TOOL_VERSION "")
+        set (_VENDOR_SOURCE "${MENTOR_SOURCE_SETTINGS}")
     endif ()
 
     #set (TCLHDL_TOOL ${CMAKE_HDL_TCLHDL})

@@ -244,7 +244,17 @@ proc ::tclhdl::ise::set_project_flow_impl {flow} {
 #------------------------------------------------------------------------------
 proc ::tclhdl::ise::build_ip {} {
     log::log debug "ise::build_ip : launch coregen"
-    process run "Regenerate All Cores"
+    set error_code ""
+    set step "Regenerate All Cores"
+
+    process run $step
+
+    #TODO: This doesn't work reliable! It needs some attention
+    #set error_code [process get $step status]
+    #if { $error_code != "up_to_date" } {
+    #    log::log debug "ise::build_ip : Regenerating all cores - $error_code"
+    #    process run $step
+    #}
 }
 
 #------------------------------------------------------------------------------

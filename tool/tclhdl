@@ -118,6 +118,7 @@ set options {
     {bitstream              "Project Bitstream"}
     {program                "Project Program"}
     {verify                 "Project Verification"}
+    {simulation             "Project Simulation"}
     {shell                  "Project Shell"}
     {clean                  "Project Clean"}
 }
@@ -167,11 +168,15 @@ if { $params(program) } {
     ::tclhdl::project_program $params(program)
 }
 
-set has_v [expr {[string length $params(verify)] > 0}]
-if { $params(verify) } {
-    ::tclhdl::project_verify $params(project)
+set has_si [expr {[string length $params(simulation)] > 0}]
+if { $params(simulation) } {
+    ::tclhdl::project_simulation $params(project)
 }
 
+set has_s [expr {[string length $params(shell)] > 0}]
+if { $params(shell) } {
+    ::tclhdl::project_shell $params(project)
+}
 set has_s [expr {[string length $params(shell)] > 0}]
 if { $params(shell) } {
     ::tclhdl::project_shell $params(project)
