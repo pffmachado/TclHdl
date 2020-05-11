@@ -297,7 +297,8 @@ proc ::tclhdl::ise::build_fitting {} {
 proc ::tclhdl::ise::build_timing {} {
     log::log debug "ise::build_timing : launch timing analysis"
 
-    set timing_file "$::tclhdl::ise::project_name.twr"
+    set project_name  [string trim "[project get top]" "/"]
+    set timing_file "$project_name.twr"
     set timing_rpt [::tclhdl::utils::grep "Timing errors:" $timing_file]
     set timing_errors ""
     regexp "Timing errors: (\[0-9\]+) *" $timing_rpt match timing_errors
