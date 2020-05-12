@@ -421,6 +421,14 @@ proc ::tclhdl::vivado::build_report {} {
     foreach fileIdx $file_list {
         eval file copy -force $fileIdx "$::tclhdl::vivado::project_name.rpt"
     }
+
+    log::log debug "xilinx::build_report: implementation parse critical warnings"
+    set critical_warnings [::tclhdl::utils::grep "CRITICAL" "$::tclhdl::vivado::project_name.rpt/${project_top}_impl.log"]
+    set fileId [open "$::tclhdl::vivado::project_name.rpt/${project_top}_impl.critical" "w"]
+    foreach warning $critical_warnings {
+        puts $fileId $warning
+    }
+    close $fileId
 }
 
 #------------------------------------------------------------------------------
