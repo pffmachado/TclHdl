@@ -344,7 +344,6 @@ proc ::tclhdl::ise::build_report {} {
     file copy -force "${project_top}.bgn" "$report_dir"
     file copy -force "${project_top}_map.map" "$report_dir"
     file copy -force "${project_top}_map.mrp" "$report_dir"
-    file copy -force "${project_top}_map.psr" "$report_dir"
 }
 
 #------------------------------------------------------------------------------
