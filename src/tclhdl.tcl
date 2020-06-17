@@ -130,7 +130,7 @@ namespace eval ::tclhdl {
     namespace export set_project_version_minor
     namespace export set_project_version_patch
     namespace export set_project_revision
-    namespace export set_project_simulation_type
+    namespace export set_project_simulation
     namespace export set_source_dir
     namespace export set_ip_dir
     namespace export set_ip_output_dir
@@ -146,6 +146,7 @@ namespace eval ::tclhdl {
     namespace export build_synthesis
     namespace export build_fitting
     namespace export build_timing
+    namespace export build_simulation
     namespace export build_bitstream
     namespace export build_report
     namespace export build_post
@@ -157,8 +158,6 @@ namespace eval ::tclhdl {
     variable project_dir
     variable project_type
     variable project_tool
-    variable project_simulation_type
-    variable project_simulation_tool
     variable project_part
     variable project_jobs
     variable project_target_dir
@@ -187,6 +186,9 @@ namespace eval ::tclhdl {
     variable list_target_dir ""
     variable list_pre_scripts ""
     variable list_post_scripts ""
+    variable list_simulations ""
+    variable list_simulations_tools
+    variable list_simulations_tools
 
     variable flag_project_create
     variable flag_is_simulation     0
@@ -414,25 +416,67 @@ proc ::tclhdl::add_constraint {type src} {
 ## Add Simulation File To The Project Structure
 #
 #-------------------------------------------------------------------------------
-proc ::tclhdl::add_simulation {} {
-    switch $::tclhdl::project_tool {
+proc ::tclhdl::add_simulation {name type src} {
+    switch $::tclhdl::list_simulations_tools($name) {
         INTEL_QUARTUS {
             check_quartus
+            ::tclhdl::quartus::simulation_add $name $type $src
         }
         XILINX_VIVADO {
             check_vivado
+            ::tclhdl::vivado::simulation_add $name $type $src
         }
         XILINX_ISE {
             check_ise
+            ::tclhdl::ise::simulation_add $name $type $src
         }
         LATTICE_DIAMOND {
             check_diamond
+            ::tclhdl::diamond::simulation_add $name $type $src
+        }
+        MENTOR_MODELSIM {
+            check_modelsim
+            ::tclhdl::modelsim::simulation_add $name $type $src
         }
         default {
             log::logMsg "add_simulation: No supported tool define for the current project"
         }
     }
 }
+
+#-------------------------------------------------------------------------------
+## Add Simulation Settings
+#
+#-------------------------------------------------------------------------------
+proc ::tclhdl::add_simulation_settings {name top settings} {
+    switch $::tclhdl::list_simulations_tools($name) {
+        INTEL_QUARTUS {
+            check_quartus
+            ::tclhdl::quartus::simulation_settings $name $top $settings
+        }
+        XILINX_VIVADO {
+            check_vivado
+            ::tclhdl::vivado::simulation_settings $name $top $settings
+        }
+        XILINX_ISE {
+            check_ise
+            ::tclhdl::ise::simulation_settings $name $top $settings
+        }
+        LATTICE_DIAMOND {
+            check_diamond
+            ::tclhdl::diamond::simulation_settings $name $top $settings
+        }
+        MENTOR_MODELSIM {
+            check_modelsim
+            ::tclhdl::modelsim::simulation_settings $name $top $settings
+        }
+        default {
+            log::logMsg "add_simulation_settings: No supported tool define for the current project"
+        }
+    }
+}
+
+
 
 #-------------------------------------------------------------------------------
 ## Add Settings To The Project Structure
@@ -768,40 +812,40 @@ proc ::tclhdl::project_close {prj} {
 ## Simulation  Project
 #
 #-------------------------------------------------------------------------------
-proc ::tclhdl::project_simulation {prj step} {
-    global ::tclhdl::project_simulation_full
-    global ::tclhdl::project_simulation_step
+proc ::tclhdl::project_simulation {prj step simulation} {
+    global ::tclhdl::project_build_full
+    global ::tclhdl::project_build_step
     
-    log::log debug "project_simulation: Building $prj with Flow $step"
+    log::log debug "project_build: Building Simulation $simulation for Project $prj with Flow $step"
     #-- Get build step
-    set ::tclhdl::project_simulation_full 0
-    set ::tclhdl::project_simulation_step $step
+    set ::tclhdl::project_build_full 0
+    set ::tclhdl::project_build_step $step
     if { $step == "full" } {
-        set ::tclhdl::project_simulation_full 1
+        set ::tclhdl::project_build_full 1
     }
 
     #-- Verify Project
     ::tclhdl::project_verify $prj
 
     #-- Get Environment Variables
-    log::log debug "project_simulation: Setting enviornment"
+    log::log debug "project_build: Setting enviornment"
     set ::tclhdl::flag_project_create 0
     source $::tclhdl::project_target_dir/project
 
     #-- Build Project
-    log::log debug "project_simulation: Build Project"
+    log::log debug "project_build: Build Project"
     foreach lst $::tclhdl::list_projects {
         set project [lindex $lst 0]
         set settings [lindex $lst 1]
 
         #-- Move to build directory
-        log::log debug "project_simulation: Change Dir to $::tclhdl::project_target_dir/$project-$settings"
+        log::log debug "project_build: Change Dir to $::tclhdl::project_target_dir/$project-$settings"
         cd "$::tclhdl::project_target_dir/$project-$settings"
 
         #-- Opennning the existent Project
-        log::log debug "project_simulation: Build Execute"
+        log::log debug "project_build: Build Execute"
         ::tclhdl::project_open [lindex $lst 0] [lindex $lst 1] [lindex $lst 2]
-        source $::tclhdl::project_target_dir/build
+        ::tclhdl::build_simulation $simulation
         ::tclhdl::project_close [lindex $lst 0]
     }
 }
@@ -1205,12 +1249,12 @@ proc ::tclhdl::set_scripts_dir {dir} {
 ## Set Project Simulation Type
 #
 #-------------------------------------------------------------------------------
-proc ::tclhdl::set_project_simulation_type {type} {
-    global ::tclhdl::project_simulation_type
-    global ::tclhdl::project_simulation_tool
-    set ::tclhdl::project_simulation_type $type
-    set ::tclhdl::project_simulation_tool $type
-    log::log debug "set_project_simulation_type: Set Project Simulation type to $::tclhdl::project_simulation_type"
+proc ::tclhdl::set_project_simulation {name type} {
+    global ::tclhdl::list_simulations
+    global ::tclhdl::list_simulations_tools
+    lappend ::tclhdl::list_simulations $name
+    set ::tclhdl::list_simulations_tools($name) $type
+    log::log debug "set_project_simulation_type: Set Project Simulation $name type to $type"
 }
 
 #-------------------------------------------------------------------------------
@@ -1350,6 +1394,38 @@ proc ::tclhdl::build_timing {} {
         }
         default {
             log::logMsg "build_timing: No supported tool define for the current project"
+        }
+    }
+}
+
+#-------------------------------------------------------------------------------
+## Build Simulation
+#
+#-------------------------------------------------------------------------------
+proc ::tclhdl::build_simulation {name} {
+    if { $::tclhdl::project_build_full == 0 && $::tclhdl::project_build_step != "simulation" } {
+        return 0
+    }
+
+    log::log debug "build_simulation: Run Simulation $name"
+    switch $::tclhdl::project_tool {
+        INTEL_QUARTUS {
+            check_quartus
+            ::tclhdl::quartus::build_simulation $name
+        }
+        XILINX_VIVADO {
+            check_vivado
+            ::tclhdl::vivado::build_simulation $name
+        }
+        XILINX_ISE {
+            check_ise
+            ::tclhdl::ise::build_simulation $name
+        }
+        LATTICE_DIAMOND {
+            check_diamond
+        }
+        default {
+            log::logMsg "build_simulation: No supported tool define for the current project"
         }
     }
 }

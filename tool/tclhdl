@@ -118,7 +118,7 @@ set options {
     {bitstream              "Project Bitstream"}
     {program                "Project Program"}
     {verify                 "Project Verification"}
-    {simulation             "Project Simulation"}
+    {simulation.arg ""      "Project Simulation"}
     {shell                  "Project Shell"}
     {clean                  "Project Clean"}
 }
@@ -169,8 +169,8 @@ if { $params(program) } {
 }
 
 set has_si [expr {[string length $params(simulation)] > 0}]
-if { $params(simulation) } {
-    ::tclhdl::project_simulation $params(project)
+if { $has_si } {
+    ::tclhdl::project_simulation $params(project) "simulation" $params(simulation)
 }
 
 set has_s [expr {[string length $params(shell)] > 0}]

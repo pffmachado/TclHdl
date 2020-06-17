@@ -523,6 +523,47 @@ proc ::tclhdl::vivado::constraint_add {type src} {
 }
 
 #-------------------------------------------------------------------------------
+## Adding Simulation Settings Files
+#
+#-------------------------------------------------------------------------------
+proc ::tclhdl::vivado::simulation_settings {name top settings} {
+    if {[string equal [get_filesets -quiet $name] ""]} {
+      create_fileset -simset $name
+    }
+    
+    set obj [get_filesets $name]
+    set_property -name "top" -value "$top" -objects $obj
+    set_property -name "top_lib" -value "xil_defaultlib" -objects $obj
+}
+
+#-------------------------------------------------------------------------------
+## Adding Simulation Files
+#
+#-------------------------------------------------------------------------------
+proc ::tclhdl::vivado::simulation_add {name type src} {
+    if {[string equal [get_filesets -quiet $name] ""]} {
+      create_fileset -simset $name
+    }
+    
+    set obj [get_filesets $name]
+    set fd "[file normalize "$src"]"
+    add_files -norecurse -fileset $obj $fd
+    set fd $src
+    set file_obj [get_files -of_objects [get_filesets $name] [list "*$fd"]]
+    set_property "file_type" $type $file_obj
+}
+
+#-------------------------------------------------------------------------------
+## Running Simulation
+#
+#-------------------------------------------------------------------------------
+proc ::tclhdl::vivado::build_simulation {name} {
+    launch_simulation -simset "$name" -mode "behavioral"
+    run 1
+    close_sim -force
+}
+
+#-------------------------------------------------------------------------------
 ## Adding Constraint Files
 #
 #-------------------------------------------------------------------------------

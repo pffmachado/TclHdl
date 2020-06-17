@@ -45,7 +45,7 @@ namespace eval ::tclhdl::definitions {
     namespace export get_version
  
     #-- Member Variables 
-    set VENDOR                           {XILINX INTEL LATTICE MICROSEMI}
+    set VENDOR                           {XILINX INTEL LATTICE MENTOR MICROSEMI}
     set IP_TYPE_INTEL                    {INTEL_IP INTEL_QSYS}
     set IP_TYPE_XILINX                   {XILINX_IP}
     set IP_TYPE_LATTICE                  {LATTICE_IP}
@@ -56,6 +56,7 @@ namespace eval ::tclhdl::definitions {
     set TOOL_XILINX_ISE                  "xtclsh"
     set TOOL_INTEL                       "quartus_sh"
     set TOOL_LATTICE                     "diamondc"
+    set TOOL_MODELSIM                    "vsim"
 
     #-- Namespace internal variables
     variable home [file join [pwd] [file dirname [info script]]]
