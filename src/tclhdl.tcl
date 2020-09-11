@@ -126,10 +126,12 @@ namespace eval ::tclhdl {
     namespace export set_project_type
     namespace export set_project_target_dir
     namespace export set_project_build_number
+    namespace export set_project_version
     namespace export set_project_version_major
     namespace export set_project_version_minor
     namespace export set_project_version_patch
     namespace export set_project_revision
+    namespace export set_project_semver
     namespace export set_project_simulation
     namespace export set_source_dir
     namespace export set_ip_dir
@@ -177,6 +179,7 @@ namespace eval ::tclhdl {
     variable project_version_minor  ""
     variable project_version_patch  ""
     variable project_revision       ""
+    variable project_semver         ""
 
     variable list_projects ""
     variable list_source ""
@@ -1116,8 +1119,30 @@ proc ::tclhdl::set_project_build_number {number} {
 #-------------------------------------------------------------------------------
 proc ::tclhdl::set_project_version {version} {
     global ::tclhdl::project_version
+    global ::tclhdl::project_version_major
+    global ::tclhdl::project_version_minor
+    global ::tclhdl::project_version_patch
     set ::tclhdl::project_version $version
     log::log debug "set_project_version: Set Project Version to $::tclhdl::project_version"
+
+    set version_fields [split $version "."]
+    set length [llength $version_fields]
+
+    set ::tclhdl::project_version_major "0"
+    if { $length > 0 } {
+        set ::tclhdl::project_version_major [lindex $version_fields 0]
+    }
+
+    set ::tclhdl::project_version_minor "0"
+    if { $length > 1 } {
+        set ::tclhdl::project_version_minor [lindex $version_fields 1]
+    }
+
+    set ::tclhdl::project_version_patch "0"
+    if { $length > 2 } {
+        set ::tclhdl::project_version_patch [lindex $version_fields 2]
+    }
+
 }
 
 #-------------------------------------------------------------------------------
@@ -1159,6 +1184,17 @@ proc ::tclhdl::set_project_revision {number} {
     set ::tclhdl::project_revision $number
     log::log debug "set_project_revision: Set Project Revision to $::tclhdl::project_revision"
 }
+
+#-------------------------------------------------------------------------------
+## Set Project Semantic Version
+#
+#-------------------------------------------------------------------------------
+proc ::tclhdl::set_project_semver {semver} {
+    global ::tclhdl::project_semver
+    set ::tclhdl::project_semver $semver
+    log::log debug "set_project_semver: Set Project semver to $::tclhdl::project_semver"
+}
+
 #-------------------------------------------------------------------------------
 ## Set Project Source Directory
 #

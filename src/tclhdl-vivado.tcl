@@ -381,7 +381,7 @@ proc ::tclhdl::vivado::build_bitstream {} {
 
     log::log debug "xilinx::build_bitstream : add bitstream version"
     set fileId [open "$::tclhdl::vivado::project_name.out/$::tclhdl::vivado::project_name.semver" "w"]
-    puts -nonewline $fileId $::tclhdl::project_version
+    puts -nonewline $fileId $::tclhdl::project_semver
     close $fileId
 
     log::log debug "xilinx::build_bitstream : compute checksums"

@@ -300,7 +300,7 @@ proc ::tclhdl::diamond::build_bitstream {} {
     prj_run Export -impl "$::tclhdl::diamond::project_impl" -task Jedecgen
 
     set fileId [open $artifact_name.semver "w"]
-    puts -nonewline $fileId $::tclhdl::project_version
+    puts -nonewline $fileId $::tclhdl::project_semver
     close $fileId
 
     log::log debug "diamond::build_bitstream : copy artifacts to output dir"

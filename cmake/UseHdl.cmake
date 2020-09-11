@@ -20,6 +20,7 @@ add_hdl(<target_name>
     [VENDOR <vendor>]
     [TOOL <tool>]
     [SETTINGS <name> [FILES <file>]]
+    [VERSION <major.minor.patch>]
     [REVISION <rev>]
     [OUTPUT_DIR <dir>]
     [OUTPUT_NAME <name>]
@@ -106,7 +107,7 @@ function(add_hdl _TARGET_NAME)
 
     cmake_parse_arguments(_add_hdl
         ""
-        "VENDOR;TOOL;REVISION;OUTPUT_DIR;OUTPUT_NAME"
+        "VENDOR;TOOL;VERSION;REVISION;OUTPUT_DIR;OUTPUT_NAME"
         "VHDL;VHDL_2008;VERILOG;COEFF;TCL;TCLHDL;SOURCES;PRE;POST;SETTINGS;TCL_SETTINGS;FLOW;SOURCEDIR;IPDIR;CONSTRAINTDIR;SETTINGDIR;SCRIPTDIR;COREGEN;XCI;XCO;XCO_UPGRADE;QSYS;IPX;UCF;XDC;SDF;LPF"
         ${ARGN}
         )
@@ -132,6 +133,7 @@ function(add_hdl _TARGET_NAME)
     string(TOUPPER ${_add_hdl_TOOL} _tool)
     string(CONCAT  _vendor_tool ${_vendor} "_" ${_tool})
 
+    set (_HDL_VERSION 	        ${_add_hdl_VERSION})
     set (_HDL_REVISION 	        ${_add_hdl_REVISION})
     set (_HDL_VHDL_FILES 	    ${_add_hdl_VHDL})
     set (_HDL_VHDL2008_FILES 	${_add_hdl_VHDL_2008})
@@ -201,6 +203,8 @@ function(add_hdl _TARGET_NAME)
     set (_name "::tclhdl::set_project_name \"${_TARGET_NAME}\"\n\n")
     file (APPEND ${CMAKE_HDL_TCLHDL_FILE_PROJECT} ${_name})
     set (_name "::tclhdl::set_project_type \"${_HDL_PROJECT_TYPE}\"\n\n")
+    file (APPEND ${CMAKE_HDL_TCLHDL_FILE_PROJECT} ${_name})
+    set (_name "::tclhdl::set_project_version \"${_HDL_VERSION}\"\n\n")
     file (APPEND ${CMAKE_HDL_TCLHDL_FILE_PROJECT} ${_name})
     set (_name "::tclhdl::set_source_dir \"${_HDL_SOURCEDIR}\"\n\n")
     file (APPEND ${CMAKE_HDL_TCLHDL_FILE_PROJECT} ${_name})
