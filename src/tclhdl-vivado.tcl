@@ -231,7 +231,11 @@ proc ::tclhdl::vivado::close_project {} {
 #------------------------------------------------------------------------------
 proc ::tclhdl::vivado::get_project_tool_version {} {
     global ::tclhdl::vivado::project_tool_version
-    set ::tclhdl::vivado::project_tool_version [::version -short]
+    set version_list [split [::version -short] .]
+
+    #-- If a patch version is installed then the version for major.minor only
+    #-- does not work.
+    set ::tclhdl::vivado::project_tool_version "[lindex $version_list 0].[lindex $version_list 1]"
 }
 
 proc ::tclhdl::vivado::set_project_name {name} {
