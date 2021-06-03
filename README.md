@@ -36,14 +36,12 @@ The project is under development and there is no release available.
 It is already possible to use for Quartus II, Vivado, ISE and Diamond.
 The development environment is being done on Linux (Arch Linux) and compatibility
 tests are being carried out on Windows 10.
+ModelSim support to Vivado is now available as well as the integration with VUnit
+framework.
 
 ### Roadmap
 
 * Provide documentation
-* Add Tests
-* Add support to simulation
-    * That includes support Modelsim, XSim, GHDL, Icarus
-* Add support to vunit
 * Refactoring and Clean Up
 * First Release
 * ...
@@ -57,3 +55,5 @@ tests are being carried out on Windows 10.
 * [VLSI-EDA/PoC](https://github.com/VLSI-EDA/PoC)
 * [FuseSoc](https://github.com/olofk/fusesoc)
 * [pyIPCMI](https://github.com/Paebbels/pyIPCMI)
+* [VUnit](https://github.com/VUnit/vunit)
+
