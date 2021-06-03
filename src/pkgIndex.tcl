@@ -15,4 +15,4 @@ package ifneeded ::tclhdl::vivado 1.0 [list source [file join $dir tclhdl-vivado
 package ifneeded ::tclhdl::ise 1.0 [list source [file join $dir tclhdl-ise.tcl]]
 package ifneeded ::tclhdl::diamond 1.0 [list source [file join $dir tclhdl-diamond.tcl]]
 package ifneeded ::tclhdl::utils 1.0 [list source [file join $dir tclhdl-utils.tcl]]
-#package ifneeded ::tclhdl::log 1.0 [list source [file join $dir tclhdl-log.tcl]]
+package ifneeded ::tclhdl::vunit 1.0 [list source [file join $dir tclhdl-vunit.tcl]]

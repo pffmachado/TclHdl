@@ -951,6 +951,40 @@ proc ::tclhdl::project_program {prj} {
     }
 }
 
+#-------------------------------------------------------------------------------
+## Project Simulation Library Compile
+#
+#-------------------------------------------------------------------------------
+proc ::tclhdl::project_simlib {prj simulator} {
+    #-- Verify Project
+    ::tclhdl::project_verify $prj
+
+    #-- Get Environment Variables
+    log::log debug "project_simlib: Setting enviornment"
+    set ::tclhdl::flag_project_create 0
+    source $::tclhdl::project_target_dir/project
+
+    log::log debug "project_simlib: Generate Simulation Libraries for $simulator"
+    switch $::tclhdl::project_tool {
+        INTEL_QUARTUS {
+            check_quartus
+        }
+        XILINX_VIVADO {
+            ::tclhdl::vivado::compile_simlib $simulator
+        }
+        XILINX_ISE {
+            check_ise
+        }
+        LATTICE_DIAMOND {
+            check_diamond
+        }
+        default {
+            log::logMsg "add_project: No supported tool define for the current project"
+        }
+    }
+
+}
+
 
 #-------------------------------------------------------------------------------
 ## Fetch Post Scripts

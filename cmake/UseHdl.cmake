@@ -108,11 +108,14 @@ function(add_hdl _TARGET_NAME)
 
     cmake_parse_arguments(_add_hdl
         ""
-        "VENDOR;TOOL;VERSION;REVISION;OUTPUT_DIR;OUTPUT_NAME"
+        "VENDOR;TOOL;SIMULATOR;VERSION;REVISION;OUTPUT_DIR;OUTPUT_NAME"
         "VHDL;VHDL_2008;VERILOG;SYSTEMVERILOG;COEFF;TCL;TCLHDL;SOURCES;PRE;POST;SETTINGS;TCL_SETTINGS;FLOW;SOURCEDIR;IPDIR;CONSTRAINTDIR;SETTINGDIR;SCRIPTDIR;COREGEN;XCI;XCO;XCO_UPGRADE;QSYS;IPX;UCF;XDC;SDC;SDF;LPF"
         ${ARGN}
         )
 
+    if (NOT DEFINED _add_hdl_SIMULATOR)
+        set(_add_hdl_SIMULATOR "none")
+    endif()
     if(NOT DEFINED _add_hdl_OUTPUT_DIR AND DEFINED CMAKE_HDL_TARGET_OUTPUT_DIR)
         set(_add_hdl_OUTPUT_DIR "${CMAKE_HDL_TARGET_OUTPUT_DIR}")
     endif()
@@ -133,6 +136,7 @@ function(add_hdl _TARGET_NAME)
     string(TOUPPER ${_add_hdl_VENDOR} _vendor)
     string(TOUPPER ${_add_hdl_TOOL} _tool)
     string(CONCAT  _vendor_tool ${_vendor} "_" ${_tool})
+    string(TOLOWER ${_add_hdl_SIMULATOR} _TARGET_SIMULATOR)
 
     set (_HDL_VERSION 	                ${_add_hdl_VERSION})
     set (_HDL_REVISION 	                ${_add_hdl_REVISION})
@@ -322,6 +326,7 @@ function(add_hdl _TARGET_NAME)
     set (_TCLHDL_PROGRAM    "-program")
     set (_TCLHDL_SHELL      "-shell")
     set (_TCLHDL_CLEAN      "-clean")
+    set (_TCLHDL_SIMLIB     "-simlib")
     #endif ()
 
     add_custom_target (${_TARGET_NAME}-shell
@@ -337,7 +342,9 @@ function(add_hdl _TARGET_NAME)
         )
 
     add_custom_target (${_TARGET_NAME}-generate
-        COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
+        COMMAND
+        ${CMAKE_HDL_SYSTEM_SOURCE} ${CMAKE_HDL_SIMULATION_SETTINGS} &&
+        ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
         ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_GENERATE} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
@@ -366,11 +373,20 @@ function(add_hdl _TARGET_NAME)
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
+    add_custom_target (${_TARGET_NAME}-simlib
+        COMMAND
+        ${CMAKE_HDL_SYSTEM_SOURCE} ${CMAKE_HDL_SIMULATION_SETTINGS} &&
+        ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
+        ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_SIMLIB} ${_TARGET_SIMULATOR} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )
+
     add_custom_target (${_TARGET_NAME}
         COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
         ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_BUILD} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
+
 endfunction()
 
 #------------------------------------------------------------------------------
@@ -446,8 +462,7 @@ function(add_hdl_simulation _TARGET_NAME)
     _tclhdl_add_file (FUNCTION "add_simulation"  NAME "${_HDL_SETTINGS_NAME}"   TYPE "VERILOG"             FILES ${_HDL_VERILOG_FILES}           OUTPUT ${CMAKE_HDL_TCLHDL_FILE_SIMULATION})
     _tclhdl_add_file (FUNCTION "add_simulation"  NAME "${_HDL_SETTINGS_NAME}"   TYPE "SYSTEMVERILOG"       FILES ${_HDL_SYSTEMVERILOG_FILES}     OUTPUT ${CMAKE_HDL_TCLHDL_FILE_SIMULATION})
     _tclhdl_add_file (FUNCTION "add_simulation"  NAME "${_HDL_SETTINGS_NAME}"   TYPE "COEFF"               FILES ${_HDL_COEFF_FILES}             OUTPUT ${CMAKE_HDL_TCLHDL_FILE_SIMULATION})
-    _tclhdl_add_file (FUNCTION "add_simulation"  NAME "${_HDL_SETTINGS_NAME}"   TYPE "TCL"                 FILES ${_HDL_TCL_FILES}               OUTPUT ${CMAKE_HDL_TCLHDL_FILE_SIMULATION})
-    _tclhdl_add_file (FUNCTION "add_simulation"  NAME "${_HDL_SETTINGS_NAME}"   TYPE "TCLHDL"              FILES ${_HDL_TCLHDL_FILES}            OUTPUT ${CMAKE_HDL_TCLHDL_FILE_SIMULATION})
+    _tclhdl_add_file (FUNCTION "add_tcl"                                        TYPE ""                    FILES ${_HDL_TCL_FILES}               OUTPUT ${CMAKE_HDL_TCLHDL_FILE_SIMULATION})
 
     #-- Set different tools invoke depending upon OS
     set (CMAKE_HDL_SYSTEM_SOURCE "")
@@ -457,7 +472,7 @@ function(add_hdl_simulation _TARGET_NAME)
 
     #-- Set the different vendor specific calls
     if ( ${_vendor} STREQUAL "XILINX" )
-        file (TO_NATIVE_PATH ${CMAKE_HDL_SIMULATION_SETTINGS} XILINX_SOURCE_SETTINGS)
+        file (TO_NATIVE_PATH ${CMAKE_HDL_TOOL_SETTINGS} XILINX_SOURCE_SETTINGS)
         if ( ${_tool} STREQUAL "VIVADO" )
             set (_VENDOR_TOOL "vivado" "-mode" "tcl" "-notrace" "-source")
             set (_VENDOR_ARGS "-tclargs")
@@ -474,7 +489,7 @@ function(add_hdl_simulation _TARGET_NAME)
         set (_VENDOR_TOOL_VERSION "")
         set (_VENDOR_SOURCE "${INTEL_SOURCE_SETTINGS}")
     elseif ( ${_vendor} STREQUAL "LATTICE" )
-        file (TO_NATIVE_PATH ${CMAKE_HDL_SIMULATION_SETTINGS} LATTICE_SOURCE_SETTINGS)
+        file (TO_NATIVE_PATH ${CMAKE_HDL_TOOL_SETTINGS} LATTICE_SOURCE_SETTINGS)
         if ( ${_tool} STREQUAL "DIAMOND" )
             set (_VENDOR_TOOL "pnmainc")
             if (UNIX)
@@ -485,7 +500,7 @@ function(add_hdl_simulation _TARGET_NAME)
         set (_VENDOR_TOOL_VERSION "")
         set (_VENDOR_SOURCE "${LATTICE_SOURCE_SETTINGS}")
     elseif ( ${_vendor} STREQUAL "MENTOR" )
-        file (TO_NATIVE_PATH ${CMAKE_HDL_SIMULATION_SETTINGS} MENTOR_SOURCE_SETTINGS)
+        file (TO_NATIVE_PATH ${CMAKE_HDL_TOOL_SETTINGS} MENTOR_SOURCE_SETTINGS)
         if ( ${_tool} STREQUAL "MENTOR" )
             set (_VENDOR_TOOL "vsim")
             set (_VENDOR_ARGS "")
@@ -504,9 +519,16 @@ function(add_hdl_simulation _TARGET_NAME)
     #endif ()
 
     add_custom_target (${_TARGET_NAME}-${_HDL_SETTINGS_NAME}
-        COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
+        COMMAND
+        ${CMAKE_HDL_SYSTEM_SOURCE} ${CMAKE_HDL_SIMULATION_SETTINGS} &&
+        ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
         ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_SIMULATION} ${_HDL_SETTINGS_NAME} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )
+
+    add_test(
+        NAME ${_HDL_SETTINGS_NAME}
+        COMMAND cmake --build "${CMAKE_BINARY_DIR}" --target "${_TARGET_NAME}-${_HDL_SETTINGS_NAME}"
         )
 
 endfunction()

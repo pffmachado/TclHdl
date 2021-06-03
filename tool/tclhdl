@@ -119,6 +119,7 @@ set options {
     {program                "Project Program"}
     {verify                 "Project Verification"}
     {simulation.arg ""      "Project Simulation"}
+    {simlib.arg ""          "Project Compile Simulation Library"}
     {shell                  "Project Shell"}
     {clean                  "Project Clean"}
 }
@@ -173,10 +174,11 @@ if { $has_si } {
     ::tclhdl::project_simulation $params(project) "simulation" $params(simulation)
 }
 
-set has_s [expr {[string length $params(shell)] > 0}]
-if { $params(shell) } {
-    ::tclhdl::project_shell $params(project)
+set has_sl [expr {[string length $params(simlib)] > 0}]
+if { $has_sl } {
+    ::tclhdl::project_simlib $params(project) $params(simlib)
 }
+
 set has_s [expr {[string length $params(shell)] > 0}]
 if { $params(shell) } {
     ::tclhdl::project_shell $params(project)

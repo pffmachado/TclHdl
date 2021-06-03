@@ -45,6 +45,7 @@
 #------------------------------------------------------------------------------
 package require ::tclhdl::definitions
 package require ::tclhdl::utils
+package require ::tclhdl::vunit
 
 #------------------------------------------------------------------------------
 ## Namespace Declaration
@@ -462,7 +463,7 @@ proc ::tclhdl::vivado::source_add {type src} {
         set_property "library" "xil_defaultlib" $file_obj
         set_property "path_mode" "RelativeFirst" $file_obj
         set_property "used_in_synthesis" "1" $file_obj
-        set_property "used_in_simulation" "1" $file_obj
+        set_property "used_in_simulation" "0" $file_obj
     } else {
         #set coefname [file tail $src]
         #set coefname_dir [lindex [split $coefname .] 0]
@@ -562,10 +563,48 @@ proc ::tclhdl::vivado::simulation_add {name type src} {
 #
 #-------------------------------------------------------------------------------
 proc ::tclhdl::vivado::build_simulation {name} {
-    launch_simulation -simset "$name" -mode "behavioral"
-    run 1
-    close_sim -force
+    launch_simulation -simset "$name" -scripts_only
+    set obj [get_projects  $::tclhdl::vivado::project_name]
+    set simulator [get_property "target_simulator" $obj]
+    set current_dir [pwd]
+    log::log debug "xilinx::build_simulation: $simulator"
+    if {[string equal $simulator "ModelSim"]} {
+        cd ${::tclhdl::vivado::project_name}.sim/$name/behav/modelsim
+
+        if { [catch {exec >&@stdout $::tclhdl::definitions::TOOL_MODELSIM -batch -do "${name}_compile.do" -do "quit"}] } {
+            log::log debug "xilinx::build_simulation: compilation error"
+            exit 1
+        }
+        if { [catch {exec >&@stdout $::tclhdl::definitions::TOOL_MODELSIM -batch -do "${name}_simulate.do" -do "quit" -l simulate.log}] } {
+            log::log debug "xilinx::build_simulation: simulation error"
+            exit 1
+        }
+
+        cd $current_dir
+    }
 }
+
+#-------------------------------------------------------------------------------
+## Compile Simulation Libraries
+#
+#-------------------------------------------------------------------------------
+proc ::tclhdl::vivado::compile_simlib {simulator} {
+    set target_dir "$::env(XILINX_VIVADO)/compile_simlib/$simulator"
+    set_param general.maxThreads 8
+
+    log::log debug "xilinx::compile_simlib: $simulator - $target_dir"
+    if { [catch {eval ::compile_simlib -simulator "$simulator" -family all -language all -library all -directory "$target_dir" -verbose}] } {
+        log::log debug "xilinx::compile_simlib: there are some issues. However perhaps not import for your case!"
+            exit 1
+    }
+
+    log::log debug "xilinx::compile_simlib: compile vunit"
+    ::tclhdl::vunit::clone "$target_dir/.."  "v4.5.0"
+    if {[string equal $simulator "ModelSim"]} {
+        ::tclhdl::vunit::modelsim "$target_dir" "$target_dir/../vunit"
+    }
+}
+
 
 #-------------------------------------------------------------------------------
 ## Adding Constraint Files

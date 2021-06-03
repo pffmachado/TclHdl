@@ -224,7 +224,6 @@ proc ::tclhdl::utils::semver {major minor patch pre_release build} {
    return "$major.$minor.$patch-$pre_release+$build"
 }
 
-
 #------------------------------------------------------------------------------
 ## Get Version
 #
