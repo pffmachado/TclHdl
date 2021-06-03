@@ -599,7 +599,7 @@ proc ::tclhdl::vivado::compile_simlib {simulator} {
 
     log::log debug "xilinx::compile_simlib: compile vunit"
     ::tclhdl::vunit::clone "$target_dir/.."  "v4.5.0"
-    if {[string equal $simulator "ModelSim"]} {
+    if {[string equal $simulator "modelsim"]} {
         ::tclhdl::vunit::modelsim "$target_dir" "$target_dir/../vunit"
     }
 }
