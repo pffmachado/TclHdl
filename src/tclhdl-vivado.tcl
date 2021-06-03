@@ -595,7 +595,6 @@ proc ::tclhdl::vivado::compile_simlib {simulator} {
     log::log debug "xilinx::compile_simlib: $simulator - $target_dir"
     if { [catch {eval ::compile_simlib -simulator "$simulator" -family all -language all -library all -directory "$target_dir" -verbose}] } {
         log::log debug "xilinx::compile_simlib: there are some issues. However perhaps not import for your case!"
-            exit 1
     }
 
     log::log debug "xilinx::compile_simlib: compile vunit"
