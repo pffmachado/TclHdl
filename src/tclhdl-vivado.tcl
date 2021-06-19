@@ -486,7 +486,7 @@ proc ::tclhdl::vivado::ip_add {type src} {
     set ip  [file normalize "$fileset_dir/$ipname_dir/$ipname"]
 
     log::log debug "xilinx::ip_add: name $ipname_dir"
-    import_ip $src -name $ipname_dir
+    read_ip $src
 
     log::log debug "xilinx::ip_add: ip $ip"
     set file_obj [get_files -of_objects [get_filesets $::tclhdl::vivado::project_fileset_source] [list "*$ipname"]]
