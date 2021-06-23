@@ -40,6 +40,7 @@
 #------------------------------------------------------------------------------
 #--  Banner
 #------------------------------------------------------------------------------
+puts ""
 puts "  _____ ____ _     _   _ ____           "
 puts " |_   _/ ___| |   | | | |  _ \\| |      "
 puts "   | || |   | |   | |_| | | | | |       "
@@ -87,8 +88,11 @@ if { [regexp {(quartus)} [info library]] } {
 } elseif { [regexp {(mtitcl)} [info library]] } {
     set runtime_prog "modelsim"
     puts "Known runtime program: $runtime_prog"
+} elseif { [regexp {(Libero)} [info library]] } {
+    set runtime_prog "libero"
+    puts "Known runtime program: $runtime_prog"
 } else {
-    puts info "Unknown runtime program"
+    puts "Unknown runtime program"
 }
 
 #------------------------------------------------------------------------------
@@ -123,7 +127,8 @@ set options {
     {shell                  "Project Shell"}
     {clean                  "Project Clean"}
 }
-set usage ": tclhdl \[options] ...\noptions:"
+
+set usage ": tclhdl \[options] ... \noptions:"
 array set params [::cmdline::getoptions argv $options $usage]
 
 #------------------------------------------------------------------------------
