@@ -815,7 +815,7 @@ proc ::tclhdl::project_close {prj} {
 ## Simulation  Project
 #
 #-------------------------------------------------------------------------------
-proc ::tclhdl::project_simulation {prj step simulation} {
+proc ::tclhdl::project_simulation {prj step simulation simulation_settings} {
     global ::tclhdl::project_build_full
     global ::tclhdl::project_build_step
     
@@ -848,7 +848,7 @@ proc ::tclhdl::project_simulation {prj step simulation} {
         #-- Opennning the existent Project
         log::log debug "project_build: Build Execute"
         ::tclhdl::project_open [lindex $lst 0] [lindex $lst 1] [lindex $lst 2]
-        ::tclhdl::build_simulation $simulation
+        ::tclhdl::build_simulation $simulation $simulation_settings
         ::tclhdl::project_close [lindex $lst 0]
     }
 }
@@ -1472,7 +1472,7 @@ proc ::tclhdl::build_timing {} {
 ## Build Simulation
 #
 #-------------------------------------------------------------------------------
-proc ::tclhdl::build_simulation {name} {
+proc ::tclhdl::build_simulation {name settings} {
     if { $::tclhdl::project_build_full == 0 && $::tclhdl::project_build_step != "simulation" } {
         return 0
     }
@@ -1481,15 +1481,15 @@ proc ::tclhdl::build_simulation {name} {
     switch $::tclhdl::project_tool {
         INTEL_QUARTUS {
             check_quartus
-            ::tclhdl::quartus::build_simulation $name
+            ::tclhdl::quartus::build_simulation $name $settings
         }
         XILINX_VIVADO {
             check_vivado
-            ::tclhdl::vivado::build_simulation $name
+            ::tclhdl::vivado::build_simulation $name $settings
         }
         XILINX_ISE {
             check_ise
-            ::tclhdl::ise::build_simulation $name
+            ::tclhdl::ise::build_simulation $name $settings
         }
         LATTICE_DIAMOND {
             check_diamond

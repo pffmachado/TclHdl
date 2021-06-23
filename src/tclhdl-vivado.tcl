@@ -539,6 +539,10 @@ proc ::tclhdl::vivado::simulation_settings {name top settings} {
     set obj [get_filesets $name]
     set_property -name "top" -value "$top" -objects $obj
     set_property -name "top_lib" -value "xil_defaultlib" -objects $obj
+
+    if { [string trim $settings] ne "" } {
+        source $settings
+    }
 }
 
 #-------------------------------------------------------------------------------
@@ -562,8 +566,15 @@ proc ::tclhdl::vivado::simulation_add {name type src} {
 ## Running Simulation
 #
 #-------------------------------------------------------------------------------
-proc ::tclhdl::vivado::build_simulation {name} {
+proc ::tclhdl::vivado::build_simulation {name settings} {
+
+    log::log debug "xilinx::build_simulation: $settings"
+    if { [string trim $settings] ne "" } {
+        source $settings
+    }
+
     launch_simulation -simset "$name" -scripts_only
+
     set obj [get_projects  $::tclhdl::vivado::project_name]
     set simulator [get_property "target_simulator" $obj]
     set current_dir [pwd]

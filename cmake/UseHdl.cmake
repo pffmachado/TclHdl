@@ -462,7 +462,7 @@ function(add_hdl_simulation _TARGET_NAME)
     _tclhdl_add_file (FUNCTION "add_simulation"  NAME "${_HDL_SETTINGS_NAME}"   TYPE "VERILOG"             FILES ${_HDL_VERILOG_FILES}           OUTPUT ${CMAKE_HDL_TCLHDL_FILE_SIMULATION})
     _tclhdl_add_file (FUNCTION "add_simulation"  NAME "${_HDL_SETTINGS_NAME}"   TYPE "SYSTEMVERILOG"       FILES ${_HDL_SYSTEMVERILOG_FILES}     OUTPUT ${CMAKE_HDL_TCLHDL_FILE_SIMULATION})
     _tclhdl_add_file (FUNCTION "add_simulation"  NAME "${_HDL_SETTINGS_NAME}"   TYPE "COEFF"               FILES ${_HDL_COEFF_FILES}             OUTPUT ${CMAKE_HDL_TCLHDL_FILE_SIMULATION})
-    _tclhdl_add_file (FUNCTION "add_tcl"                                        TYPE ""                    FILES ${_HDL_TCL_FILES}               OUTPUT ${CMAKE_HDL_TCLHDL_FILE_SIMULATION})
+    #    _tclhdl_add_file (FUNCTION "add_tcl"                                        TYPE ""                    FILES ${_HDL_TCL_FILES}               OUTPUT ${CMAKE_HDL_TCLHDL_FILE_SIMULATION})
 
     #-- Set different tools invoke depending upon OS
     set (CMAKE_HDL_SYSTEM_SOURCE "")
@@ -512,17 +512,18 @@ function(add_hdl_simulation _TARGET_NAME)
     #set (TCLHDL_TOOL ${CMAKE_HDL_TCLHDL})
     file (TO_NATIVE_PATH ${CMAKE_HDL_TCLHDL} TCLHDL_TOOL)
     #if ( ${HAS_TCLHDL} )
-    set (_TCLHDL_TOOL       "${TCLHDL_TOOL}")
-    set (_TCLHDL_DEBUG      "-debug")
-    set (_TCLHDL_PROJECT    "-project")
-    set (_TCLHDL_SIMULATION "-simulation")
+    set (_TCLHDL_TOOL                "${TCLHDL_TOOL}")
+    set (_TCLHDL_DEBUG               "-debug")
+    set (_TCLHDL_PROJECT             "-project")
+    set (_TCLHDL_SIMULATION          "-simulation")
+    set (_TCLHDL_SIMULATION_SETTINGS "-simsettings")
     #endif ()
 
     add_custom_target (${_TARGET_NAME}-${_HDL_SETTINGS_NAME}
         COMMAND
         ${CMAKE_HDL_SYSTEM_SOURCE} ${CMAKE_HDL_SIMULATION_SETTINGS} &&
         ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
-        ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_SIMULATION} ${_HDL_SETTINGS_NAME} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
+        ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_SIMULATION} ${_HDL_SETTINGS_NAME} ${_TCLHDL_SIMULATION_SETTINGS} ${_HDL_TCL_FILES} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
