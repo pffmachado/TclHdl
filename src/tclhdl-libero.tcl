@@ -137,16 +137,19 @@ proc ::tclhdl::libero::open_project {args} {
 
     log::log debug "libero::open_project: Trying to open project $::tclhdl::libero::project_name"
 
-    if { [file exists "$::tclhdl::libero::project_name.ldf"] } {
+    if { [file exists "$::tclhdl::libero::project_name.prjx"] } {
         log::log debug "libero::open_project: We are at $current_dir"
-        log::log debug "libero::open_project: Open project $::tclhdl::libero::project_name.ldf"
-        prj_project open "$::tclhdl::libero::project_name.ldf"
+        log::log debug "libero::open_project: Open project $::tclhdl::libero::project_name.prjx"
+        open_project -file "$::tclhdl::libero::project_name.prjx"
         set ::tclhdl::libero::is_project_closed 1
     } else {
         log::log debug "libero::open_project: New project $::tclhdl::libero::project_name"
-        prj_project new -name "$::tclhdl::libero::project_name"\
-            -impl "$::tclhdl::libero::project_impl"\
-            -synthesis "$::tclhdl::libero::project_synth"
+        file delete -force "$::tclhdl::project_build_dir"
+        new_project -name "$::tclhdl::libero::project_name" \
+                    -location "$::tclhdl::project_build_dir" \
+                    -hdl "VHDL" \
+                    -family "PolarFire" \
+                    -die "MPF100T"
         #-- Set Project to Close
         set ::tclhdl::libero::is_project_closed 1
     }
@@ -164,8 +167,7 @@ proc ::tclhdl::libero::close_project {} {
 
     if {$::tclhdl::libero::is_project_closed} {
         log::log debug "libero::project_close:: Project Closed"
-        prj_project save
-        prj_project close
+        save_project
     }
 }
 
@@ -241,20 +243,7 @@ proc ::tclhdl::libero::build_ip {} {
 #------------------------------------------------------------------------------
 proc ::tclhdl::libero::build_synthesis {} {
     log::log debug "libero::build_synthesis : launch synthesis - $::tclhdl::libero::project_impl"
-    #TODO: Very ugly hook! It happens on libero the synthesis it seams be 
-    #spawn in other process which exits from tclhdl once finished.
-    set hook [open "hook.tcl" "w"]
-    puts $hook "prj_project open $::tclhdl::libero::project_name.ldf"
-    puts $hook "prj_run Synthesis -impl $::tclhdl::libero::project_impl -forceAll"
-    puts $hook "prj_project close"
-    close $hook
-    if { $::runtime_system == "Linux" } {
-        exec liberoc hook.tcl
-    } elseif { $::runtime_system == "Windows NT" } {
-        exec pnmainc hook.tcl
-    } else {
-        log::log debug "libero::build_synthesis : Platform not identified"
-    }
+    run_tool -name SYNTHESIZE
 }
 
 #------------------------------------------------------------------------------
@@ -263,9 +252,8 @@ proc ::tclhdl::libero::build_synthesis {} {
 #------------------------------------------------------------------------------
 proc ::tclhdl::libero::build_fitting {} {
     log::log debug "libero::build_fitting : launch implementation"
-    prj_run Translate -impl "$::tclhdl::libero::project_impl"
-    prj_run Map -impl "$::tclhdl::libero::project_impl"
-    prj_run PAR -impl "$::tclhdl::libero::project_impl"
+    run_tool -name COMPILE
+    run_tool -name PLACEROUTE
 }
 
 #------------------------------------------------------------------------------
@@ -274,9 +262,7 @@ proc ::tclhdl::libero::build_fitting {} {
 #------------------------------------------------------------------------------
 proc ::tclhdl::libero::build_timing {} {
     log::log debug "libero::build_timing : launch timing analysis"
-    prj_run Map -impl "$::tclhdl::libero::project_impl" -task MapTrace
-    prj_run PAR -impl "$::tclhdl::libero::project_impl" -task PARTrace
-    prj_run PAR -impl "$::tclhdl::libero::project_impl" -task IOTiming
+    run_tool -name VERIFYTIMING
 }
 
 #------------------------------------------------------------------------------
@@ -358,7 +344,7 @@ proc ::tclhdl::libero::set_project_top {value} {
 #-------------------------------------------------------------------------------
 proc ::tclhdl::libero::source_add {type src} {
     log::log debug "libero::source_add: Add $type - $src"
-    prj_src add -format $type $src
+    import_files -hdl_source $src
 }
 
 #-------------------------------------------------------------------------------
@@ -367,11 +353,7 @@ proc ::tclhdl::libero::source_add {type src} {
 #-------------------------------------------------------------------------------
 proc ::tclhdl::libero::ip_add {type src} {
     log::log debug "libero::ip_add: Add $type $src"
-    if { $type == "IPX" } {
-        prj_src add $src
-    } else {
-        log::log debug "libero::ip_add: IP type ($type) not recognized"
-    }
+    import_files -smartgen_core $src
 }
 
 #-------------------------------------------------------------------------------
@@ -380,9 +362,10 @@ proc ::tclhdl::libero::ip_add {type src} {
 #-------------------------------------------------------------------------------
 proc ::tclhdl::libero::constraint_add {type src} {
     log::log debug "libero::constraint_add: Add $type $src"
-     if { $type == "LPF" } {
-        prj_src add -format $type $src
-        prj_src enable $src
+     if { $type == "SDC" } {
+        import_files -constraint_sdc $src
+    } else if { $type == "DCF" } {
+        import_files -constraint_dcf $src
     } else {
         log::log debug "libero::constraint_add: Constraint type ($type) not recognized"
     }

@@ -279,50 +279,6 @@ function(add_hdl _TARGET_NAME)
         set (CMAKE_HDL_SYSTEM_SOURCE "source")
     endif ()
 
-    #-- Set the different vendor specific calls
-    if ( ${_vendor} STREQUAL "XILINX" )
-        #set (XILINX_SOURCE_SETTINGS ${CMAKE_HDL_TOOL_SETTINGS})
-        file (TO_NATIVE_PATH ${CMAKE_HDL_TOOL_SETTINGS} XILINX_SOURCE_SETTINGS)
-        if ( ${_tool} STREQUAL "VIVADO" )
-            set (_VENDOR_TOOL "vivado" "-mode" "tcl" "-notrace" "-source")
-            set (_VENDOR_ARGS "-tclargs")
-        elseif ( ${_tool} STREQUAL "ISE" )
-            set (_VENDOR_TOOL "xtclsh")
-            set (_VENDOR_ARGS "")
-        endif ()
-        set (_VENDOR_TOOL_VERSION "")
-        set (_VENDOR_SOURCE "${XILINX_SOURCE_SETTINGS}")
-    elseif ( ${_vendor} MATCHES "Altera|Intel" )
-        if ( ${_tool} EQUAL "Quartus" )
-            set (_VENDOR_TOOL "quartus_sh")
-        endif ()
-        set (_VENDOR_TOOL_VERSION "")
-        set (_VENDOR_SOURCE "${INTEL_SOURCE_SETTINGS}")
-    elseif ( ${_vendor} STREQUAL "LATTICE" )
-        file (TO_NATIVE_PATH ${CMAKE_HDL_TOOL_SETTINGS} LATTICE_SOURCE_SETTINGS)
-        if ( ${_tool} STREQUAL "DIAMOND" )
-            set (_VENDOR_TOOL "pnmainc")
-            if (UNIX)
-                set (_VENDOR_TOOL "diamondc")
-            endif ()
-            set (_VENDOR_ARGS "")
-        endif ()
-        set (_VENDOR_TOOL_VERSION "")
-        set (_VENDOR_SOURCE "${LATTICE_SOURCE_SETTINGS}")
-    elseif ( ${_vendor} STREQUAL "MICROSEMI" )
-        file (TO_NATIVE_PATH ${CMAKE_HDL_TOOL_SETTINGS} MICROSEMI_SOURCE_SETTINGS)
-        if ( ${_tool} STREQUAL "LIBERO" )
-            set (_VENDOR_TOOL "libero")
-            if (UNIX)
-                set (_VENDOR_TOOL "libero")
-            endif ()
-            set (_VENDOR_ARGS "")
-        endif ()
-        set (_VENDOR_TOOL_VERSION "")
-        set (_VENDOR_SOURCE "${MICROSEMI_SOURCE_SETTINGS}")
-
-    endif ()
-
     #set (TCLHDL_TOOL ${CMAKE_HDL_TCLHDL})
     file (TO_NATIVE_PATH ${CMAKE_HDL_TCLHDL} TCLHDL_TOOL)
     #if ( ${HAS_TCLHDL} )
@@ -340,15 +296,61 @@ function(add_hdl _TARGET_NAME)
     set (_TCLHDL_SIMLIB     "-simlib")
     #endif ()
 
+    set (CMAKE_HDL_COMMAND_END "")
+    #-- Set the different vendor specific calls
+    if ( ${_vendor} STREQUAL "XILINX" )
+        #set (XILINX_SOURCE_SETTINGS ${CMAKE_HDL_TOOL_SETTINGS})
+        file (TO_NATIVE_PATH ${CMAKE_HDL_TOOL_SETTINGS} XILINX_SOURCE_SETTINGS)
+        if ( ${_tool} STREQUAL "VIVADO" )
+            set (_VENDOR_TOOL "vivado" "-mode" "tcl" "-notrace" "-source")
+            set (_VENDOR_ARGS "-tclargs")
+        elseif ( ${_tool} STREQUAL "ISE" )
+            set (_VENDOR_TOOL "xtclsh")
+            set (_VENDOR_ARGS "")
+        endif ()
+        set (_VENDOR_TOOL_VERSION "")
+        set (_VENDOR_SOURCE "${XILINX_SOURCE_SETTINGS}")
+        set (CMAKE_HDL_COMMAND ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_PROJECT} ${_TARGET_NAME})
+    elseif ( ${_vendor} MATCHES "Altera|Intel" )
+        if ( ${_tool} EQUAL "Quartus" )
+            set (_VENDOR_TOOL "quartus_sh")
+        endif ()
+        set (_VENDOR_TOOL_VERSION "")
+        set (_VENDOR_SOURCE "${INTEL_SOURCE_SETTINGS}")
+        set (CMAKE_HDL_COMMAND ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_PROJECT} ${_TARGET_NAME})
+    elseif ( ${_vendor} STREQUAL "LATTICE" )
+        file (TO_NATIVE_PATH ${CMAKE_HDL_TOOL_SETTINGS} LATTICE_SOURCE_SETTINGS)
+        if ( ${_tool} STREQUAL "DIAMOND" )
+            set (_VENDOR_TOOL "pnmainc")
+            if (UNIX)
+                set (_VENDOR_TOOL "diamondc")
+            endif ()
+            set (_VENDOR_ARGS "")
+        endif ()
+        set (_VENDOR_TOOL_VERSION "")
+        set (_VENDOR_SOURCE "${LATTICE_SOURCE_SETTINGS}")
+        set (CMAKE_HDL_COMMAND ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_PROJECT} ${_TARGET_NAME})
+    elseif ( ${_vendor} STREQUAL "MICROSEMI" )
+        file (TO_NATIVE_PATH ${CMAKE_HDL_TOOL_SETTINGS} MICROSEMI_SOURCE_SETTINGS)
+        if ( ${_tool} STREQUAL "LIBERO" )
+            set (_VENDOR_TOOL "libero" "script:")
+            set (_VENDOR_ARGS "script_args:")
+        endif ()
+        set (_VENDOR_TOOL_VERSION "")
+        set (_VENDOR_SOURCE "${MICROSEMI_SOURCE_SETTINGS}")
+        set (CMAKE_HDL_COMMAND ${_VENDOR_TOOL}${_TCLHDL_TOOL} ${_VENDOR_ARGS}\"${_TCLHDL_DEBUG} ${_TCLHDL_PROJECT} ${_TARGET_NAME})
+        set (CMAKE_HDL_COMMAND_END "\"")
+    endif ()
+
     add_custom_target (${_TARGET_NAME}-shell
         COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
-        ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_SHELL} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
+        ${CMAKE_HDL_COMMAND} ${_TCLHDL_SHELL}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
     add_custom_target (${_TARGET_NAME}-ip
         COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
-        ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_IP} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
+        ${CMAKE_HDL_COMMAND} ${_TCLHDL_IP} ${CMAKE_HDL_COMMAND_END}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
@@ -356,31 +358,31 @@ function(add_hdl _TARGET_NAME)
         COMMAND
         ${CMAKE_HDL_SYSTEM_SOURCE} ${CMAKE_HDL_SIMULATION_SETTINGS} &&
         ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
-        ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_GENERATE} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
+        ${CMAKE_HDL_COMMAND} ${_TCLHDL_GENERATE} ${CMAKE_HDL_COMMAND_END}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
     add_custom_target (${_TARGET_NAME}-report
         COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
-        ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_BUILD} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
+        ${CMAKE_HDL_COMMAND} ${_TCLHDL_BUILD} ${CMAKE_HDL_COMMAND_END}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
     add_custom_target (${_TARGET_NAME}-bitstream
         COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
-        ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_BITSTREAM} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
+        ${CMAKE_HDL_COMMAND} ${_TCLHDL_BITSTREAM} ${CMAKE_HDL_COMMAND_END}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
     add_custom_target (${_TARGET_NAME}-program
         COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
-        ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_PROGRAM} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
+        ${CMAKE_HDL_COMMAND} ${_TCLHDL_PROGRAM} ${CMAKE_HDL_COMMAND_END}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
     add_custom_target (${_TARGET_NAME}-clean
         COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
-        ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_CLEAN} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
+        ${CMAKE_HDL_COMMAND} ${_TCLHDL_CLEAN} ${CMAKE_HDL_COMMAND_END}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
@@ -388,13 +390,13 @@ function(add_hdl _TARGET_NAME)
         COMMAND
         ${CMAKE_HDL_SYSTEM_SOURCE} ${CMAKE_HDL_SIMULATION_SETTINGS} &&
         ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
-        ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_SIMLIB} ${_TARGET_SIMULATOR} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
+        ${CMAKE_HDL_COMMAND} ${_TCLHDL_SIMLIB} ${_TARGET_SIMULATOR} ${CMAKE_HDL_COMMAND_END}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
     add_custom_target (${_TARGET_NAME}
         COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
-        ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_BUILD} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
+        ${CMAKE_HDL_COMMAND} ${_TCLHDL_BUILD} ${CMAKE_HDL_COMMAND_END}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
