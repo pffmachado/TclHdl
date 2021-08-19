@@ -113,7 +113,7 @@ log::lvSuppress info 0
 #------------------------------------------------------------------------------
 set options {
     {debug                  "Enable Debug"}
-    {project.arg    ""      "Project Name"}
+    {project.arg       ""   "Project Name"}
     {generate               "Project Generator"}
     {generateip             "Project IP Generator"}
     {build                  "Project Build"}
@@ -122,9 +122,9 @@ set options {
     {bitstream              "Project Bitstream"}
     {program                "Project Program"}
     {verify                 "Project Verification"}
-    {simulation.arg ""      "Project Simulation"}
-    {simsettings.arg ""     "Project Simulation Settings"}
-    {simlib.arg ""          "Project Compile Simulation Library"}
+    {simulation.arg    ""   "Project Simulation"}
+    {simsettings.arg   ""   "Project Simulation Settings"}
+    {simlib.arg        ""  "Project Compile Simulation Library"}
     {shell                  "Project Shell"}
     {clean                  "Project Clean"}
 }

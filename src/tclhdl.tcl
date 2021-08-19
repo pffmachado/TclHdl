@@ -61,6 +61,8 @@ if { $runtime_prog == "quartus" } {
     package require ::tclhdl::ise
 } elseif { $runtime_prog == "diamond" } {
     package require ::tclhdl::diamond
+} elseif { $runtime_prog == "libero" } {
+    package require ::tclhdl::libero
 } elseif { $runtime_prog == "modelsim" } {
     package require ::tclhdl::modelsim
 } elseif { $runtime_prog == "ghdl" } {
@@ -78,6 +80,7 @@ interp alias {} check_quartus  {} if { $::runtime_prog != "quartus"  } { return 
 interp alias {} check_vivado   {} if { $::runtime_prog != "vivado"   } { return 0 }
 interp alias {} check_ise      {} if { $::runtime_prog != "ise"      } { return 0 }
 interp alias {} check_diamond  {} if { $::runtime_prog != "diamond"  } { return 0 }
+interp alias {} check_libero   {} if { $::runtime_prog != "libero"  } { return 0 }
 interp alias {} check_modelsim {} if { $::runtime_prog != "modelsim" } { return 0 }
 
 interp alias {} check_project_created {} if { $::tclhdl::flag_project_create == 0} { return 0 }
@@ -269,6 +272,11 @@ proc ::tclhdl::add_source {type src} {
             log::log debug "add_source: Lattice Diamond - Adding file type $type - $src"
             ::tclhdl::diamond::source_add $type $src
         }
+        MICROSEMI_LIBERO {
+            check_libero
+            log::log debug "add_source: Microsemi Libero - Adding file type $type - $src"
+            ::tclhdl::libero::source_add $type $src
+        }
         default {
             log::logMsg "add_source: No supported tool define for the current project"
         }
@@ -373,6 +381,18 @@ proc ::tclhdl::add_ip {type src} {
                 }
             }
         }
+        MICROSEMI_LIBERO {
+            check_libero
+            switch $type {
+                IPX {
+                    log::log debug "add_ip: Adding ip type $type - $src"
+                    ::tclhdl::libero::ip_add $type $src
+                }
+                default {
+                    log::logMsg "add_ip: No IP type defined for $ip_file"
+                }
+            }
+        }
         default {
             log::logMsg "add_source: No supported tool define for the current project"
         }
@@ -409,6 +429,11 @@ proc ::tclhdl::add_constraint {type src} {
             log::log debug "add_constraint: Diamond - Adding file type $type - $src"
             ::tclhdl::diamond::constraint_add $type $src
         }
+        MICROSEMI_LIBERO {
+            check_libero
+            log::log debug "add_constraint: Libero - Adding file type $type - $src"
+            ::tclhdl::libero::constraint_add $type $src
+        }
         default {
             log::logMsg "add_constraint: No supported tool define for the current project"
         }
@@ -436,6 +461,10 @@ proc ::tclhdl::add_simulation {name type src} {
         LATTICE_DIAMOND {
             check_diamond
             ::tclhdl::diamond::simulation_add $name $type $src
+        }
+        MICROSEMI_LIBERO {
+            check_libero
+            ::tclhdl::libero::simulation_add $name $type $src
         }
         MENTOR_MODELSIM {
             check_modelsim
@@ -468,6 +497,10 @@ proc ::tclhdl::add_simulation_settings {name top settings} {
         LATTICE_DIAMOND {
             check_diamond
             ::tclhdl::diamond::simulation_settings $name $top $settings
+        }
+        MICROSEMI_LIBERO {
+            check_libero
+            ::tclhdl::libero::simulation_settings $name $top $settings
         }
         MENTOR_MODELSIM {
             check_modelsim
@@ -516,6 +549,13 @@ proc ::tclhdl::add_settings {settings src} {
                 source $src
             }
         }
+        MICROSEMI_LIBERO {
+            check_libero
+            log::log debug "add_settings: Libero - Adding file settings $settings - $src"
+            if { $::tclhdl::libero::project_settings == $settings } {
+                source $src
+            }
+        }
         default {
             log::logMsg "add_source: No supported tool define for the current project"
         }
@@ -545,6 +585,10 @@ proc ::tclhdl::add_project {prj settings rev} {
         }
         LATTICE_DIAMOND {
             check_diamond
+            lappend ::tclhdl::list_projects [list $prj $settings $rev]
+        }
+        MICROSEMI_LIBERO {
+            check_libero
             lappend ::tclhdl::list_projects [list $prj $settings $rev]
         }
         default {
@@ -776,6 +820,21 @@ proc ::tclhdl::project_open {args} {
                 log::Msg "project_open: Adding Project not correct"
             }
         }
+        MICROSEMI_LIBERO {
+            check_libero
+            if { [llength $args] == 3 } {
+                set prj [lindex $args 0]
+                set settings [lindex $args 1]
+                set rev [lindex $args 2]
+                log::log debug "project_open: Adding Project $prj with settings $settings"
+                ::tclhdl::libero::set_project_name $prj
+                ::tclhdl::libero::set_project_settings $settings
+                ::tclhdl::libero::set_project_revision $rev
+                ::tclhdl::libero::open_project
+            } else {
+                log::Msg "project_open: Adding Project not correct"
+            }
+        }
         default {
             log::logMsg "project_open: No supported tool define for the current project"
         }
@@ -804,6 +863,10 @@ proc ::tclhdl::project_close {prj} {
         LATTICE_DIAMOND {
             check_diamond
             ::tclhdl::diamond::close_project
+        }
+        MICROSEMI_LIBERO {
+            check_libero
+            ::tclhdl::libero::close_project
         }
         default {
             log::logMsg "project_close: No supported tool define for the current project"
@@ -977,6 +1040,9 @@ proc ::tclhdl::project_simlib {prj simulator} {
         }
         LATTICE_DIAMOND {
             check_diamond
+        }
+        MICROSEMI_LIBERO {
+            check_libero
         }
         default {
             log::logMsg "add_project: No supported tool define for the current project"
@@ -1364,6 +1430,10 @@ proc ::tclhdl::build_ip {} {
             check_diamond
             ::tclhdl::diamond::build_ip
         }
+        MICROSEMI_LIBERO {
+            check_libero
+            ::tclhdl::libero::build_ip
+        }
         default {
             log::logMsg "build_ip: No supported tool define for the current project"
         }
@@ -1390,12 +1460,16 @@ proc ::tclhdl::build_synthesis {} {
             ::tclhdl::vivado::build_synthesis
         }
         XILINX_ISE {
-            check_diamond
+            check_ise
             ::tclhdl::ise::build_synthesis
         }
         LATTICE_DIAMOND {
             check_diamond
             ::tclhdl::diamond::build_synthesis
+        }
+        MICROSEMI_LIBERO {
+            check_libero
+            ::tclhdl::libero::build_synthesis
         }
         default {
             log::logMsg "build_synthesis: No supported tool define for the current project"
@@ -1430,6 +1504,10 @@ proc ::tclhdl::build_fitting {} {
             check_diamond
             ::tclhdl::diamond::build_fitting
         }
+        MICROSEMI_LIBERO {
+            check_libero
+            ::tclhdl::libero::build_fitting
+        }
         default {
             log::logMsg "build_fitting: No supported tool define for the current project"
         }
@@ -1462,6 +1540,9 @@ proc ::tclhdl::build_timing {} {
         LATTICE_DIAMOND {
             check_diamond
         }
+        MICROSEMI_LIBERO {
+            check_libero
+        }
         default {
             log::logMsg "build_timing: No supported tool define for the current project"
         }
@@ -1493,6 +1574,9 @@ proc ::tclhdl::build_simulation {name settings} {
         }
         LATTICE_DIAMOND {
             check_diamond
+        }
+        MICROSEMI_LIBERO {
+            check_libero
         }
         default {
             log::logMsg "build_simulation: No supported tool define for the current project"
@@ -1538,6 +1622,10 @@ proc ::tclhdl::build_bitstream {} {
             check_diamond
             ::tclhdl::diamond::build_bitstream
         }
+        MICROSEMI_LIBERO {
+            check_libero
+            ::tclhdl::libero::build_bitstream
+        }
         default {
             log::logMsg "build_bitstream: No supported tool define for the current project"
         }
@@ -1570,6 +1658,10 @@ proc ::tclhdl::build_report {} {
         LATTICE_DIAMOND {
             check_diamond
             ::tclhdl::diamond::build_report
+        }
+        MICROSEMI_LIBERO {
+            check_libero
+            ::tclhdl::libero::build_report
         }
         default {
             log::logMsg "build_report: No supported tool define for the current project"

@@ -56,6 +56,7 @@ namespace eval ::tclhdl::definitions {
     set TOOL_XILINX_ISE                  "xtclsh"
     set TOOL_INTEL                       "quartus_sh"
     set TOOL_LATTICE                     "diamondc"
+    set TOOL_MICROSEMI                   "libero"
     set TOOL_MODELSIM                    "vsim"
 
     #-- Namespace internal variables
