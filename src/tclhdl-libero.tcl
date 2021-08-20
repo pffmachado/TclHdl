@@ -37,6 +37,7 @@
 #------------------------------------------------------------------------------
 
 package require ::tclhdl::definitions
+package require ::tclhdl::utils
 
 #------------------------------------------------------------------------------
 ## Namespace Declaration
@@ -125,6 +126,7 @@ namespace eval ::tclhdl::libero {
 proc ::tclhdl::libero::open_project {args} {
     global ::tclhdl::libero::is_project_closed
     global ::tclhdl::libero::is_project_assignments
+    global ::tclhdl::libero::project_name
     global ::tclhdl::libero::project_part
     global ::tclhdl::libero::project_synth
     global ::tclhdl::libero::project_synth_flow
@@ -140,16 +142,19 @@ proc ::tclhdl::libero::open_project {args} {
     if { [file exists "$::tclhdl::libero::project_name.prjx"] } {
         log::log debug "libero::open_project: We are at $current_dir"
         log::log debug "libero::open_project: Open project $::tclhdl::libero::project_name.prjx"
-        open_project -file "$::tclhdl::libero::project_name.prjx"
+        #-- Confliting proc name! Namespace needs to be forced.
+        namespace eval :: {
+            open_project "$::tclhdl::libero::project_name.prjx"
+            }
         set ::tclhdl::libero::is_project_closed 1
     } else {
         log::log debug "libero::open_project: New project $::tclhdl::libero::project_name"
         file delete -force "$::tclhdl::project_build_dir"
         new_project -name "$::tclhdl::libero::project_name" \
-                    -location "$::tclhdl::project_build_dir" \
-                    -hdl "VHDL" \
-                    -family "PolarFire" \
-                    -die "MPF100T"
+                      -location "$::tclhdl::project_build_dir" \
+                      -hdl "VHDL" \
+                      -family "PolarFire" \
+                      -die "MPF100T"
         #-- Set Project to Close
         set ::tclhdl::libero::is_project_closed 1
     }
@@ -167,7 +172,10 @@ proc ::tclhdl::libero::close_project {} {
 
     if {$::tclhdl::libero::is_project_closed} {
         log::log debug "libero::project_close:: Project Closed"
-        save_project
+        namespace eval :: {
+            save_project
+            close_project
+        }
     }
 }
 
@@ -344,7 +352,7 @@ proc ::tclhdl::libero::set_project_top {value} {
 #-------------------------------------------------------------------------------
 proc ::tclhdl::libero::source_add {type src} {
     log::log debug "libero::source_add: Add $type - $src"
-    import_files -hdl_source $src
+    create_links -hdl_source $src
 }
 
 #-------------------------------------------------------------------------------
@@ -363,9 +371,9 @@ proc ::tclhdl::libero::ip_add {type src} {
 proc ::tclhdl::libero::constraint_add {type src} {
     log::log debug "libero::constraint_add: Add $type $src"
      if { $type == "SDC" } {
-        import_files -constraint_sdc $src
+        create_links -sdc $src
     } else if { $type == "DCF" } {
-        import_files -constraint_dcf $src
+        create_links -dcf $src
     } else {
         log::log debug "libero::constraint_add: Constraint type ($type) not recognized"
     }
