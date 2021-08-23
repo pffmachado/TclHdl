@@ -155,6 +155,9 @@ proc ::tclhdl::libero::open_project {args} {
                       -hdl "VHDL" \
                       -family "PolarFire" \
                       -die "MPF100T"
+
+        #file mkdir "$::tclhdl::project_build_dir/vault"
+        change_vault_location -location "$::tclhdl::project_build_dir/vault"
         #-- Set Project to Close
         set ::tclhdl::libero::is_project_closed 1
     }
@@ -361,7 +364,13 @@ proc ::tclhdl::libero::source_add {type src} {
 #-------------------------------------------------------------------------------
 proc ::tclhdl::libero::ip_add {type src} {
     log::log debug "libero::ip_add: Add $type $src"
-    import_files -smartgen_core $src
+    if { $type == "CXF" } {
+        import_files -cxf $src
+    } elseif { $type == "IPTCL" } {
+        source $src
+    } else {
+        log::log debug "libero::ip_add: IP type ($type) not recognized"
+    }
 }
 
 #-------------------------------------------------------------------------------
@@ -372,7 +381,7 @@ proc ::tclhdl::libero::constraint_add {type src} {
     log::log debug "libero::constraint_add: Add $type $src"
      if { $type == "SDC" } {
         create_links -sdc $src
-    } else if { $type == "DCF" } {
+    } elseif { $type == "DCF" } {
         create_links -dcf $src
     } else {
         log::log debug "libero::constraint_add: Constraint type ($type) not recognized"

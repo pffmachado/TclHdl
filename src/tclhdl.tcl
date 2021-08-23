@@ -384,7 +384,11 @@ proc ::tclhdl::add_ip {type src} {
         MICROSEMI_LIBERO {
             check_libero
             switch $type {
-                IPX {
+                CXF {
+                    log::log debug "add_ip: Adding ip type $type - $src"
+                    ::tclhdl::libero::ip_add $type $src
+                }
+                IPTCL {
                     log::log debug "add_ip: Adding ip type $type - $src"
                     ::tclhdl::libero::ip_add $type $src
                 }

@@ -27,7 +27,7 @@ We could think in the case to ship with this library TclOO but that isn't forese
 for the time being, perhaps in the future!
 
 ## CMake Module
-The first draft of a CMake module is also provided.
+A CMake module is also provided.
 CMake is an excellent tool for setting up build infrastructure. On that regard
 the UseHdl.cmake module intend to generate the TclHdl project structure.
 
@@ -38,6 +38,14 @@ The development environment is being done on Linux (Arch Linux) and compatibilit
 tests are being carried out on Windows 10.
 ModelSim support to Vivado is now available as well as the integration with VUnit
 framework.
+
+- [x] Intel Quartus
+- [x] Xilinx ISE
+- [x] Xilinx Vivado
+- [x] Lattice Diamond
+- [x] Microsemi Libero
+- [x] Vunit
+- [x] ModelSim on Vivado
 
 ### Roadmap
 

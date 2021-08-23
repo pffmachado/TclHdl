@@ -45,7 +45,7 @@ add_hdl(<target_name>
     [XCO] <source1> [<source2>...]
     [XCO_UPGRADE] <source1> [<source2>...]
     [QSYS] <source1> [<source2>...]
-    [IPX] <source1> [<source2>...]
+    [CXF] <source1> [<source2>...]
     [FLOW] <flow>
     [SOURCE_DIR] <dir>
     [IP_DIR] <dir>
@@ -109,7 +109,7 @@ function(add_hdl _TARGET_NAME)
     cmake_parse_arguments(_add_hdl
         ""
         "VENDOR;TOOL;SIMULATOR;VERSION;REVISION;OUTPUT_DIR;OUTPUT_NAME"
-        "VHDL;VHDL_2008;VERILOG;SYSTEMVERILOG;COEFF;TCL;TCLHDL;SOURCES;PRE;POST;SETTINGS;TCL_SETTINGS;FLOW;SOURCEDIR;IPDIR;CONSTRAINTDIR;SETTINGDIR;SCRIPTDIR;COREGEN;XCI;XCO;XCO_UPGRADE;QSYS;IPX;UCF;XDC;SDC;SDF;LPF"
+        "VHDL;VHDL_2008;VERILOG;SYSTEMVERILOG;COEFF;TCL;TCLHDL;SOURCES;PRE;POST;SETTINGS;TCL_SETTINGS;FLOW;SOURCEDIR;IPDIR;CONSTRAINTDIR;SETTINGDIR;SCRIPTDIR;COREGEN;XCI;XCO;XCO_UPGRADE;QSYS;IPTCL;CXF;IPX;UCF;XDC;SDC;SDF;LPF"
         ${ARGN}
         )
 
@@ -167,6 +167,8 @@ function(add_hdl _TARGET_NAME)
     set (_HDL_XDC_FILES 	            ${_add_hdl_XDC})
     set (_HDL_SDC_FILES 	            ${_add_hdl_SDC})
     set (_HDL_LPF_FILES 	            ${_add_hdl_LPF})
+    set (_HDL_CXF_FILES 	            ${_add_hdl_CXF})
+    set (_HDL_IPTCL_FILES 	            ${_add_hdl_IPTCL})
     set (_HDL_SOURCE_FILES 	            ${_add_hdl_SOURCES} ${_add_hdl_UNPARSED_ARGUMENTS})
 
     set (_HDL_PROJECT_DIR "${CMAKE_BINARY_DIR}/${_TARGET_NAME}")
@@ -258,6 +260,8 @@ function(add_hdl _TARGET_NAME)
     _tclhdl_add_file (FUNCTION "add_ip"         TYPE "XCO_UPGRADE"         FILES ${_HDL_XCO_UPGRADE_FILES}        OUTPUT ${CMAKE_HDL_TCLHDL_FILE_IP})
     _tclhdl_add_file (FUNCTION "add_ip"         TYPE "QSYS"                FILES ${_HDL_QSYS_FILES}               OUTPUT ${CMAKE_HDL_TCLHDL_FILE_IP})
     _tclhdl_add_file (FUNCTION "add_ip"         TYPE "IPX"                 FILES ${_HDL_IPX_FILES}                OUTPUT ${CMAKE_HDL_TCLHDL_FILE_IP})
+    _tclhdl_add_file (FUNCTION "add_ip"         TYPE "CXF"                 FILES ${_HDL_CXF_FILES}                OUTPUT ${CMAKE_HDL_TCLHDL_FILE_IP})
+    _tclhdl_add_file (FUNCTION "add_ip"         TYPE "IPTCL"               FILES ${_HDL_IPTCL_FILES}              OUTPUT ${CMAKE_HDL_TCLHDL_FILE_IP})
     _tclhdl_add_file (FUNCTION "add_constraint" TYPE "UCF"                 FILES ${_HDL_UCF_FILES}                OUTPUT ${CMAKE_HDL_TCLHDL_FILE_CONSTRAINTS})
     _tclhdl_add_file (FUNCTION "add_constraint" TYPE "XDC"                 FILES ${_HDL_XDC_FILES}                OUTPUT ${CMAKE_HDL_TCLHDL_FILE_CONSTRAINTS})
     _tclhdl_add_file (FUNCTION "add_constraint" TYPE "SDC"                 FILES ${_HDL_SDC_FILES}                OUTPUT ${CMAKE_HDL_TCLHDL_FILE_CONSTRAINTS})
