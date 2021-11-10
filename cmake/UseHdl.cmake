@@ -346,8 +346,6 @@ function(add_hdl _TARGET_NAME)
         set (CMAKE_HDL_COMMAND_END "\"")
     endif ()
 
-<<<<<<< Updated upstream
-=======
     set (CMAKE_HDL_SIMULATION_SETTINGS "")
     if (UNIX)
         set (CMAKE_HDL_SIMULATION_SETTINGS ${_VENDOR_SOURCE})
@@ -370,7 +368,6 @@ function(add_hdl _TARGET_NAME)
     set (_TCLHDL_SIMLIB     "-simlib")
     #endif ()
 
->>>>>>> Stashed changes
     add_custom_target (${_TARGET_NAME}-shell
         COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
         ${CMAKE_HDL_COMMAND} ${_TCLHDL_SHELL}
