@@ -346,6 +346,31 @@ function(add_hdl _TARGET_NAME)
         set (CMAKE_HDL_COMMAND_END "\"")
     endif ()
 
+<<<<<<< Updated upstream
+=======
+    set (CMAKE_HDL_SIMULATION_SETTINGS "")
+    if (UNIX)
+        set (CMAKE_HDL_SIMULATION_SETTINGS ${_VENDOR_SOURCE})
+    endif ()
+
+    #set (TCLHDL_TOOL ${CMAKE_HDL_TCLHDL})
+    file (TO_NATIVE_PATH ${CMAKE_HDL_TCLHDL} TCLHDL_TOOL)
+    #if ( ${HAS_TCLHDL} )
+    set (_TCLHDL_TOOL       "${TCLHDL_TOOL}")
+    set (_TCLHDL_IP         "-generateip")
+    set (_TCLHDL_DEBUG      "-debug")
+    set (_TCLHDL_PROJECT    "-project")
+    set (_TCLHDL_GENERATE   "-generate")
+    set (_TCLHDL_BUILD      "-build")
+    set (_TCLHDL_REPORT     "-report")
+    set (_TCLHDL_BITSTREAM  "-bitstream")
+    set (_TCLHDL_PROGRAM    "-program")
+    set (_TCLHDL_SHELL      "-shell")
+    set (_TCLHDL_CLEAN      "-clean")
+    set (_TCLHDL_SIMLIB     "-simlib")
+    #endif ()
+
+>>>>>>> Stashed changes
     add_custom_target (${_TARGET_NAME}-shell
         COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
         ${CMAKE_HDL_COMMAND} ${_TCLHDL_SHELL}
