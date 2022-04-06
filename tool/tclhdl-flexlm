@@ -1,0 +1,20 @@
+#! /bin/sh
+
+LM_PATH=$1
+FEATURE=$2
+LICSRV=$(echo $LM_LICENSE_FILE | tr ':' '\n')
+LICENSE_FILE=
+
+for lic in $LICSRV;
+do
+    feature_license=$(${LM_PATH}/lmutil lmstat -c $lic -f $FEATURE | grep $FEATURE)
+    feature_license_issued=$(echo $feature_license | sed 's/.* (\(.*\))/\1/' | sed 's/;  /;/' | tr ";" "\n" | awk '{print $3}' | sed -n 1p)
+    feature_license_used=$(echo $feature_license | sed 's/.* (\(.*\))/\1/' | sed 's/;  /;/' | tr ";" "\n" | awk '{print $3}' | sed -n 2p)
+    if [ $feature_license_issued -gt $feature_license_used ];
+    then
+        LICENSE_FILE=$lic
+        break
+    fi
+done
+
+echo $LICENSE_FILE
