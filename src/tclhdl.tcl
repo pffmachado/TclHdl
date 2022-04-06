@@ -127,6 +127,7 @@ namespace eval ::tclhdl {
     namespace export set_project_name
     namespace export set_project_dir
     namespace export set_project_type
+    namespace export set_project_toplevel
     namespace export set_project_target_dir
     namespace export set_project_build_number
     namespace export set_project_version
@@ -1543,9 +1544,11 @@ proc ::tclhdl::build_timing {} {
         }
         LATTICE_DIAMOND {
             check_diamond
+            ::tclhdl::diamond::build_timing
         }
         MICROSEMI_LIBERO {
             check_libero
+            ::tclhdl::libero::build_timing
         }
         default {
             log::logMsg "build_timing: No supported tool define for the current project"

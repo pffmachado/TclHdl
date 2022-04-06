@@ -109,7 +109,7 @@ function(add_hdl _TARGET_NAME)
     cmake_parse_arguments(_add_hdl
         ""
         "VENDOR;TOOL;SIMULATOR;VERSION;REVISION;OUTPUT_DIR;OUTPUT_NAME"
-        "VHDL;VHDL_2008;VERILOG;SYSTEMVERILOG;COEFF;TCL;TCLHDL;SOURCES;PRE;POST;SETTINGS;TCL_SETTINGS;FLOW;SOURCEDIR;IPDIR;CONSTRAINTDIR;SETTINGDIR;SCRIPTDIR;COREGEN;XCI;XCO;XCO_UPGRADE;QSYS;IPTCL;CXF;IPX;UCF;XDC;SDC;SDF;LPF"
+        "VHDL;VHDL_2008;VERILOG;SYSTEMVERILOG;COEFF;TCL;TCLHDL;SOURCES;PRE;POST;SETTINGS;TCL_SETTINGS;FLOW;SOURCEDIR;IPDIR;CONSTRAINTDIR;SETTINGDIR;SCRIPTDIR;COREGEN;XCI;XCO;XCO_UPGRADE;QSYS;IPTCL;CXF;IPX;UCF;XDC;SDC;SDF;LPF;PDC_FP;PDC_IO"
         ${ARGN}
         )
 
@@ -168,6 +168,8 @@ function(add_hdl _TARGET_NAME)
     set (_HDL_SDC_FILES 	            ${_add_hdl_SDC})
     set (_HDL_LPF_FILES 	            ${_add_hdl_LPF})
     set (_HDL_CXF_FILES 	            ${_add_hdl_CXF})
+    set (_HDL_PDC_FP_FILES 	            ${_add_hdl_PDC_FP})
+    set (_HDL_PDC_IO_FILES 	            ${_add_hdl_PDC_IO})
     set (_HDL_IPTCL_FILES 	            ${_add_hdl_IPTCL})
     set (_HDL_SOURCE_FILES 	            ${_add_hdl_SOURCES} ${_add_hdl_UNPARSED_ARGUMENTS})
 
@@ -266,6 +268,8 @@ function(add_hdl _TARGET_NAME)
     _tclhdl_add_file (FUNCTION "add_constraint" TYPE "XDC"                 FILES ${_HDL_XDC_FILES}                OUTPUT ${CMAKE_HDL_TCLHDL_FILE_CONSTRAINTS})
     _tclhdl_add_file (FUNCTION "add_constraint" TYPE "SDC"                 FILES ${_HDL_SDC_FILES}                OUTPUT ${CMAKE_HDL_TCLHDL_FILE_CONSTRAINTS})
     _tclhdl_add_file (FUNCTION "add_constraint" TYPE "LPF"                 FILES ${_HDL_LPF_FILES}                OUTPUT ${CMAKE_HDL_TCLHDL_FILE_CONSTRAINTS})
+    _tclhdl_add_file (FUNCTION "add_constraint" TYPE "PDC_FP"              FILES ${_HDL_PDC_FP_FILES}             OUTPUT ${CMAKE_HDL_TCLHDL_FILE_CONSTRAINTS})
+    _tclhdl_add_file (FUNCTION "add_constraint" TYPE "PDC_IO"              FILES ${_HDL_PDC_IO_FILES}             OUTPUT ${CMAKE_HDL_TCLHDL_FILE_CONSTRAINTS})
     _tclhdl_add_file (FUNCTION "add_settings"   TYPE ${_HDL_SETTINGS_NAME} FILES ${_HDL_SETTINGS_FILES}           OUTPUT ${CMAKE_HDL_TCLHDL_FILE_SETTINGS})
     _tclhdl_add_file (FUNCTION "fetch_settings" TYPE ""                    FILES ${_HDL_TCL_SETTINGS}             OUTPUT ${CMAKE_HDL_TCLHDL_FILE_PROJECT})
 

@@ -156,8 +156,6 @@ proc ::tclhdl::libero::open_project {args} {
                       -family "PolarFire" \
                       -die "MPF100T"
 
-        #file mkdir "$::tclhdl::project_build_dir/vault"
-        change_vault_location -location "$::tclhdl::project_build_dir/vault"
         #-- Set Project to Close
         set ::tclhdl::libero::is_project_closed 1
     }
@@ -254,7 +252,8 @@ proc ::tclhdl::libero::build_ip {} {
 #------------------------------------------------------------------------------
 proc ::tclhdl::libero::build_synthesis {} {
     log::log debug "libero::build_synthesis : launch synthesis - $::tclhdl::libero::project_impl"
-    run_tool -name SYNTHESIZE
+    cleanall_tool -name {SYNTHESIZE}
+    run_tool -name {SYNTHESIZE}
 }
 
 #------------------------------------------------------------------------------
@@ -263,8 +262,7 @@ proc ::tclhdl::libero::build_synthesis {} {
 #------------------------------------------------------------------------------
 proc ::tclhdl::libero::build_fitting {} {
     log::log debug "libero::build_fitting : launch implementation"
-    run_tool -name COMPILE
-    run_tool -name PLACEROUTE
+    run_tool -name {PLACEROUTE}
 }
 
 #------------------------------------------------------------------------------
@@ -273,7 +271,7 @@ proc ::tclhdl::libero::build_fitting {} {
 #------------------------------------------------------------------------------
 proc ::tclhdl::libero::build_timing {} {
     log::log debug "libero::build_timing : launch timing analysis"
-    run_tool -name VERIFYTIMING
+    run_tool -name {VERIFYTIMING}
 }
 
 #------------------------------------------------------------------------------
@@ -281,6 +279,34 @@ proc ::tclhdl::libero::build_timing {} {
 #
 #------------------------------------------------------------------------------
 proc ::tclhdl::libero::build_bitstream {} {
+    log::log debug "libero::build_bitstream : launch bitstream"
+    run_tool -name {GENERATEPROGRAMMINGFILE}
+
+    #set fileId [open $artifact_name.semver "w"]
+    #puts -nonewline $fileId $::tclhdl::project_semver
+    #close $fileId
+
+    #log::log debug "libero::build_bitstream : copy artifacts to output dir"
+    #file copy -force "$::tclhdl::libero::project_impl/${artifact_name}_${::tclhdl::libero::project_impl}.bit"\
+    #    "$artifact_dir/$artifact_name.bit"
+    #file copy -force "$::tclhdl::libero::project_impl/${artifact_name}_${::tclhdl::libero::project_impl}.jed"\
+    #    "$artifact_dir/$artifact_name.jed"
+    #file copy -force "$artifact_name.semver"      "$artifact_dir"
+
+    #log::log debug "libero::build_bitstream : adding checksum to artifacts"
+    #set file_list [glob "$artifact_dir/$artifact_name*"]
+    #foreach fileIdx $file_list {
+    #    ::tclhdl::utils::checksum $fileIdx
+    #}
+}
+
+#------------------------------------------------------------------------------
+## Run Report Generation
+#
+#------------------------------------------------------------------------------
+proc ::tclhdl::libero::build_report {} {
+    set project_top "$::tclhdl::libero::project_impl/$::tclhdl::libero::project_name"
+    set report_dir "report"
     set project_top $::tclhdl::libero::project_name
     set project_output "output"
     set project_report "report"
@@ -292,39 +318,10 @@ proc ::tclhdl::libero::build_bitstream {} {
         eval file delete -force $fileIdx
     }
 
-    log::log debug "libero::build_bitstream : launch bitstream"
-    prj_run Export -impl "$::tclhdl::libero::project_impl" -task Bitgen
-    prj_run Export -impl "$::tclhdl::libero::project_impl" -task Jedecgen
 
-    set fileId [open $artifact_name.semver "w"]
-    puts -nonewline $fileId $::tclhdl::project_semver
-    close $fileId
+    log::log debug "libero::build_report: launch report generation"
 
-    log::log debug "libero::build_bitstream : copy artifacts to output dir"
-    file copy -force "$::tclhdl::libero::project_impl/${artifact_name}_${::tclhdl::libero::project_impl}.bit"\
-        "$artifact_dir/$artifact_name.bit"
-    file copy -force "$::tclhdl::libero::project_impl/${artifact_name}_${::tclhdl::libero::project_impl}.jed"\
-        "$artifact_dir/$artifact_name.jed"
-    file copy -force "$artifact_name.semver"      "$artifact_dir"
-
-    log::log debug "libero::build_bitstream : adding checksum to artifacts"
-    set file_list [glob "$artifact_dir/$artifact_name*"]
-    foreach fileIdx $file_list {
-        ::tclhdl::utils::checksum $fileIdx
-    }
-}
-
-#------------------------------------------------------------------------------
-## Run Report Generation
-#
-#------------------------------------------------------------------------------
-proc ::tclhdl::libero::build_report {} {
-    set project_top "$::tclhdl::libero::project_impl/$::tclhdl::libero::project_name"
-    set report_dir "report"
-
-    log::log debug "lattice::build_report: launch report generation"
-
-    log::log debug "lattice::build_report: synthesis copy reports to output folder"
+    log::log debug "libero::build_report: synthesis copy reports to output folder"
     file mkdir "$report_dir"
     file copy -force "$::tclhdl::libero::project_impl/stdout.log" "$report_dir"
     file copy -force "$::tclhdl::libero::project_impl/automake.log" "$report_dir"
@@ -365,7 +362,7 @@ proc ::tclhdl::libero::source_add {type src} {
 proc ::tclhdl::libero::ip_add {type src} {
     log::log debug "libero::ip_add: Add $type $src"
     if { $type == "CXF" } {
-        import_files -cxf $src
+        import_component -file $src
     } elseif { $type == "IPTCL" } {
         source $src
     } else {
@@ -383,6 +380,10 @@ proc ::tclhdl::libero::constraint_add {type src} {
         create_links -sdc $src
     } elseif { $type == "DCF" } {
         create_links -dcf $src
+    } elseif { $type == "PDC_FP" } {
+        create_links -fp_pdc $src
+    } elseif { $type == "PDC_IO" } {
+        create_links -io_pdc $src
     } else {
         log::log debug "libero::constraint_add: Constraint type ($type) not recognized"
     }
