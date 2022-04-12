@@ -64,6 +64,7 @@ namespace eval ::tclhdl::libero {
     namespace export set_project_sim
     namespace export set_project_flow_synth
     namespace export set_project_flow_impl
+    namespace export set_project_top
 
     namespace export build_synthesis
     namespace export build_fitting
@@ -102,6 +103,7 @@ namespace eval ::tclhdl::libero {
     variable project_flow_synth
     variable project_flow_impl              
     variable project_jobs                   "4"
+    variable project_top
 
     variable output_root       ""
     variable output_dir       ""
@@ -159,6 +161,13 @@ proc ::tclhdl::libero::open_project {args} {
         #-- Set Project to Close
         set ::tclhdl::libero::is_project_closed 1
     }
+
+    #-- Vault Specification
+    file mkdir "$current_dir/vault"
+    if { [catch {exec >&@stdout change_vault_location -location "$current_dir/vault"}] } {
+        log::log debug "libero::open_project: Force Vault at $current_dir/vault"
+    }
+
 }
 
 #------------------------------------------------------------------------------
@@ -238,6 +247,12 @@ proc ::tclhdl::libero::set_project_flow_impl {flow} {
     set ::tclhdl::libero::project_flow_impl $flow
 }
 
+#-- NOTE: Apparently there is no call for getting the toplevel name.
+proc ::tclhdl::libero::set_project_top {top} {
+    global ::tclhdl::libero::project_top
+    set ::tclhdl::libero::project_top $top
+}
+
 #------------------------------------------------------------------------------
 ## Run Ip Build
 #
@@ -281,23 +296,6 @@ proc ::tclhdl::libero::build_timing {} {
 proc ::tclhdl::libero::build_bitstream {} {
     log::log debug "libero::build_bitstream : launch bitstream"
     run_tool -name {GENERATEPROGRAMMINGFILE}
-
-    #set fileId [open $artifact_name.semver "w"]
-    #puts -nonewline $fileId $::tclhdl::project_semver
-    #close $fileId
-
-    #log::log debug "libero::build_bitstream : copy artifacts to output dir"
-    #file copy -force "$::tclhdl::libero::project_impl/${artifact_name}_${::tclhdl::libero::project_impl}.bit"\
-    #    "$artifact_dir/$artifact_name.bit"
-    #file copy -force "$::tclhdl::libero::project_impl/${artifact_name}_${::tclhdl::libero::project_impl}.jed"\
-    #    "$artifact_dir/$artifact_name.jed"
-    #file copy -force "$artifact_name.semver"      "$artifact_dir"
-
-    #log::log debug "libero::build_bitstream : adding checksum to artifacts"
-    #set file_list [glob "$artifact_dir/$artifact_name*"]
-    #foreach fileIdx $file_list {
-    #    ::tclhdl::utils::checksum $fileIdx
-    #}
 }
 
 #------------------------------------------------------------------------------
@@ -305,34 +303,24 @@ proc ::tclhdl::libero::build_bitstream {} {
 #
 #------------------------------------------------------------------------------
 proc ::tclhdl::libero::build_report {} {
-    set project_top "$::tclhdl::libero::project_impl/$::tclhdl::libero::project_name"
-    set report_dir "report"
-    set project_top $::tclhdl::libero::project_name
-    set project_output "output"
+    global ::tclhdl::libero::project_top
+    set project_top $::tclhdl::libero::project_top
     set project_report "report"
+    set project_design "designer/${project_top}"
     set artifact_name $project_top
-    set artifact_dir $project_output
 
-    file mkdir "$project_output"
-    foreach fileIdx [glob -nocomplain "$project_output/*"] {
-        eval file delete -force $fileIdx
+    log::log debug "libero::build_report: create report"
+    file mkdir "$project_report"
+
+    log::log debug "libero::build_report: copy log files"
+    foreach fileIdx [glob -nocomplain "${project_design}/${project_top}_*.log"] {
+        eval file copy -force $fileIdx $project_report
     }
 
-
-    log::log debug "libero::build_report: launch report generation"
-
-    log::log debug "libero::build_report: synthesis copy reports to output folder"
-    file mkdir "$report_dir"
-    file copy -force "$::tclhdl::libero::project_impl/stdout.log" "$report_dir"
-    file copy -force "$::tclhdl::libero::project_impl/automake.log" "$report_dir"
-    file copy -force "${project_top}_${::tclhdl::libero::project_impl}.twr" "$report_dir"
-    file copy -force "${project_top}_${::tclhdl::libero::project_impl}.par" "$report_dir"
-    file copy -force "${project_top}_${::tclhdl::libero::project_impl}.pad" "$report_dir"
-    file copy -force "${project_top}_${::tclhdl::libero::project_impl}.mrp" "$report_dir"
-    file copy -force "${project_top}_${::tclhdl::libero::project_impl}.bgn" "$report_dir"
-    file copy -force "${project_top}_${::tclhdl::libero::project_impl}.srf" "$report_dir"
-    file copy -force "${project_top}_${::tclhdl::libero::project_impl}.srr" "$report_dir"
-    file copy -force "${project_top}_${::tclhdl::libero::project_impl}_map.hrr" "$report_dir"
+    log::log debug "libero::build_report: copy rpt files"
+    foreach fileIdx [glob -nocomplain "${project_design}/${project_top}_*.rpt"] {
+        eval file copy -force $fileIdx $project_report
+    }
 }
 
 #------------------------------------------------------------------------------
@@ -341,9 +329,6 @@ proc ::tclhdl::libero::build_report {} {
 #------------------------------------------------------------------------------
 proc ::tclhdl::libero::ip_generate {} {
     log::log debug "ip_generate: Generate $::tclhdl::libero::ip_type for $::tclhdl::libero::ip_name"
-}
-
-proc ::tclhdl::libero::set_project_top {value} {
 }
 
 #-------------------------------------------------------------------------------

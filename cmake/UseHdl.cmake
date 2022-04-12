@@ -346,6 +346,8 @@ function(add_hdl _TARGET_NAME)
         endif ()
         set (_VENDOR_TOOL_VERSION "")
         set (_VENDOR_SOURCE "${MICROSEMI_SOURCE_SETTINGS}")
+        #-- NOTE: If you realise there is no white space between vendor and tool.
+        #-- That is because libero could not deal with the white space on the argument
         set (CMAKE_HDL_COMMAND ${_VENDOR_TOOL}${_TCLHDL_TOOL} ${_VENDOR_ARGS}\"${_TCLHDL_DEBUG} ${_TCLHDL_PROJECT} ${_TARGET_NAME})
         set (CMAKE_HDL_COMMAND_END "\"")
     endif ()
