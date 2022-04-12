@@ -38,6 +38,10 @@ The development environment is being done on Linux (Arch Linux) and compatibilit
 tests are being carried out on Windows 10.
 ModelSim support to Vivado is now available as well as the integration with VUnit
 framework.
+Microsemi Libero (tested on version 2022.3) is now supported.
+FlexLM handler on Linux hosts is now provided however it needs to be properly
+supported inside of tclhdl.
+
 
 - [x] Intel Quartus
 - [x] Xilinx ISE
@@ -46,6 +50,7 @@ framework.
 - [x] Microsemi Libero
 - [x] Vunit
 - [x] ModelSim on Vivado
+- [ ] FlexLM Handler on cross platforms
 
 ### Roadmap
 

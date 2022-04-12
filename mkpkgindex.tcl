@@ -20,9 +20,9 @@
 #-- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #-- SOFTWARE.
 #------------------------------------------------------------------------------
-#-- Project  : OpenHh - Open HDL hub
+#-- Project  : TCLHDL
 #-- Author   : Paulo Machado <pffmachado@yahoo.com> 
-#-- Filename : tclhdl
+#-- Filename : mkpkgindex.tcl
 #------------------------------------------------------------------------------
 #-- File Description:
 #--
@@ -37,8 +37,5 @@
 #--
 #------------------------------------------------------------------------------
 
-
-
 set path_tclhdl [pwd]
-
 pkg_mkIndex "$path_tclhdl/src/tclhdl" *.tcl
