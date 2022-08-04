@@ -198,7 +198,7 @@ proc ::tclhdl::vivado::open_project {args} {
         current_run -implementation [get_runs $::tclhdl::vivado::project_synth]
 
         set obj [get_projects $::tclhdl::vivado::project_name]
-        if { [expr $::tclhdl::vivado::project_tool_version > 2018.0] } {
+        if { [expr [regsub {_.*} $::tclhdl::vivado::project_tool_version ""] > 2018.0] } {
             log::log debug "xilinx::open_project: Setting ip output - version $::tclhdl::vivado::project_tool_version"
             set_property "ip_cache_permissions" "read write" $obj
             set_property "ip_output_repo" "$::tclhdl::vivado::project_name.cache/ip" $obj
