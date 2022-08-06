@@ -170,11 +170,10 @@ proc ::tclhdl::libero::open_project {args} {
         file delete -force "$::env(HOME)/.config/Actel"
         file delete -force {*}[glob $::env(HOME)/.actel*]
         file mkdir "$current_dir/vault"
-        if { [catch {eval add_vault -location "$current_dir/vault" -set_as_default "TRUE" }] } {
-            log::log debug "libero::open_project: Change vault"
-        }
     }
-
+    if { [catch {eval add_vault -location "$current_dir/vault" -set_as_default "TRUE" }] } {
+        log::log debug "libero::open_project: Add vault"
+    }
 }
 
 #------------------------------------------------------------------------------
