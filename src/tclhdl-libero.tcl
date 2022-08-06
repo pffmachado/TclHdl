@@ -160,18 +160,19 @@ proc ::tclhdl::libero::open_project {args} {
 
         #-- Set Project to Close
         set ::tclhdl::libero::is_project_closed 1
-    }
 
-    #-- Vault Specification
-    #-- FIXME: Setting once (and same) the vault seams not work when we pass here
-    #-- multiple times, then we set twice became the vault always different.
-    log::log debug "libero::open_project: Force Vault at $::env(HOME)/.microsemi/libero/vault"
-    file delete -force "$::env(HOME)/.microsemi/libero/vault"
-    file mkdir "$::env(HOME)/.microsemi/libero/vault"
-    if { [catch {exec >&@stdout change_vault_location -location "$::env(HOME)/.microsemi/libero/vault"}] } {
-        log::log debug "libero::open_project: Force Vault at $::env(HOME)/.microsemi/libero/vault"
+        #-- Vault Specification
+        #-- FIXME: Setting once (and same) the vault seams not work when we pass here
+        #-- multiple times, then we set twice became the vault always different.
+        log::log debug "libero::open_project: Force Vault at $current_dir/vault"
+        file mkdir "$current_dir/vault"
+        change_vault_location -location "$current_dir/vault
+        #file mkdir "$::env(HOME)/.microsemi/libero/vault"
+        #change_vault_location -location "/.microsemi/libero/vault
+        #if { [catch {exec >&@stdout change_vault_location -location "$current_dir/vault"}] } {
+        #    log::log debug "libero::open_project: Force Vault at $current_dir/vault"
+        #}
     }
-
 }
 
 #------------------------------------------------------------------------------
