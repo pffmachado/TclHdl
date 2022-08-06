@@ -163,7 +163,8 @@ proc ::tclhdl::libero::open_project {args} {
 
         #-- Vault Specification
         log::log debug "libero::open_project: Force Vault at $current_dir/vault"
-        file delete -force "$::env(HOME)/.actel/ipmgr.ini"
+        file delete -force "$::env(HOME)/.config/Actel"
+        file delete -force "$::env(HOME)/.actel"
         file mkdir "$current_dir/vault"
         change_vault_location -location "$current_dir/vault"
     }
