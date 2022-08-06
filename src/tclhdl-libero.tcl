@@ -161,11 +161,15 @@ proc ::tclhdl::libero::open_project {args} {
         #-- Set Project to Close
         set ::tclhdl::libero::is_project_closed 1
 
-        #-- Vault Specification
-        log::log debug "libero::open_project: Force Vault at $current_dir/vault"
-        file mkdir "$current_dir/vault"
-        change_vault_location -location "$current_dir/vault"
     }
+
+    #-- Vault Specification
+    
+    log::log debug "libero::open_project: Force Vault at $current_dir/vault"
+    file delete -force "$::env(HOME)/.actel/ipmgr.ini"
+    file mkdir "$current_dir/vault"
+    change_vault_location -location "$current_dir/vault"
+
 }
 
 #------------------------------------------------------------------------------
