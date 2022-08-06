@@ -164,7 +164,7 @@ proc ::tclhdl::libero::open_project {args} {
         #-- Vault Specification
         log::log debug "libero::open_project: Force Vault at $current_dir/vault"
         file mkdir "$current_dir/vault"
-        add_vault -location "$current_dir/vault" -set_as_default "TRUE"
+        change_vault_location -location "$current_dir/vault"
     }
 }
 
