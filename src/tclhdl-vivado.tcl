@@ -162,6 +162,10 @@ proc ::tclhdl::vivado::open_project {args} {
     log::log debug "xilinx::open_project: Trying to open project $::tclhdl::vivado::project_name"
     get_project_tool_version
 
+    set ::tclhdl::vivado::project_jobs [::tclhdl::utils::ncpu]
+    set ::tclhdl::vivado::project_threads $::tclhdl::vivado::project_jobs
+    log::log debug "xilinx::open_project: Set number of threads $::tclhdl::vivado::project_jobs"
+
     if { [file exists "$::tclhdl::vivado::project_name.xpr"] } {
         set current_dir [pwd]
         log::log debug "xilinx::open_project: We are at $current_dir"
@@ -292,6 +296,13 @@ proc ::tclhdl::vivado::set_project_flow_synth {flow} {
 proc ::tclhdl::vivado::set_project_flow_impl {flow} {
     global ::tclhdl::vivado::project_flow_impl
     set ::tclhdl::vivado::project_flow_impl $flow
+}
+
+proc ::tclhdl::vivado::set_project_jobs {jobs} {
+    global ::tclhdl::vivado::project_jobs
+    global ::tclhdl::vivado::project_threads
+    set ::tclhdl::vivado::project_jobs $jobs
+    set ::tclhdl::vivado::project_threads $jobs
 }
 
 #------------------------------------------------------------------------------
