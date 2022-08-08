@@ -163,10 +163,10 @@ proc ::tclhdl::vivado::open_project {args} {
     get_project_tool_version
 
     set ::tclhdl::vivado::project_jobs [::tclhdl::utils::ncpu]
-    set ::tclhdl::vivado::project_threads $::tclhdl::vivado::project_jobs
-    if { $::tclhdl::vivado::project_threads > 32 } {
-        set ::tclhdl::vivado::project_threads 32
+    if { $::tclhdl::vivado::project_jobs > 32 } {
+        set ::tclhdl::vivado::project_jobs 32
     }
+    set ::tclhdl::vivado::project_threads $::tclhdl::vivado::project_jobs
     log::log debug "xilinx::open_project: Set number of threads $::tclhdl::vivado::project_jobs"
 
     if { [file exists "$::tclhdl::vivado::project_name.xpr"] } {
