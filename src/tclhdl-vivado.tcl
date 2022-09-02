@@ -167,6 +167,9 @@ proc ::tclhdl::vivado::open_project {args} {
         set ::tclhdl::vivado::project_jobs 32
     }
     set ::tclhdl::vivado::project_threads $::tclhdl::vivado::project_jobs
+    if { $::tclhdl::vivado::project_threads > 8 } {
+        set ::tclhdl::vivado::project_threads 8
+    }
     log::log debug "xilinx::open_project: Set number of threads $::tclhdl::vivado::project_jobs"
 
     if { [file exists "$::tclhdl::vivado::project_name.xpr"] } {
