@@ -57,8 +57,14 @@ set runtime_prog "tclsh"
 set runtime_system $tcl_platform(os)
 
 lappend auto_path "$path_tclhdl/src"
-if { $runtime_system == "Linux" && [file isdirectory $path_tcllib_linux] } {
-    lappend auto_path $path_tcllib_linux
+if { $runtime_system == "Linux"  } {
+    if { [file isdirectory $path_tcllib_linux] } {
+        lappend auto_path $path_tcllib_linux
+    } elseif { [file isdirectory [file readlink $path_tcllib_linux]] } {
+        lappend auto_path [file readlink $path_tcllib_linux]
+    } else {
+        puts "tcllib is not available"
+    }
 }
 
 #TODO: ActiveTcl needs to be reviewed and tested
