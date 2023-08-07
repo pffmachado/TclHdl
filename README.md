@@ -33,12 +33,12 @@ the UseHdl.cmake module intend to generate the TclHdl project structure.
 
 ## Status
 The project is under development and there is no release available.
-It is already possible to use for Quartus II, Vivado, ISE and Diamond.
+It is already possible to use for Quartus II, Vivado, ISE, Diamond and Libero.
 The development environment is being done on Linux (Arch Linux) and compatibility
 tests are being carried out on Windows 10.
 ModelSim support to Vivado is now available as well as the integration with VUnit
 framework.
-Microsemi Libero (tested on version 2022.3) is now supported.
+Microsemi Libero (tested on version 2022.3 and 2023.1) is now supported.
 FlexLM handler on Linux hosts is now provided however it needs to be properly
 supported inside of tclhdl.
 
@@ -62,6 +62,7 @@ supported inside of tclhdl.
 ## Project Documentation
 
 * [TCLDHL](https://pffmachado.github.io/TclHdl)
+* **Note:** The documention is still not available
 
 ## Related Projects
 
