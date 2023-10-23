@@ -109,7 +109,7 @@ function(add_hdl _TARGET_NAME)
     cmake_parse_arguments(_add_hdl
         ""
         "VENDOR;TOOL;SIMULATOR;VERSION;REVISION;OUTPUT_DIR;OUTPUT_NAME"
-        "VHDL;VHDL_2008;VERILOG;SYSTEMVERILOG;COEFF;TCL;TCLHDL;SOURCES;PRE;POST;SETTINGS;TCL_SETTINGS;FLOW;SOURCEDIR;IPDIR;CONSTRAINTDIR;SETTINGDIR;SCRIPTDIR;COREGEN;XCI;XCO;XCO_UPGRADE;QSYS;IPTCL;CXF;IPX;UCF;XDC;SDC;SDF;LPF;PDC_FP;PDC_IO"
+        "VHDL;VHDL_2008;VERILOG;SYSTEMVERILOG;COEFF;TCL;TCLHDL;SOURCES;PRE;POST;SETTINGS;TCL_SETTINGS;FLOW;SOURCEDIR;IPDIR;CONSTRAINTDIR;SETTINGDIR;SCRIPTDIR;COREGEN;XCI;BD;XCO;XCO_UPGRADE;QSYS;IPTCL;CXF;IPX;UCF;XDC;SDC;SDF;LPF;PDC_FP;PDC_IO"
         ${ARGN}
         )
 
@@ -160,6 +160,7 @@ function(add_hdl _TARGET_NAME)
     set (_HDL_TCL_SETTINGS 	            ${_add_hdl_TCL_SETTINGS})
     set (_HDL_COREGEN_FILES 	        ${_add_hdl_COREGEN})
     set (_HDL_XCI_FILES 	            ${_add_hdl_XCI})
+    set (_HDL_BD_FILES 	              ${_add_hdl_BD})
     set (_HDL_XCO_FILES 	            ${_add_hdl_XCO})
     set (_HDL_XCO_UPGRADE_FILES         ${_add_hdl_XCO_UPGRADE})
     set (_HDL_IPX_FILES 	            ${_add_hdl_IPX})
@@ -258,6 +259,7 @@ function(add_hdl _TARGET_NAME)
     _tclhdl_add_file (FUNCTION "add_post"       TYPE ""                    FILES ${_HDL_POST_FILES}               OUTPUT ${CMAKE_HDL_TCLHDL_FILE_POST})
     _tclhdl_add_file (FUNCTION "add_ip"         TYPE "COREGEN"             FILES ${_HDL_COREGEN_FILES}            OUTPUT ${CMAKE_HDL_TCLHDL_FILE_IP})
     _tclhdl_add_file (FUNCTION "add_ip"         TYPE "XCI"                 FILES ${_HDL_XCI_FILES}                OUTPUT ${CMAKE_HDL_TCLHDL_FILE_IP})
+    _tclhdl_add_file (FUNCTION "add_ip"         TYPE "BD"                  FILES ${_HDL_BD_FILES}                 OUTPUT ${CMAKE_HDL_TCLHDL_FILE_IP})
     _tclhdl_add_file (FUNCTION "add_ip"         TYPE "XCO"                 FILES ${_HDL_XCO_FILES}                OUTPUT ${CMAKE_HDL_TCLHDL_FILE_IP})
     _tclhdl_add_file (FUNCTION "add_ip"         TYPE "XCO_UPGRADE"         FILES ${_HDL_XCO_UPGRADE_FILES}        OUTPUT ${CMAKE_HDL_TCLHDL_FILE_IP})
     _tclhdl_add_file (FUNCTION "add_ip"         TYPE "QSYS"                FILES ${_HDL_QSYS_FILES}               OUTPUT ${CMAKE_HDL_TCLHDL_FILE_IP})

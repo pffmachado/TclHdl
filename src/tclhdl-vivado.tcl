@@ -95,6 +95,8 @@ namespace eval ::tclhdl::vivado {
     namespace export ip_generate 
     namespace export ip_add
 
+    namespace export bd_add
+
     namespace export hw_programming
 
     #---------------------------------------------------------------------------
@@ -527,6 +529,17 @@ proc ::tclhdl::vivado::ip_add {type src} {
     generate_target all [get_ips $ipname_dir]
     create_ip_run [get_ips $ipname_dir]
     log::log debug "xilinx::ip_add: Done"
+}
+
+#-------------------------------------------------------------------------------
+## Adding Block Design Files
+#
+#-------------------------------------------------------------------------------
+proc ::tclhdl::vivado::bd_add {type src} {
+    log::log debug "xilinx:bd_add: Add $type $src"
+    read_bd $src
+    set wrapper_path [make_wrapper -fileset $::tclhdl::vivado::project_fileset_source -files [ get_files -norecurse $src] -top]
+    add_files -norecurse -fileset $::tclhdl::vivado::project_fileset_source $wrapper_path
 }
 
 #-------------------------------------------------------------------------------

@@ -349,6 +349,10 @@ proc ::tclhdl::add_ip {type src} {
                     log::log debug "add_ip: Adding ip type $type - $src"
                     ::tclhdl::vivado::ip_add $type $src
                 }
+                BD {
+                    log::log debug "add_ip: Adding block design type $type - $src"
+                    ::tclhdl::vivado::bd_add $type $src
+                }
                 default {
                     log::logMsg "add_ip: No IP type defined for $ip_file"
                 }
