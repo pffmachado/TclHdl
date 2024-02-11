@@ -61,7 +61,6 @@ supported inside of tclhdl.
 
 ## Project Documentation
 
-* [TCLDHL](https://pffmachado.github.io/TclHdl)
 * **Note:** The documention is still not available
 
 ## Related Projects
