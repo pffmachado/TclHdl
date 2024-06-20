@@ -252,6 +252,11 @@ proc ::tclhdl::get_project_list {tclhdl_dir} {
 proc ::tclhdl::add_source {type src} {
     check_simulation
     check_project_created
+
+    if { ! [file exists "$src"] } {
+	    log::log debug "add_source: File $src does not exists"
+	    exit 1
+    }
     switch $::tclhdl::project_tool {
         INTEL_QUARTUS {
             check_quartus
