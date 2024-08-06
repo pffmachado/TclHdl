@@ -37,27 +37,42 @@
 #--
 #------------------------------------------------------------------------------
 
-
 LM_PATH=$(dirname $(readlink -f ${BASH_SOURCE[0]}))
 FEATURE=$1
-LICENSE_FILE=
+LICENSE_FILE=""
 
-LICSRV=$(${LM_PATH}/lmutil lmstat | grep 'License server status:' | awk '{print $4}')
+LICNR=1
+LICSRV=$(${LM_PATH}/lmutil lmstat | grep 'License server status:' | awk '{print $4}' | sort -R)
+
+nr=0
 for lic in $LICSRV;
 do
+
     feature_license=$(${LM_PATH}/lmutil lmstat -c $lic -f $FEATURE | grep $FEATURE)
     if [ -z "$feature_license" ];
     then
-	continue
+      continue
     fi
+
+    nr=$((nr+1))
 
     feature_license_issued=$(echo $feature_license | sed 's/.* (\(.*\))/\1/' | sed 's/;  /;/' | tr ";" "\n" | awk '{print $3}' | sed -n 1p)
     feature_license_used=$(echo $feature_license | sed 's/.* (\(.*\))/\1/' | sed 's/;  /;/' | tr ";" "\n" | awk '{print $3}' | sed -n 2p)
     if [ $feature_license_issued -gt $feature_license_used ];
     then
-        LICENSE_FILE=$lic
-        break
+      if [ $nr -eq 1 ];
+      then
+                LICENSE_FILE="$lic"
+      else
+                LICENSE_FILE="$LICENSE_FILE:$lic"
+      fi
+
+      if [ $nr -ge $LICNR ];
+      then
+          break
+      fi
     fi
+
 done
 
 echo $LICENSE_FILE
