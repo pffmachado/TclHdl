@@ -382,11 +382,15 @@ function(add_hdl _TARGET_NAME)
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
+    set_property(TARGET "${_TARGET_NAME}-shell" PROPERTY FOLDER "TclHdl")
+
     add_custom_target (${_TARGET_NAME}-ip
         COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
         ${CMAKE_HDL_COMMAND} ${_TCLHDL_IP} ${CMAKE_HDL_COMMAND_END}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
+
+    set_property(TARGET "${_TARGET_NAME}-ip" PROPERTY FOLDER "TclHdl")
 
     add_custom_target (${_TARGET_NAME}-generate
         COMMAND
@@ -396,11 +400,15 @@ function(add_hdl _TARGET_NAME)
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
+    set_property(TARGET "${_TARGET_NAME}-generate" PROPERTY FOLDER "TclHdl")
+
     add_custom_target (${_TARGET_NAME}-report
         COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
         ${CMAKE_HDL_COMMAND} ${_TCLHDL_BUILD} ${CMAKE_HDL_COMMAND_END}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
+
+    set_property(TARGET "${_TARGET_NAME}-report" PROPERTY FOLDER "TclHdl")
 
     add_custom_target (${_TARGET_NAME}-bitstream
         COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
@@ -408,17 +416,23 @@ function(add_hdl _TARGET_NAME)
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
+    set_property(TARGET "${_TARGET_NAME}-bitstream" PROPERTY FOLDER "TclHdl")
+
     add_custom_target (${_TARGET_NAME}-program
         COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
         ${CMAKE_HDL_COMMAND} ${_TCLHDL_PROGRAM} ${CMAKE_HDL_COMMAND_END}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
+    set_property(TARGET "${_TARGET_NAME}-program" PROPERTY FOLDER "TclHdl")
+
     add_custom_target (${_TARGET_NAME}-clean
         COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
         ${CMAKE_HDL_COMMAND} ${_TCLHDL_CLEAN} ${CMAKE_HDL_COMMAND_END}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
+
+    set_property(TARGET "${_TARGET_NAME}-clean" PROPERTY FOLDER "TclHdl")
 
     add_custom_target (${_TARGET_NAME}-simlib
         COMMAND
@@ -428,11 +442,15 @@ function(add_hdl _TARGET_NAME)
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
+    set_property(TARGET "${_TARGET_NAME}-simlib" PROPERTY FOLDER "TclHdl")
+
     add_custom_target (${_TARGET_NAME}
         COMMAND ${CMAKE_HDL_SYSTEM_SOURCE} ${_VENDOR_SOURCE} &&
         ${CMAKE_HDL_COMMAND} ${_TCLHDL_BUILD} ${CMAKE_HDL_COMMAND_END}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
+
+    set_property(TARGET "${_TARGET_NAME}" PROPERTY FOLDER "TclHdl")
 
 endfunction()
 
@@ -584,6 +602,8 @@ function(add_hdl_simulation _TARGET_NAME)
         ${_VENDOR_TOOL} ${_TCLHDL_TOOL} ${_VENDOR_ARGS} ${_TCLHDL_DEBUG} ${_TCLHDL_SIMULATION} ${_HDL_SETTINGS_NAME} ${_TCLHDL_SIMULATION_SETTINGS} ${_HDL_TCL_FILES} ${_TCLHDL_PROJECT} ${_TARGET_NAME}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
+
+    set_property(TARGET "${_TARGET_NAME}-${_HDL_SETTINGS_NAME}" PROPERTY FOLDER "TclHdl")
 
     add_test(
         NAME ${_HDL_SETTINGS_NAME}
