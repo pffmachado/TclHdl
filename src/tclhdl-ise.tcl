@@ -148,16 +148,29 @@ proc ::tclhdl::ise::open_project {args} {
 
     log::log debug "ise::open_project: Trying to open project $::tclhdl::ise::project_name"
 
-    if { [file exists "$::tclhdl::ise::project_name.xise"] } {
+    if { [file exists "$::tclhdl::ise::project_name.xise"] || [file exists "$::tclhdl::ise::project_name.ise"] } {
         log::log debug "ise::open_project: We are at $current_dir"
-        log::log debug "ise::open_project: Open project $::tclhdl::ise::project_name.xise"
-        project open "$::tclhdl::ise::project_name.xise"
+        set project_file [glob -type f "$::tclhdl::ise::project_name.*"]
+        set project_ext [file extension $project_file]
+        log::log debug "ise::open_project: Open project $::tclhdl::ise::project_name$project_ext"
+        project open "$::tclhdl::ise::project_name$project_ext"
         set ::tclhdl::ise::is_project_closed 1
     } else {
         log::log debug "ise::open_project: New project $::tclhdl::ise::project_name"
         project new $::tclhdl::ise::project_name
-        project set "Cores Search Directories" "$::tclhdl::project_build_ip_dir" -process "Synthesize - XST"
-        project set "Work Directory" "$current_dir/xst" -process "Synthesize - XST"
+
+        #-- Check if property exists and set it
+        #-- The following properties do not exist in all versions of ISE (<=10.1)
+        foreach prop [project properties] {
+          if { [string match "*$prop*" "Cores Search Directories"] } {
+            log::log debug "ise::open_project: Set project Cores Search Directories to $::tclhdl::ise::project_build_ip_dir"
+            project set "Cores Search Directories" "$::tclhdl::project_build_ip_dir" -process "Synthesize - XST"
+          }
+          if { [string match "*$prop*" "Work Directory"] } {
+            log::log debug "ise::open_project: Set project Work Directory $::tclhdl::ise::project_current_build_dir/xst"
+            project set "Work Directory" "$current_dir/xst" -process "Synthesize - XST"
+          }
+        } 
 
         #-- Set Project to Close
         set ::tclhdl::ise::is_project_closed 1
@@ -176,7 +189,9 @@ proc ::tclhdl::ise::close_project {} {
 
     if {$::tclhdl::ise::is_project_closed} {
         log::log debug "ise::project_close:: Project Closed"
-        project save
+        if { [catch {project save}] } {
+          log::log debug "ise::project_close:: Save subcommnad does not exists, likelly ISE <= 10.1"
+        }
         project close
     }
 }
