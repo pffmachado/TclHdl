@@ -163,7 +163,7 @@ proc ::tclhdl::ise::open_project {args} {
         #-- The following properties do not exist in all versions of ISE (<=10.1)
         foreach prop [project properties] {
           if { [string match "*$prop*" "Cores Search Directories"] } {
-            log::log debug "ise::open_project: Set project Cores Search Directories to $::tclhdl::ise::project_build_ip_dir"
+            log::log debug "ise::open_project: Set project Cores Search Directories to $::tclhdl::project_build_ip_dir"
             project set "Cores Search Directories" "$::tclhdl::project_build_ip_dir" -process "Synthesize - XST"
           }
           if { [string match "*$prop*" "Work Directory"] } {
