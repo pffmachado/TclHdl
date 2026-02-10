@@ -150,8 +150,11 @@ proc ::tclhdl::ise::open_project {args} {
 
     if { [file exists "$::tclhdl::ise::project_name.xise"] || [file exists "$::tclhdl::ise::project_name.ise"] } {
         log::log debug "ise::open_project: We are at $current_dir"
-        set project_file [glob -type f "$::tclhdl::ise::project_name.*"]
-        set project_ext [file extension $project_file]
+        if { [file exists "$::tclhdl::ise::project_name.xise"] } {
+          set project_ext ".xise"
+        } else {
+          set project_ext ".ise"
+        }
         log::log debug "ise::open_project: Open project $::tclhdl::ise::project_name$project_ext"
         project open "$::tclhdl::ise::project_name$project_ext"
         set ::tclhdl::ise::is_project_closed 1
