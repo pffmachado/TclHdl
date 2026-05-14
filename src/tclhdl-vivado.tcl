@@ -519,11 +519,13 @@ proc ::tclhdl::vivado::ip_add {type src} {
     log::log debug "xilinx::ip_add: set properties  $file_obj"
     set_property "is_enabled" "1" $file_obj
     set_property "is_global_include" "0" $file_obj
-    set_property "library" "xil_defaultlib" $file_obj
     set_property "path_mode" "RelativeFirst" $file_obj
     set_property "used_in_synthesis" "1" $file_obj
     set_property "used_in_implementation" "1" $file_obj
     set_property "used_in_simulation" "1" $file_obj
+    if { [expr [regsub {_.*} $::tclhdl::vivado::project_tool_version ""] < 2025.1] } {
+      set_property "library" "xil_defaultlib" $file_obj
+    }
 
     log::log debug "xilinx::ip_add: create runs  $file_obj"
     generate_target all [get_ips $ipname_dir]
