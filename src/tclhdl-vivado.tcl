@@ -508,10 +508,22 @@ proc ::tclhdl::vivado::ip_add {type src} {
     read_ip $src
 
     log::log debug "xilinx::ip_add: ip $ip"
-    set file_obj [get_files -of_objects [get_filesets $::tclhdl::vivado::project_fileset_source] [list "*$ipname"]]
+    set source_fileset [get_filesets $::tclhdl::vivado::project_fileset_source]
+    set src_norm [file normalize $src]
+    set file_obj [get_files -of_objects $source_fileset [list $src_norm]]
+    if { [llength $file_obj] == 0 } {
+        set file_obj [get_files -of_objects $source_fileset [list $ip]]
+    }
+    if { [llength $file_obj] != 1 } {
+        log::log error "xilinx::ip_add: unable to resolve a unique file object for '$src'"
+        log::log error "xilinx::ip_add: candidates: $file_obj"
+        exit 1
+    }
 
     log::log debug "xilinx::ip_add: check if is locked"
-    if { [get_property "is_locked" $file_obj] } {
+    set is_locked [get_property "is_locked" $file_obj]
+    log::log debug "xilinx::ip_add: check $file_obj is_locked $is_locked"
+    if { $is_locked } {
         log::log debug "xilinx::ip_add: locked ip needs to be upgrade $ipname_dir"
         upgrade_ip [get_ips $ipname_dir]
     }
