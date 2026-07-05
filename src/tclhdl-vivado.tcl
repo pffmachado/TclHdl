@@ -229,12 +229,25 @@ proc ::tclhdl::vivado::open_project {args} {
 proc ::tclhdl::vivado::close_project {} {
     global ::tclhdl::vivado::is_project_closed
     global ::tclhdl::vivado::is_project_assignments
+    global ::tclhdl::vivado::project_tool_version
 
     log::log debug "xilinx::project_close:: Closing project $::tclhdl::vivado::project_name"
 
     if {$::tclhdl::vivado::is_project_closed} {
-        log::log debug "xilinx::project_close:: Project Closed"
-        ::close_project
+        set vivado_version [regsub {_.*} $::tclhdl::vivado::project_tool_version ""]
+        if { [string trim $vivado_version] eq "" } {
+            get_project_tool_version
+            set vivado_version [regsub {_.*} $::tclhdl::vivado::project_tool_version ""]
+        }
+
+        if { [expr $vivado_version > 2025.1] } {
+            # Vivado > 2025.1 can fail during close_project when QoR suggestion
+            # scripts execute (e.g. "can't set \"params\": variable is array").
+            # Skip close to avoid non-actionable teardown failures at end of flow.
+            log::log debug "xilinx::project_close:: Skipping close_project for Vivado $vivado_version"
+        } else {
+            ::close_project
+        }
     }
 }
 
